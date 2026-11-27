@@ -1,0 +1,52 @@
+# Local development: `docker compose up` starts the database, cache, API and web app.
+# API:  http://localhost:8000/api/v1/health    Web: http://localhost:5173
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: simuwork
+      POSTGRES_PASSWORD: simuwork
+      POSTGRES_DB: simuwork
+    ports: ['5432:5432']
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U simuwork']
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    ports: ['6379:6379']
+
+  api:
+    build: ./api
+    working_dir: /app
+    volumes: ['./api:/app']
+    environment:
+      DB_HOST: postgres
+      REDIS_HOST: redis
+    ports: ['8000:8000']
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    command: >
+      sh -c "[ -f .env ] || cp .env.example .env;
+             composer install --no-interaction &&
+             php artisan key:generate --no-interaction --force -q || true;
+             php artisan migrate --force &&
+             php artisan serve --host=0.0.0.0 --port=8000"
+
+  web:
+    image: node:22
+    working_dir: /app
+    volumes: ['./:/app']
+    environment:
+      VITE_API_URL: http://localhost:8000
+    ports: ['5173:5173']
+    command: sh -c "npm install && npm run dev:web -- --host 0.0.0.0"
+    depends_on: [api]
+
+volumes:
+  pgdata:

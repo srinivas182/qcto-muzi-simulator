@@ -1,0 +1,32 @@
+/* Design tokens — keep in sync with tokens.ts. Tenant branding overrides only the --brand-* variables. */
+:root {
+  --color-midnight: #0d1230;
+  --color-midnight-2: #161c45;
+  --color-indigo: #4b45d6;
+  --color-indigo-light: #eeedfc;
+  --color-gold: #c9a24b;
+  --color-gold-light: #fbf5e6;
+  --color-emerald: #12a27c;
+  --color-emerald-light: #e6f6f1;
+  --color-coral: #e5484d;
+  --color-coral-light: #fdecec;
+  --color-amber: #e8a21b;
+  --color-amber-light: #fdf4e1;
+  --color-sky: #2f80ed;
+  --color-sky-light: #e9f2fe;
+  --color-ink: #151933;
+  --color-muted: #6b7090;
+  --color-line: #e9eaf2;
+  --color-canvas: #f5f6fa;
+
+  /* Tenant-overridable brand layer (set per provider in Sprint 1.5) */
+  --brand-primary: var(--color-indigo);
+  --brand-accent: var(--color-gold);
+  --brand-nav: var(--color-midnight);
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Lora', Georgia, serif;
+}
