@@ -261,8 +261,8 @@ const af: Messages = {
   'm.me.appearance': "Voorkoms",
   'm.me.version': "Weergawe {version}",
   'm.me.signOutConfirm': "Teken uit by {academy}?",
-  'm.staff.title': "Jou gereedskap is op die web",
-  'm.staff.body': "Jou rol werk die beste op 'n groter skerm. Maak {host} op 'n rekenaar of tablet oop. Selfoongereedskap vir jou rol kom in 'n latere opdatering.",
+  'm.staff.title': "Jou gereedskap is voorlopig op die web",
+  'm.staff.body': "Maak {host} in jou foon se blaaier of op 'n rekenaar oop. Dit werk op enige skerm. Jou gereedskap kom in 'n latere opdatering na hierdie toep.",
   'm.staff.open': "Maak die webportaal oop",
 };
 

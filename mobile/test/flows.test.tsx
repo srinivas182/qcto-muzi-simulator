@@ -76,7 +76,7 @@ describe('sign-in', () => {
     await seed({ signedIn: true });
     mockApi({ '/session': { data: session({ permissions: ['classes.view', 'attendance.mark'] }) } });
     await renderRouter('./app', { initialUrl: '/home' });
-    expect(await screen.findByText('Your tools are on the web')).toBeOnTheScreen();
+    expect(await screen.findByText('Your tools are on the web for now')).toBeOnTheScreen();
     expect(screen.queryByRole('tab', { name: 'Simulate' })).toBeNull();
     expect(screen.getByRole('tab', { name: 'Me' })).toBeOnTheScreen();
   });

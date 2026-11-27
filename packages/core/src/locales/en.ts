@@ -259,8 +259,8 @@ const en = {
   'm.me.appearance': "Appearance",
   'm.me.version': "Version {version}",
   'm.me.signOutConfirm': "Sign out of {academy}?",
-  'm.staff.title': "Your tools are on the web",
-  'm.staff.body': "Your role works best on a bigger screen. Open {host} on a computer or tablet. Mobile tools for your role arrive in a later update.",
+  'm.staff.title': "Your tools are on the web for now",
+  'm.staff.body': "Open {host} in your phone's browser or on a computer. It works on any screen. Your tools come to this app in a later update.",
   'm.staff.open': "Open the web portal",
 } as const;
 
