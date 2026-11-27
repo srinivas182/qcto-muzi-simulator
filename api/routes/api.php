@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\DomainAllowedController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\Programmes\CatalogueController;
 use App\Http\Controllers\Api\V1\Programmes\PlatformProgrammeController;
+use App\Http\Controllers\Api\V1\Programmes\ProgrammeStudioController;
 use App\Http\Controllers\Api\V1\Programmes\ReferencePageController;
 use Illuminate\Support\Facades\Route;
 
@@ -117,12 +118,35 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::get('/programmes', [PlatformProgrammeController::class, 'index'])->name('programmes.index');
                 Route::get('/programmes/{programme}', [PlatformProgrammeController::class, 'show'])->name('programmes.show');
                 Route::get('/programmes/{programme}/versions/{number}', [PlatformProgrammeController::class, 'version'])->whereNumber('number')->name('programmes.version');
+                Route::get('/programmes/{programme}/compare', [ProgrammeStudioController::class, 'compare'])->name('programmes.compare');
                 Route::get('/reference-pages', [ReferencePageController::class, 'index'])->name('reference-pages.index');
                 Route::get('/reference-pages/{page}', [ReferencePageController::class, 'show'])->name('reference-pages.show');
             });
             Route::get('/support-sessions', [SupportSessionController::class, 'index'])->middleware('permission:support.login')->name('support-sessions.index');
             Route::post('/support-sessions', [SupportSessionController::class, 'store'])->middleware('permission:support.login')->name('support-sessions.store');
             Route::delete('/support-sessions/{session}', [SupportSessionController::class, 'destroy'])->middleware('permission:support.login')->name('support-sessions.destroy');
+
+            // Programme Studio: authors edit drafts, reviewers approve or send back, publishers publish.
+            Route::prefix('/programmes/{programme}/draft')->name('programmes.draft.')->group(function (): void {
+                Route::middleware('permission:programmes.manage|content.author')->group(function (): void {
+                    Route::post('/', [ProgrammeStudioController::class, 'start'])->name('start');
+                    Route::patch('/', [ProgrammeStudioController::class, 'update'])->name('update');
+                    Route::delete('/', [ProgrammeStudioController::class, 'discard'])->name('discard');
+                    Route::post('/duty-areas', [ProgrammeStudioController::class, 'addDutyArea'])->name('duty-areas.store');
+                    Route::patch('/duty-areas/{number}', [ProgrammeStudioController::class, 'updateDutyArea'])->whereNumber('number')->name('duty-areas.update');
+                    Route::delete('/duty-areas/{number}', [ProgrammeStudioController::class, 'removeDutyArea'])->whereNumber('number')->name('duty-areas.destroy');
+                    Route::post('/duty-areas/{number}/outcomes', [ProgrammeStudioController::class, 'addOutcome'])->whereNumber('number')->name('outcomes.store');
+                    Route::patch('/outcomes/{code}', [ProgrammeStudioController::class, 'updateOutcome'])->name('outcomes.update');
+                    Route::delete('/outcomes/{code}', [ProgrammeStudioController::class, 'removeOutcome'])->name('outcomes.destroy');
+                    Route::post('/duty-areas/{number}/evidence', [ProgrammeStudioController::class, 'addEvidence'])->whereNumber('number')->name('evidence.store');
+                    Route::patch('/evidence/{id}', [ProgrammeStudioController::class, 'updateEvidence'])->whereUuid('id')->name('evidence.update');
+                    Route::delete('/evidence/{id}', [ProgrammeStudioController::class, 'removeEvidence'])->whereUuid('id')->name('evidence.destroy');
+                    Route::post('/submit', [ProgrammeStudioController::class, 'submit'])->name('submit');
+                });
+                Route::post('/approve', [ProgrammeStudioController::class, 'approve'])->middleware('permission:content.review')->name('approve');
+                Route::post('/request-changes', [ProgrammeStudioController::class, 'requestChanges'])->middleware('permission:content.review')->name('request-changes');
+                Route::post('/publish', [ProgrammeStudioController::class, 'publish'])->middleware('permission:content.publish')->name('publish');
+            });
         });
     });
 });

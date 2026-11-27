@@ -30,6 +30,8 @@ export const routes: RouteObject[] = [
           { path: 'hq', lazy: page(() => import('../pages/shared/Dashboard')) },
           { path: 'hq/roles', lazy: page(() => import('../pages/shared/Roles')) },
           { path: 'hq/audit', lazy: page(() => import('../pages/shared/Audit')) },
+          { path: 'hq/programmes', lazy: page(() => import('../pages/hq/Programmes')) },
+          { path: 'hq/programmes/:code', lazy: page(() => import('../pages/hq/ProgrammeDetail')) },
           { path: 'learn', lazy: page(() => import('../pages/learn/LearnHome')) },
           { path: '*', element: <Fallback /> },
         ],

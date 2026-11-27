@@ -42,7 +42,7 @@ final class PlatformProgrammeController extends Controller
         return response()->json(['data' => [
             'programme' => ['code' => $programme->code, 'prefix' => $programme->prefix, 'title' => $programme->title, 'family' => $programme->family, 'status' => $programme->status],
             'versions' => $versions,
-            'current' => $current ? ProgrammePresenter::version($current) : null,
+            'current' => $current ? ProgrammePresenter::studio($current) : null,
         ]]);
     }
 
@@ -50,6 +50,6 @@ final class PlatformProgrammeController extends Controller
     {
         $version = ProgrammeVersion::query()->where('programme_id', $programme->id)->where('number', $number)->firstOrFail();
 
-        return response()->json(['data' => ProgrammePresenter::version($version)]);
+        return response()->json(['data' => ProgrammePresenter::studio($version)]);
     }
 }

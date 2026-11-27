@@ -106,3 +106,79 @@ export interface SupportSessionRow {
   ended_by: string | null;
   active: boolean;
 }
+
+export interface ProgrammeSummary {
+  code: string;
+  prefix: string;
+  title: string;
+  family: string;
+  summary: string | null;
+  version: number | null;
+  published_at: string | null;
+  counts: { duty_areas: number; outcomes: number; evidence: number } | null;
+  status?: string;
+  draft?: { version: number; status: 'draft' | 'in_review' } | null;
+}
+
+export type EvidenceType = 'document' | 'photo' | 'observation' | 'sign_off' | 'feedback' | 'record';
+export type QualificationKind = 'occupational' | 'legacy' | 'skills_programme' | 'related' | 'note';
+export type VersionStatus = 'draft' | 'in_review' | 'published' | 'retired';
+
+export interface OutcomeItem {
+  code: string;
+  statement: string;
+  plain_words: string | null;
+}
+
+export interface EvidenceItem {
+  id: string;
+  description: string;
+  type: EvidenceType;
+  min_count: number;
+}
+
+export interface DutyAreaItem {
+  number: number;
+  title: string;
+  outcomes: OutcomeItem[];
+  evidence: EvidenceItem[];
+}
+
+export interface ProgrammeVersionContent {
+  programme: { code: string; prefix: string; title: string; family: string };
+  version: number;
+  status: VersionStatus;
+  summary: string;
+  purpose: string;
+  occupations: string[];
+  workplace_requirements: string[];
+  tools: string[];
+  to_confirm: string[];
+  source: { document?: string; publisher?: string; edition?: string; page?: number } | null;
+  change_notes: string | null;
+  published_at: string | null;
+  qualifications: { kind: QualificationKind; saqa_id: string | null; title: string | null; nqf_level: number | null; credits: number | null; source_text: string }[];
+  duty_areas: DutyAreaItem[];
+  review?: {
+    submitted_at: string | null;
+    submitted_by: string | null;
+    reviewed_at: string | null;
+    reviewed_by: string | null;
+    comment: string | null;
+    published_by: string | null;
+  };
+}
+
+export interface ProgrammeStudioData {
+  programme: { code: string; prefix: string; title: string; family: string; status: string };
+  versions: { version: number; status: VersionStatus; change_notes: string | null; published_at: string | null; created_at: string | null }[];
+  current: ProgrammeVersionContent | null;
+}
+
+export interface VersionChange {
+  area: 'overview' | 'duty_areas' | 'outcomes' | 'evidence';
+  change: 'added' | 'removed' | 'changed';
+  item: string;
+  before?: string | null;
+  after?: string | null;
+}
