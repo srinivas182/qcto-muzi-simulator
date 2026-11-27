@@ -81,3 +81,19 @@ It is rendered by the platform (not tenant-editable content) and covered by auto
   and stops when the session ends or expires. The provider sees every session (who, why, until when) and can end it.
   Mechanism: the database exposes the staff member's own user row inside the provider through `app.support_user_id`;
   nothing else of HQ becomes visible.
+
+## Sub-sprint 1.5 decisions (web shells)
+- **Separate web and mobile designs** (agreed with Srini, 27 Nov): shared foundations only (brand colours, type
+  scale, icon names, translations, footer wording). Mobile design system and shell move to **Sprint 1.6**.
+- **Web portals:** HQ (`admin.<domain>`), provider and learner. Role-aware menu from `config/navigation.php`;
+  pages outside a person's menu show "no access"; menu items not built yet show "on the way".
+- **Learners:** no admin sidebar; bottom tab bar on phones, top tabs on desktop.
+- **Branding page:** name, logo URL, primary/menu/accent colours with a WCAG AA contrast check (client and
+  API), default language, live phone preview. Audited.
+- **⌘K / Ctrl+K / "/"** quick search over pages and actions (language, theme, sign out).
+- **Dark mode** (system, light, dark) without a flash on load. Tenant colours never touch platform UI.
+- **Web sign-in uses an HttpOnly cookie** with an XHR-header CSRF check — see ADR 0002.
+- **POPIA consent gate** before anything else; **support banner** whenever HQ is viewing.
+- **Speed:** first-load JS ≈ 129 KB gzip (budget 170 KB); Lighthouse mobile 100 performance / 100
+  accessibility locally; enforced at ≥ 95 in CI.
+- **Demo data:** `php artisan db:seed --class=DemoSeeder` (README) for local runs and prospect demos.

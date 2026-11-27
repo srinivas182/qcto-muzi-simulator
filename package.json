@@ -1,7 +1,7 @@
 {
   "name": "simuwork",
   "private": true,
-  "description": "SimuWork (working name) — interactive workplace simulators and AI courses for QCTO occupational programmes. Developed and maintained by Mayura Consultancy Services.",
+  "description": "SimuWork (working name) \u2014 interactive workplace simulators and AI courses for QCTO occupational programmes. Developed and maintained by Mayura Consultancy Services.",
   "workspaces": [
     "web",
     "packages/*"
@@ -12,7 +12,8 @@
     "typecheck": "npm run typecheck -w web",
     "test": "npm run test -w web",
     "build": "npm run build -w web",
-    "size": "npm run size -w web"
+    "size": "npm run size -w web",
+    "lighthouse": "npm run lighthouse -w web"
   },
   "engines": {
     "node": ">=22"

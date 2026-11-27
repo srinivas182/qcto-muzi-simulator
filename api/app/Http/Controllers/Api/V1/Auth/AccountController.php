@@ -28,6 +28,16 @@ final class AccountController extends Controller
         return response()->json(['data' => $this->auth->present($this->user($request))]);
     }
 
+    /** Personal preferences, e.g. the app language. */
+    public function preferences(Request $request): JsonResponse
+    {
+        $data = $request->validate(['locale' => ['required', Rule::in(array_keys((array) config('app.locales')))]]);
+        $user = $this->user($request);
+        $user->forceFill(['locale' => $data['locale']])->save();
+
+        return response()->json(['data' => $this->auth->present($user)]);
+    }
+
     public function logout(Request $request): JsonResponse
     {
         $this->audit->record('auth.logout', $this->user($request));

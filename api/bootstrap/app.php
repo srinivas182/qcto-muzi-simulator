@@ -9,6 +9,7 @@ use App\Http\Middleware\EnsurePlatformStaff;
 use App\Http\Middleware\PlatformContext;
 use App\Http\Middleware\ResolveSupportSession;
 use App\Http\Middleware\ResolveTenant;
+use App\Http\Middleware\WebTokenCookie;
 use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -36,6 +37,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // decides whether a token's user is visible at this address at all.
         $middleware->prependToPriorityList(before: AuthenticatesRequests::class, prepend: ResolveTenant::class);
         $middleware->prependToPriorityList(before: AuthenticatesRequests::class, prepend: PlatformContext::class);
+        // The web app's sign-in cookie becomes the bearer token before anything else looks for one.
+        $middleware->api(prepend: WebTokenCookie::class);
+        $middleware->prependToPriorityList(before: ResolveTenant::class, prepend: WebTokenCookie::class);
         // HQ support tokens are recognised after the tenant is known and before the user is loaded.
         $middleware->prependToPriorityList(before: AuthenticatesRequests::class, prepend: ResolveSupportSession::class);
     })
