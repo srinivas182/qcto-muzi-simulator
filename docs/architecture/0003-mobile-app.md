@@ -32,8 +32,8 @@ The API issues a 60-day device token (`client=mobile`), stored in the Android Ke
 ## Speed budget
 - Hermes bytecode bundle ≤ 3.5 MB (currently ~2.9 MB, ~1.3 MB compressed in the download), checked in CI.
 - Icons are imported one file each: Metro does not tree-shake, and the icon barrel alone added ~2.6 MB.
-- Target app download < 25 MB and cold start < 2 s on a budget Android phone — measured with EAS builds
-  once store builds start.
+- Target app download < 25 MB and cold start < 2 s on a budget Android phone. Both are measured in CI from
+  Sprint 2.4 (see below); the real-phone check happens before launch.
 
 Since Sprint 2.4, CI also builds the release APK (no EAS: `expo prebuild` + Gradle). It fails if the arm64
 APK reaches 25 MB, and it measures cold start on an emulator on every mobile PR (see `docs/sprints/sprint-02.md`).
