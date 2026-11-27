@@ -161,3 +161,27 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
 - **Screens:** Programmes list (search, status per programme) and Programme page (Outcomes, Overview, History;
   click-to-edit text, plain-language line per outcome, evidence type per item; draft/published switch).
 - Every step is in the audit log. Providers keep seeing the published version until the new one is published.
+
+## Sub-sprint 2.3 notes (coverage map, provider catalogue, checklist, additions)
+- **Coverage map (HQ):** new Coverage tab on each programme. For every outcome HQ sets how a simulator and a
+  course cover it: planned · in production · linked. An outcome is **ready** when at least one channel is
+  linked; **readiness % = ready outcomes ÷ outcomes** in the current version (published, else newest). The
+  Programmes list shows a readiness ring per programme. Coverage is keyed by the stable outcome code, so it
+  carries over to new versions. Filters: all · not covered · in progress · ready. Changes are audited.
+  Edit: `programmes.manage` or `content.author`; everyone with `programmes.view` can see it.
+- **Provider catalogue (web):** new menu section "Curriculum" with **Programmes** (published programmes by
+  family; per programme: Outcomes, Set-up checklist, About) and **Mentor guide** (the guide's general chapters,
+  rendered from markdown without injecting HTML). Facilitators, assessors, moderators and centre managers
+  read; TP Admins (new permission `catalogue.manage`) answer the checklist and manage additions.
+- **"To confirm before use" checklist:** each item is answered Confirmed or Not applicable (a reason is
+  required), with an optional note, who and when. Answers are tenant data (row-level security), audited, and
+  tied to the item's wording: if HQ rewords an item, it must be confirmed again.
+- **Provider additions:** HQ → Training providers has a per-provider switch, **off by default**
+  (`providers.manage` to change, `providers.view` to see). When on, the provider adds its own outcomes
+  (codes like `TS-1.P1`, never reused) and evidence on top of HQ's content, shown as "Your addition", visible
+  only to that provider and never changing HQ's version. When switched off, existing additions stay visible
+  but read-only. The switch change is audited under the provider, so it shows in the provider's audit log too.
+- **Tables:** `outcome_coverage` (platform); `provider_programme_checks`, `provider_outcomes`,
+  `provider_evidence_requirements` (tenant-owned, RLS, additions soft-deleted to keep codes unique).
+- The HQ Training providers page is a first, minimal version (list + switch); full provider management
+  (onboarding, approval, suspension) arrives with Sprint 3.

@@ -5,3 +5,4 @@ export { Drawer } from './Drawer';
 export { ToastProvider, useToast } from './Toast';
 export { cx } from './cx';
 export { Editable } from './Editable';
+export { Switch } from './Switch';

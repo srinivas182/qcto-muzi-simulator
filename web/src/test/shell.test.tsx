@@ -62,7 +62,7 @@ describe('app shell', () => {
     mockApi({}, session({ navigation: nav('learn', 'learn.simulate', 'learn.courses', 'learn.progress') }));
     renderAt('/learn');
     await screen.findByText(/Ready to practise/);
-    expect(document.documentElement.dataset.tabbar).toBe('');
+    await waitFor(() => expect(document.documentElement.dataset.tabbar).toBe(''));
     expect(screen.queryByRole('button', { name: 'Open menu' })).not.toBeInTheDocument();
   });
 

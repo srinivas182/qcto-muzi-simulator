@@ -65,6 +65,12 @@ class Tenant extends Model
         return $this->hasMany(Centre::class);
     }
 
+    /** HQ switch (off by default): may this provider add its own outcomes and evidence to programmes? */
+    public function allowsProgrammeAdditions(): bool
+    {
+        return ($this->settings['programme_additions'] ?? false) === true;
+    }
+
     public function isReachable(): bool
     {
         return $this->status !== self::STATUS_ARCHIVED;
