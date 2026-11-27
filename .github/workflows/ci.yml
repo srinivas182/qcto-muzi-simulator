@@ -105,7 +105,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -126,6 +126,9 @@ jobs:
       - name: Performance budget (bundle size)
         if: github.event.pull_request.draft != true
         run: npm run size
+      - name: Lighthouse (mobile) — performance and accessibility ≥ 95
+        if: github.event.pull_request.draft != true
+        run: npm run lighthouse
 
   mobile:
     needs: changes

@@ -1,24 +1,104 @@
 @import 'tailwindcss';
 @import '@simuwork/ui/tokens.css';
+@import '@fontsource-variable/inter';
 
-@theme {
-  --color-midnight: var(--color-midnight);
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Semantic surface layer (platform-owned). Tenants only change the --brand-* variables. */
+:root {
+  --sw-bg: #f6f7fb;
+  --sw-surface: #ffffff;
+  --sw-surface-2: #f1f2f8;
+  --sw-text: #12152b;
+  --sw-muted: #5f6483;
+  --sw-line: #e6e8f0;
+  --sw-shadow: 0 1px 2px rgb(16 20 50 / 0.04), 0 8px 24px -12px rgb(16 20 50 / 0.12);
+  --sw-footer-fg: #5f6483;
+  --sw-footer-link: #4b45d6;
+  --brand-soft: color-mix(in oklab, var(--brand-primary) 11%, var(--sw-surface));
+  --brand-ring: color-mix(in oklab, var(--brand-primary) 40%, transparent);
+  color-scheme: light;
+}
+
+.dark {
+  --sw-bg: #090c1c;
+  --sw-surface: #10142c;
+  --sw-surface-2: #171c3a;
+  --sw-text: #eceef8;
+  --sw-muted: #a0a6c4;
+  --sw-line: #252b4e;
+  --sw-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px -16px rgb(0 0 0 / 0.6);
+  --sw-footer-fg: #a0a6c4;
+  --sw-footer-link: #a9a5ff;
+  --brand-soft: color-mix(in oklab, var(--brand-primary) 22%, var(--sw-surface));
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--sw-bg);
+  --color-surface: var(--sw-surface);
+  --color-surface-2: var(--sw-surface-2);
+  --color-ink: var(--sw-text);
+  --color-muted: var(--sw-muted);
+  --color-line: var(--sw-line);
   --color-brand: var(--brand-primary);
+  --color-brand-soft: var(--brand-soft);
   --color-accent: var(--brand-accent);
-  --font-sans: var(--font-ui);
-  --font-display: var(--font-display);
+  --color-nav: var(--brand-nav);
+  --font-sans: 'Inter Variable', var(--font-ui);
+  --shadow-card: var(--sw-shadow);
 }
 
 html,
 body,
 #root {
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
   margin: 0;
-  background: var(--color-canvas);
-  color: var(--color-ink);
-  font-family: var(--font-ui);
+  background: var(--sw-bg);
+  color: var(--sw-text);
+  font-family: 'Inter Variable', var(--font-ui);
+  font-feature-settings: 'cv11', 'ss01';
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@keyframes sw-shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+@keyframes sw-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sw-slide {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes sw-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.sw-skeleton {
+  background: linear-gradient(90deg, var(--sw-surface-2) 25%, var(--sw-line) 37%, var(--sw-surface-2) 63%);
+  background-size: 400% 100%;
+  animation: sw-shimmer 1.4s ease infinite;
+}
+.sw-in { animation: sw-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.sw-slide { animation: sw-slide 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.sw-fade { animation: sw-fade 0.18s ease both; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* Learner phone view: keep the page end (and the platform footer) above the bottom tab bar. */
+@media (max-width: 1023px) {
+  html[data-tabbar] body { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
 }

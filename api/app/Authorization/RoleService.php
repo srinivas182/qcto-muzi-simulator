@@ -138,19 +138,17 @@ final class RoleService
     /**
      * What someone with this role would see: permissions in plain language and their menu.
      *
-     * @return array{role: string, permissions: list<string>, navigation: list<array<string, string>>}
+     * @return array{role: string, permissions: list<string>, navigation: list<array{id: string, section: string, label: string, icon: string, path: string}>}
      */
     public function preview(Role $role): array
     {
         $permissions = $role->effectivePermissions();
         $area = $role->scope === Role::SCOPE_PLATFORM ? 'platform' : 'tenant';
-        /** @var list<array<string, string>> $items */
-        $items = config("navigation.{$area}", []);
 
         return [
             'role' => $role->name,
             'permissions' => PermissionRegistry::labels($permissions),
-            'navigation' => array_values(array_filter($items, fn (array $item) => in_array($item['permission'], $permissions, true))),
+            'navigation' => Navigation::for($area, $permissions),
         ];
     }
 

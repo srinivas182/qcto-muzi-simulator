@@ -88,6 +88,16 @@ return [
 
     'locale' => env('APP_LOCALE', 'en'),
 
+    /*
+    | Languages offered in the apps (learner-facing content may add more later).
+    */
+    'locales' => [
+        'en' => 'English',
+        'zu' => 'isiZulu',
+        'af' => 'Afrikaans',
+        'xh' => 'isiXhosa',
+    ],
+
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),

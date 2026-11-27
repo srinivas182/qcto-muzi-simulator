@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\Access\AuditController;
+use App\Http\Controllers\Api\V1\Access\BrandingController;
 use App\Http\Controllers\Api\V1\Access\RoleController;
 use App\Http\Controllers\Api\V1\Access\SupportSessionController;
 use App\Http\Controllers\Api\V1\Access\UserRoleController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Api\V1\Auth\AccountController;
 use App\Http\Controllers\Api\V1\Auth\InvitationController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
+use App\Http\Controllers\Api\V1\Auth\SessionController;
 use App\Http\Controllers\Api\V1\Auth\TwoFactorController;
 use App\Http\Controllers\Api\V1\CurrentTenantController;
 use App\Http\Controllers\Api\V1\DomainAllowedController;
@@ -36,7 +38,9 @@ $authRoutes = function (bool $platform): void {
     $signedIn = $platform ? ['auth:sanctum', 'platform.staff', 'active'] : ['auth:sanctum', 'active'];
 
     Route::middleware($signedIn)->group(function (): void {
+        Route::get('/session', SessionController::class)->name('session');
         Route::get('/auth/me', [AccountController::class, 'me'])->name('auth.me');
+        Route::patch('/auth/preferences', [AccountController::class, 'preferences'])->name('auth.preferences');
         Route::post('/auth/logout', [AccountController::class, 'logout'])->name('auth.logout');
         Route::post('/auth/consents', [AccountController::class, 'consent'])->name('auth.consents');
         Route::get('/auth/sessions', [AccountController::class, 'sessions'])->name('auth.sessions');
@@ -85,6 +89,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
         Route::middleware(['auth:sanctum', 'active', 'consented'])->group(function () use ($accessRoutes): void {
             $accessRoutes(false);
             Route::get('/audit', [AuditController::class, 'index'])->middleware('permission:audit.view_tenant')->name('audit.index');
+            Route::patch('/branding', [BrandingController::class, 'update'])->middleware('permission:branding.manage')->name('branding.update');
             Route::get('/support-sessions', [SupportSessionController::class, 'index'])->middleware('permission:audit.view_tenant')->name('support-sessions.index');
             Route::delete('/support-sessions/{session}', [SupportSessionController::class, 'destroy'])->middleware('permission:audit.view_tenant')->name('support-sessions.destroy');
         });

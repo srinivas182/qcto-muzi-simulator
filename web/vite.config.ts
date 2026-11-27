@@ -8,7 +8,9 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     port: 5173,
-    proxy: { '/api': 'http://localhost:8000' },
+    // Keep the Host header so the API can tell which academy is asking (ubuntu.localhost, admin.localhost).
+    proxy: { '/api': { target: 'http://127.0.0.1:8000', changeOrigin: false } },
+    allowedHosts: ['.localhost'],
   },
   build: {
     target: 'es2022',

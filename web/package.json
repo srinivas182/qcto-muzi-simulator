@@ -10,16 +10,20 @@
     "lint": "oxlint src",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
-    "size": "size-limit"
+    "size": "node scripts/shell-size.mjs && size-limit",
+    "lighthouse": "lhci autorun"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@simuwork/ui": "*",
     "@tanstack/react-query": "^5.108.4",
+    "lucide-react": "^1.82.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-router": "^8.5.3",
-    "@simuwork/ui": "*"
+    "react-router": "^8.5.3"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.16.1",
     "@size-limit/file": "^14.3.0",
     "@tailwindcss/vite": "^4.3.5",
     "@testing-library/jest-dom": "^8.0.0",
@@ -38,9 +42,9 @@
   },
   "size-limit": [
     {
-      "name": "App shell (all JS, gzip)",
+      "name": "All JavaScript incl. lazy pages and languages (gzip)",
       "path": "dist/assets/*.js",
-      "limit": "170 KB",
+      "limit": "240 KB",
       "gzip": true
     },
     {

@@ -10,3 +10,4 @@ coverage/
 mobile/.expo/
 mobile/ios/
 mobile/android/
+.lighthouseci/

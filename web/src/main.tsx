@@ -1,17 +1,20 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createBrowserRouter, RouterProvider } from 'react-router';
 import './index.css';
-import App from './App';
+import { createQueryClient, Providers } from './app/Providers';
+import { routes } from './app/routes';
+import { applyTheme, storedTheme } from './lib/theme';
 
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
-});
+applyTheme(storedTheme());
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => storedTheme() === 'system' && applyTheme('system'));
+
+const router = createBrowserRouter(routes);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
+    <Providers client={createQueryClient()}>
+      <RouterProvider router={router} />
+    </Providers>
   </StrictMode>,
 );
