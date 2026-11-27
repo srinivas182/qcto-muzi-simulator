@@ -261,8 +261,8 @@ const xh: Messages = {
   'm.me.appearance': "Inkangeleko",
   'm.me.version': "Uguqulelo {version}",
   'm.me.signOutConfirm': "Phuma kwi-{academy}?",
-  'm.staff.title': "Izixhobo zakho zikwiwebhu",
-  'm.staff.body': "Indima yakho isebenza ngcono kwiskrini esikhulu. Vula i-{host} kwikhompyutha okanye kwithebhulethi. Izixhobo zeselula zendima yakho ziza kufika kuhlaziyo oluzayo.",
+  'm.staff.title': "Izixhobo zakho zikwiwebhu okwangoku",
+  'm.staff.body': "Vula i-{host} kwisikhangeli sefowuni yakho okanye kwikhompyutha. Isebenza kuso nasiphi na isikrini. Izixhobo zakho ziza kufika kule app kuhlaziyo oluzayo.",
   'm.staff.open': "Vula iphothali yewebhu",
 };
 

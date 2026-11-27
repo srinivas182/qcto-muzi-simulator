@@ -261,8 +261,8 @@ const zu: Messages = {
   'm.me.appearance': "Ukubukeka",
   'm.me.version': "Inguqulo {version}",
   'm.me.signOutConfirm': "Phuma ku-{academy}?",
-  'm.staff.title': "Amathuluzi akho asewebhu",
-  'm.staff.body': "Indima yakho isebenza kangcono esikrinini esikhulu. Vula i-{host} kukhompyutha noma kuthebhulethi. Amathuluzi eselula endima yakho azofika esibuyekezweni esizayo.",
+  'm.staff.title': "Amathuluzi akho asewebhu okwamanje",
+  'm.staff.body': "Vula i-{host} kusiphequluli sefoni yakho noma kukhompyutha. Isebenza kunoma yisiphi isikrini. Amathuluzi akho azofika kule app esibuyekezweni esizayo.",
   'm.staff.open': "Vula iphothali yewebhu",
 };
 
