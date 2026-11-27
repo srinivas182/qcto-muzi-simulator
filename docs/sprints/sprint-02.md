@@ -129,3 +129,21 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
 2. **Official QCTO curricula:** only the guide is available now; Muzi is collecting the curriculum documents.
    The model already allows several qualification references per programme; knowledge and practical
    modules from the curricula will be added when the documents arrive.
+
+## Sub-sprint 2.1 notes (catalogue and import)
+- `tools/guide/` turns the guide PDF into `api/database/data/guide/workplace-practical-expectations.json`
+  (the PDF itself is not stored in the repository). Result: **13 programmes, 90 duty areas, 320 outcomes,
+  229 evidence items, 18 qualification references, 3 reference pages.** Outcome codes: `TS-1.1` style.
+- Qualification references are typed: occupational (QCTO), legacy, skills programme, related, or a **note**
+  where the guide gives guidance but no registered qualification (e.g. Robotics, Data Analytics, Cellphone
+  Repair, Technopreneur, End User Computing). These programmes need the curricula Muzi is collecting.
+- Evidence types are a first guess from the wording (document, record, feedback, observation, sign-off,
+  photo); HQ confirms them in Programme Studio (2.2).
+- `php artisan programmes:import [--publish]` is repeatable and never overwrites a draft HQ is editing.
+  The demo seeder loads and publishes the catalogue.
+- Published and retired versions are frozen by a database trigger (content and children); only
+  published → retired is allowed, and only one published version per programme.
+- New provider permission `catalogue.view` ("See programmes, workplace outcomes and the mentor guide"):
+  TP Admin, Centre Manager, Facilitator, Assessor/Mentor, Moderator. Learners will see their own programme
+  through enrolment (Sprint 3).
+- Published content is cached forever by version id (it cannot change); the list is cleared on publish.

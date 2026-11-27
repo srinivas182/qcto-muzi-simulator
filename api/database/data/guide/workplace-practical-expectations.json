@@ -1,0 +1,3595 @@
+{
+  "source": {
+    "document": "Workplace Practical Expectations: Mentor Guide",
+    "publisher": "Services SETA (QCTO and SAQA aligned)",
+    "edition": "2026",
+    "file": "acd0fe12-Workplace_Practical_Expectations_Guide.pdf"
+  },
+  "family": "Services SETA: ICT and business services",
+  "programmes": [
+    {
+      "code": "technical-support",
+      "prefix": "TS",
+      "position": 1,
+      "title": "Technical Support",
+      "summary": "First-line and second-line support of users, devices, software and basic networks.",
+      "purpose": "To turn classroom knowledge of hardware, operating systems, networks and customer service into dependable day-to-day support practice. By the end of placement the learner should be able to receive a problem from a real user, diagnose it logically, fix or escalate it correctly, and document it so another technician could follow what was done.",
+      "occupations": [
+        "IT support technician",
+        "help desk analyst",
+        "desktop support technician",
+        "end-user support technician",
+        "first-line support analyst"
+      ],
+      "qualifications": [
+        {
+          "kind": "legacy",
+          "saqa_id": "78964",
+          "title": "Further Education and Training Certificate: Information Technology: Technical Support",
+          "nqf_level": 4,
+          "credits": 163,
+          "source_text": "SAQA ID 78964: Further Education and Training Certificate: Information Technology: Technical Support, NQF 4, 163 credits (legacy qualification that replaced ID 24293)."
+        },
+        {
+          "kind": "occupational",
+          "saqa_id": "101408",
+          "title": "Occupational Certificate: Computer Technician",
+          "nqf_level": 5,
+          "credits": 282,
+          "source_text": "Related current occupational route: Occupational Certificate: Computer Technician, SAQA ID 101408, NQF 5, 282 credits (QCTO)."
+        }
+      ],
+      "to_confirm": [
+        "Which qualification or skills programme your funded learners are actually registered on, and its current registration end dates.",
+        "The workplace experience hours and logbook format required by your Skills Development Provider (SDP)."
+      ],
+      "workplace_requirements": [
+        "A real or realistic IT environment with live users, a ticketing or job-logging system and at least one mentor who can do the work.",
+        "Supervised access to user devices, a stock of spares and a safe workbench.",
+        "Basic access to directory, email and remote-support tools (with limited, logged permissions)."
+      ],
+      "tools": [
+        "Ticketing or job-card system",
+        "Remote support software",
+        "Directory and email administration console (limited permissions)",
+        "Bootable diagnostic and imaging media",
+        "Antistatic wrist strap and mat, screwdriver set, cable tester",
+        "Knowledge base and asset register"
+      ],
+      "duty_areas": [
+        {
+          "number": 1,
+          "title": "Service desk and ticket management",
+          "outcomes": [
+            {
+              "code": "TS-1.1",
+              "statement": "Receive requests by phone, email, walk-in or portal and log each one as a ticket with accurate details."
+            },
+            {
+              "code": "TS-1.2",
+              "statement": "Categorise by type, impact and urgency, and apply the service level agreement (SLA)."
+            },
+            {
+              "code": "TS-1.3",
+              "statement": "Update ticket status, record each step taken and close only after user confirmation."
+            },
+            {
+              "code": "TS-1.4",
+              "statement": "Escalate unresolved tickets with symptoms, tests done and user contact details."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Ticket extract showing a spread of ticket types",
+              "type": "record"
+            },
+            {
+              "description": "SLA performance summary",
+              "type": "record"
+            },
+            {
+              "description": "Mentor observation of a live call or walk-in",
+              "type": "observation"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Hardware support",
+          "outcomes": [
+            {
+              "code": "TS-2.1",
+              "statement": "Set up new workstations: unpack, connect, image or configure, label and record in the asset register."
+            },
+            {
+              "code": "TS-2.2",
+              "statement": "Diagnose faults in peripherals, power supplies, memory, drives and displays using substitution and diagnostic tools."
+            },
+            {
+              "code": "TS-2.3",
+              "statement": "Replace parts under supervision using antistatic precautions and correct tools."
+            },
+            {
+              "code": "TS-2.4",
+              "statement": "Prepare retired equipment for secure data wiping and e-waste handover."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Job cards with fault, action and test result",
+              "type": "document"
+            },
+            {
+              "description": "Asset register entries",
+              "type": "record"
+            },
+            {
+              "description": "Photos of completed installations (no user data visible)",
+              "type": "photo"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Operating system and application support",
+          "outcomes": [
+            {
+              "code": "TS-3.1",
+              "statement": "Install, update and repair operating systems and common business applications."
+            },
+            {
+              "code": "TS-3.2",
+              "statement": "Troubleshoot slow performance, startup problems, profile corruption, application crashes and licence errors."
+            },
+            {
+              "code": "TS-3.3",
+              "statement": "Detect and remove malware using approved tools and report suspected incidents to the security lead."
+            },
+            {
+              "code": "TS-3.4",
+              "statement": "Back up and restore user data with the user's consent."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Completed installation and configuration checklists",
+              "type": "document"
+            },
+            {
+              "description": "Resolved tickets covering at least three fault types",
+              "type": "document"
+            },
+            {
+              "description": "Backup and restore log entries",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Network and connectivity support",
+          "outcomes": [
+            {
+              "code": "TS-4.1",
+              "statement": "Connect users to wired and wireless networks, shared drives and printers."
+            },
+            {
+              "code": "TS-4.2",
+              "statement": "Check IP settings and use basic tools (ping, ipconfig, tracert) to isolate where a connection fails."
+            },
+            {
+              "code": "TS-4.3",
+              "statement": "Configure email clients, VPN and remote-access settings as per company procedure."
+            },
+            {
+              "code": "TS-4.4",
+              "statement": "Report suspected network equipment or ISP faults to the responsible team with test results."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Ticket notes showing the diagnostic path",
+              "type": "document"
+            },
+            {
+              "description": "Mentor sign-off on a supervised printer or Wi-Fi setup",
+              "type": "sign_off"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "User accounts and access",
+          "outcomes": [
+            {
+              "code": "TS-5.1",
+              "statement": "Create, change and disable accounts only on an authorised request."
+            },
+            {
+              "code": "TS-5.2",
+              "statement": "Verify the user's identity before resetting a password or changing access."
+            },
+            {
+              "code": "TS-5.3",
+              "statement": "Support multi-factor authentication enrolment and recovery."
+            },
+            {
+              "code": "TS-5.4",
+              "statement": "Follow the joiner, mover and leaver checklist."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Authorised request attached to each account change",
+              "type": "document"
+            },
+            {
+              "description": "Completed joiner or leaver checklist",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "User communication and knowledge sharing",
+          "outcomes": [
+            {
+              "code": "TS-6.1",
+              "statement": "Explain fixes in plain language and confirm the user understands."
+            },
+            {
+              "code": "TS-6.2",
+              "statement": "Stay calm and professional with frustrated or non-technical users."
+            },
+            {
+              "code": "TS-6.3",
+              "statement": "Write or update knowledge-base articles and quick user guides for recurring issues."
+            },
+            {
+              "code": "TS-6.4",
+              "statement": "Hand over clearly at shift end or when escalating."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "User feedback or satisfaction scores",
+              "type": "feedback"
+            },
+            {
+              "description": "At least one knowledge article authored and reviewed by the mentor",
+              "type": "feedback"
+            }
+          ]
+        }
+      ],
+      "source_page": 7,
+      "checksum": "8f0c8a0f0a4764d8"
+    },
+    {
+      "code": "systems-support",
+      "prefix": "SS",
+      "position": 2,
+      "title": "Systems Support",
+      "summary": "Administration and maintenance of servers, user environments, networks and backups.",
+      "purpose": "To develop learners who can keep an organisation's IT infrastructure running reliably and securely. The placement shows how installation, configuration, monitoring, backup and incident handling work under real change-control and service-level pressure. .",
+      "occupations": [
+        "Systems support technician",
+        "junior systems administrator",
+        "network support technician",
+        "infrastructure support officer",
+        "data centre technician"
+      ],
+      "qualifications": [
+        {
+          "kind": "legacy",
+          "saqa_id": "48573",
+          "title": "National Certificate: Information Technology: Systems Support",
+          "nqf_level": 5,
+          "credits": null,
+          "source_text": "SAQA ID 48573: National Certificate: Information Technology: Systems Support, NQF 5 (legacy; SAQA lists it as past its registration end date, so check teach-out arrangements)."
+        },
+        {
+          "kind": "related",
+          "saqa_id": "101408",
+          "title": "Occupational Certificate: Computer Technician",
+          "nqf_level": 5,
+          "credits": null,
+          "source_text": "Related occupational routes include Computer Technician (SAQA ID 101408, NQF 5) and Cloud Administrator (SAQA ID 118699, NQF 4)."
+        },
+        {
+          "kind": "related",
+          "saqa_id": "118699",
+          "title": "Occupational Certificate: Cloud Administrator",
+          "nqf_level": 4,
+          "credits": null,
+          "source_text": "Related occupational routes include Computer Technician (SAQA ID 101408, NQF 5) and Cloud Administrator (SAQA ID 118699, NQF 4)."
+        }
+      ],
+      "to_confirm": [
+        "The current qualification replacing the legacy certificate for your cohort.",
+        "The level of administrative access a learner may hold on production systems under your SDP and employer agreement."
+      ],
+      "workplace_requirements": [
+        "A production or realistic test environment with servers, directory services, network equipment and monitoring.",
+        "A named mentor with administrator-level competence and a documented change-control process.",
+        "A safe test or staging area where the learner can practise before touching production."
+      ],
+      "tools": [
+        "Directory services and group policy console",
+        "Hypervisor or cloud administration portal",
+        "Monitoring and alerting platform",
+        "Backup software and storage",
+        "Network diagrams, switch and firewall consoles",
+        "Change and incident management system"
+      ],
+      "duty_areas": [
+        {
+          "number": 1,
+          "title": "Server and operating system administration",
+          "outcomes": [
+            {
+              "code": "SS-1.1",
+              "statement": "Install and configure server operating systems and core roles (directory, DNS, DHCP, file and print)."
+            },
+            {
+              "code": "SS-1.2",
+              "statement": "Apply patches and updates in line with the maintenance window and change record."
+            },
+            {
+              "code": "SS-1.3",
+              "statement": "Create and manage virtual machines under supervision."
+            },
+            {
+              "code": "SS-1.4",
+              "statement": "Monitor disk, memory, processor and service health, and act on thresholds."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Build and configuration checklist",
+              "type": "document"
+            },
+            {
+              "description": "Approved change records",
+              "type": "record"
+            },
+            {
+              "description": "Patch schedule and completion log",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "User and identity management",
+          "outcomes": [
+            {
+              "code": "SS-2.1",
+              "statement": "Manage users, groups, shared folders and permissions on authorised requests."
+            },
+            {
+              "code": "SS-2.2",
+              "statement": "Apply group policies and password rules under mentor guidance."
+            },
+            {
+              "code": "SS-2.3",
+              "statement": "Run periodic access reviews and remove stale accounts."
+            },
+            {
+              "code": "SS-2.4",
+              "statement": "Support cloud productivity platform administration where used."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Access request tickets",
+              "type": "document"
+            },
+            {
+              "description": "Access review report",
+              "type": "feedback"
+            },
+            {
+              "description": "Mentor observation of policy change",
+              "type": "observation"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Network administration",
+          "outcomes": [
+            {
+              "code": "SS-3.1",
+              "statement": "Maintain IP address plans and document subnets, VLANs and devices."
+            },
+            {
+              "code": "SS-3.2",
+              "statement": "Configure switch ports, wireless access points and basic firewall rules under supervision."
+            },
+            {
+              "code": "SS-3.3",
+              "statement": "Troubleshoot DNS, DHCP and routing issues using standard tools."
+            },
+            {
+              "code": "SS-3.4",
+              "statement": "Label and tidy patch panels and cabling, and update network diagrams."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Updated network diagram",
+              "type": "document"
+            },
+            {
+              "description": "Configuration backups",
+              "type": "document"
+            },
+            {
+              "description": "Fault tickets with diagnostic steps",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Backup, recovery and continuity",
+          "outcomes": [
+            {
+              "code": "SS-4.1",
+              "statement": "Run, monitor and verify scheduled backups, and investigate failures."
+            },
+            {
+              "code": "SS-4.2",
+              "statement": "Perform test restores at agreed intervals and record results."
+            },
+            {
+              "code": "SS-4.3",
+              "statement": "Support disaster recovery drills and record lessons learned."
+            },
+            {
+              "code": "SS-4.4",
+              "statement": "Monitor storage capacity and report trends."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Backup log and exception notes",
+              "type": "record"
+            },
+            {
+              "description": "Test restore record signed by mentor",
+              "type": "sign_off"
+            },
+            {
+              "description": "Disaster recovery drill report",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Monitoring, incident and change management",
+          "outcomes": [
+            {
+              "code": "SS-5.1",
+              "statement": "Respond to monitoring alerts, triage severity and escalate according to the runbook."
+            },
+            {
+              "code": "SS-5.2",
+              "statement": "Contribute to root-cause analysis and post-incident reviews."
+            },
+            {
+              "code": "SS-5.3",
+              "statement": "Raise change requests with impact, rollback plan and approvals."
+            },
+            {
+              "code": "SS-5.4",
+              "statement": "Keep stakeholders informed during outages."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Incident tickets and timelines",
+              "type": "document"
+            },
+            {
+              "description": "Change request records",
+              "type": "record"
+            },
+            {
+              "description": "Post-incident review contribution",
+              "type": "feedback"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Security hygiene and compliance",
+          "outcomes": [
+            {
+              "code": "SS-6.1",
+              "statement": "Maintain anti-malware and endpoint protection, and check coverage."
+            },
+            {
+              "code": "SS-6.2",
+              "statement": "Apply hardening standards and remove unnecessary services."
+            },
+            {
+              "code": "SS-6.3",
+              "statement": "Check licence compliance and software inventories."
+            },
+            {
+              "code": "SS-6.4",
+              "statement": "Follow least-privilege principles and escalate security concerns."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Hardening checklist",
+              "type": "document"
+            },
+            {
+              "description": "Licence reconciliation",
+              "type": "document"
+            },
+            {
+              "description": "Security concern escalation record",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Documentation and asset management",
+          "outcomes": [
+            {
+              "code": "SS-7.1",
+              "statement": "Maintain runbooks, build documents and configuration records."
+            },
+            {
+              "code": "SS-7.2",
+              "statement": "Update the asset or configuration database after every change."
+            },
+            {
+              "code": "SS-7.3",
+              "statement": "Write handover notes for shift changes."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Runbook updates with version history",
+              "type": "document"
+            },
+            {
+              "description": "Asset database entries",
+              "type": "document"
+            }
+          ]
+        }
+      ],
+      "source_page": 10,
+      "checksum": "c87a524ada01218b"
+    },
+    {
+      "code": "systems-development",
+      "prefix": "SD",
+      "position": 3,
+      "title": "Systems Development",
+      "summary": "Designing, building, testing and maintaining software as part of a development team.",
+      "purpose": "To move the learner from writing exercises to contributing safe, tested, reviewed code to a real product. The placement should expose the full lifecycle: requirements, design, build, test, release and maintenance.",
+      "occupations": [
+        "Junior software developer",
+        "graduate developer",
+        "test analyst",
+        "web or application developer",
+        "support developer"
+      ],
+      "qualifications": [
+        {
+          "kind": "occupational",
+          "saqa_id": "118707",
+          "title": "Occupational Certificate: Software Developer",
+          "nqf_level": 5,
+          "credits": 220,
+          "source_text": "Occupational Certificate: Software Developer, SAQA ID 118707, NQF 5, 220 credits (listed by training providers; MICT SETA is the originating quality partner)."
+        }
+      ],
+      "to_confirm": [
+        "Whether your learners are registered for the occupational certificate or a legacy systems development qualification.",
+        "The technology stack the host employer uses, so the learning plan matches real work."
+      ],
+      "workplace_requirements": [
+        "A development team following a recognisable process (agile or similar) with a backlog, version control and code review.",
+        "Development, test and production environments with controlled access.",
+        "A senior developer mentor who reviews code and gives regular written feedback."
+      ],
+      "tools": [
+        "Integrated development environment",
+        "Version control platform (for example Git hosting)",
+        "Issue tracker or agile board",
+        "Continuous integration and deployment tools",
+        "Database client and test environment",
+        "Team documentation space"
+      ],
+      "duty_areas": [
+        {
+          "number": 1,
+          "title": "Requirements and analysis",
+          "outcomes": [
+            {
+              "code": "SD-1.1",
+              "statement": "Take part in backlog refinement, planning and daily stand-ups."
+            },
+            {
+              "code": "SD-1.2",
+              "statement": "Read user stories and acceptance criteria, and ask clarifying questions before coding."
+            },
+            {
+              "code": "SD-1.3",
+              "statement": "Estimate small tasks and report progress honestly."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Task board history",
+              "type": "document"
+            },
+            {
+              "description": "Clarification notes or comments",
+              "type": "document"
+            },
+            {
+              "description": "Mentor feedback on estimates",
+              "type": "feedback"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Design and coding",
+          "outcomes": [
+            {
+              "code": "SD-2.1",
+              "statement": "Write clean, readable code in the team's language and framework, following coding standards."
+            },
+            {
+              "code": "SD-2.2",
+              "statement": "Apply data structures, object-oriented or functional principles and error handling appropriately."
+            },
+            {
+              "code": "SD-2.3",
+              "statement": "Design and query relational databases and consume or build simple APIs."
+            },
+            {
+              "code": "SD-2.4",
+              "statement": "Break larger tasks into small, committable pieces."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Merged pull requests",
+              "type": "document"
+            },
+            {
+              "description": "Mentor code review comments",
+              "type": "feedback"
+            },
+            {
+              "description": "Database scripts or API endpoints delivered",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Testing and quality",
+          "outcomes": [
+            {
+              "code": "SD-3.1",
+              "statement": "Write unit tests and run existing automated test suites."
+            },
+            {
+              "code": "SD-3.2",
+              "statement": "Reproduce, debug and fix defects, with a clear log of cause and resolution."
+            },
+            {
+              "code": "SD-3.3",
+              "statement": "Perform peer code reviews and respond constructively to reviews."
+            },
+            {
+              "code": "SD-3.4",
+              "statement": "Log defects with steps to reproduce, expected and actual results."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Test coverage for the learner's code",
+              "type": "document"
+            },
+            {
+              "description": "Defect tickets raised and fixed",
+              "type": "document"
+            },
+            {
+              "description": "Review comments given and received",
+              "type": "feedback"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Version control and delivery",
+          "outcomes": [
+            {
+              "code": "SD-4.1",
+              "statement": "Use branching, commits, pull requests and merge conflict resolution correctly."
+            },
+            {
+              "code": "SD-4.2",
+              "statement": "Understand and run the continuous integration pipeline and read build failures."
+            },
+            {
+              "code": "SD-4.3",
+              "statement": "Deploy to development or test environments under supervision."
+            },
+            {
+              "code": "SD-4.4",
+              "statement": "Manage configuration and environment settings without hard-coding secrets."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Commit history with meaningful messages",
+              "type": "document"
+            },
+            {
+              "description": "Pipeline run records",
+              "type": "record"
+            },
+            {
+              "description": "Supervised deployment checklist",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Maintenance and production support",
+          "outcomes": [
+            {
+              "code": "SD-5.1",
+              "statement": "Fix defects in existing code and learn to read unfamiliar code."
+            },
+            {
+              "code": "SD-5.2",
+              "statement": "Shadow the production support rota and read logs to trace issues."
+            },
+            {
+              "code": "SD-5.3",
+              "statement": "Follow the hotfix and release process."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Maintenance tickets resolved",
+              "type": "document"
+            },
+            {
+              "description": "Support shadowing notes",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Documentation and teamwork",
+          "outcomes": [
+            {
+              "code": "SD-6.1",
+              "statement": "Write comments, README files and technical notes others can use."
+            },
+            {
+              "code": "SD-6.2",
+              "statement": "Communicate blockers early and ask for help in good time."
+            },
+            {
+              "code": "SD-6.3",
+              "statement": "Record time and tasks as the team requires."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Documentation produced",
+              "type": "document"
+            },
+            {
+              "description": "Mentor and team feedback",
+              "type": "feedback"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Secure and responsible development",
+          "outcomes": [
+            {
+              "code": "SD-7.1",
+              "statement": "Apply basic secure-coding practice: input validation, safe authentication, protecting secrets."
+            },
+            {
+              "code": "SD-7.2",
+              "statement": "Respect software licences and company policy on AI-assisted code."
+            },
+            {
+              "code": "SD-7.3",
+              "statement": "Protect personal information in test data (use masked or synthetic data)."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Security review checklist",
+              "type": "feedback"
+            },
+            {
+              "description": "Evidence that test data is masked",
+              "type": "document"
+            }
+          ]
+        }
+      ],
+      "source_page": 13,
+      "checksum": "6d649fe92dce552c"
+    },
+    {
+      "code": "business-process-outsourcing",
+      "prefix": "BPO",
+      "position": 4,
+      "title": "Business Process Outsourcing and Contact Centre",
+      "summary": "Customer contact handling and back-office processing against quality and service targets.",
+      "purpose": "To build confidence and consistency in real customer and process work. Workplace exposure shows the pace, emotional demands, compliance rules and performance measures that a classroom cannot fully reproduce.",
+      "occupations": [
+        "Contact centre agent",
+        "customer service representative",
+        "back-office processor",
+        "quality assurance assistant",
+        "team leader trainee",
+        "chat and social media agent"
+      ],
+      "qualifications": [
+        {
+          "kind": "note",
+          "saqa_id": null,
+          "title": null,
+          "nqf_level": null,
+          "credits": null,
+          "source_text": "Services SETA covers contact centre and business services; related occupational qualifications and skills programmes exist for contact centre agents, team leaders and BPO processors."
+        }
+      ],
+      "to_confirm": [
+        "The exact qualification title, SAQA ID, NQF level and credits your cohort is registered on.",
+        "Which channels (voice, email, chat, social) and which sector rules (for example financial services or telecommunications) the host employer operates under."
+      ],
+      "workplace_requirements": [
+        "A live or realistic contact centre or BPO operation with real customer interactions or real transactions.",
+        "Headsets, telephony or chat platform, CRM and knowledge base access.",
+        "A team leader or senior agent mentor, with call monitoring and a quality scorecard in use."
+      ],
+      "tools": [
+        "Telephony or softphone and headset",
+        "Customer relationship management (CRM) system",
+        "Knowledge base and scripts",
+        "Chat, email and social media tools",
+        "Quality monitoring scorecards",
+        "Workforce management and attendance system"
+      ],
+      "duty_areas": [
+        {
+          "number": 1,
+          "title": "Voice customer contact",
+          "outcomes": [
+            {
+              "code": "BPO-1.1",
+              "statement": "Greet, verify identity using the approved questions and record consent where required."
+            },
+            {
+              "code": "BPO-1.2",
+              "statement": "Listen actively, diagnose the need and resolve or route correctly."
+            },
+            {
+              "code": "BPO-1.3",
+              "statement": "Use scripts and compliance statements accurately without sounding scripted."
+            },
+            {
+              "code": "BPO-1.4",
+              "statement": "Manage holds, transfers and call wrap-up within target times."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Monitored call scores and recordings reviewed with the mentor",
+              "type": "feedback"
+            },
+            {
+              "description": "Call-handling observation form",
+              "type": "observation"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Written and digital channels",
+          "outcomes": [
+            {
+              "code": "BPO-2.1",
+              "statement": "Respond to email, web chat and messaging in a clear, courteous and accurate way."
+            },
+            {
+              "code": "BPO-2.2",
+              "statement": "Use approved templates and adapt them to the customer's situation."
+            },
+            {
+              "code": "BPO-2.3",
+              "statement": "Handle more than one chat at a time when the operation requires."
+            },
+            {
+              "code": "BPO-2.4",
+              "statement": "Meet response and resolution times for each channel."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Sample of written interactions with quality scores",
+              "type": "document"
+            },
+            {
+              "description": "Channel performance report",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Systems and data accuracy",
+          "outcomes": [
+            {
+              "code": "BPO-3.1",
+              "statement": "Use CRM, telephony, knowledge base and workflow tools correctly."
+            },
+            {
+              "code": "BPO-3.2",
+              "statement": "Capture complete, accurate notes and select the right call reason or disposition."
+            },
+            {
+              "code": "BPO-3.3",
+              "statement": "Update customer records only with verified information."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "CRM record audit",
+              "type": "record"
+            },
+            {
+              "description": "Disposition accuracy report",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Performance and quality",
+          "outcomes": [
+            {
+              "code": "BPO-4.1",
+              "statement": "Understand and track own measures: average handling time, first-contact resolution, quality score, schedule adherence and customer satisfaction."
+            },
+            {
+              "code": "BPO-4.2",
+              "statement": "Take part in call calibrations and coaching sessions and act on feedback."
+            },
+            {
+              "code": "BPO-4.3",
+              "statement": "Set and review a personal improvement plan with the team leader."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Monthly scorecards",
+              "type": "document"
+            },
+            {
+              "description": "Coaching records signed by learner and mentor",
+              "type": "sign_off"
+            },
+            {
+              "description": "Improvement plan",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Back-office and BPO processing",
+          "outcomes": [
+            {
+              "code": "BPO-5.1",
+              "statement": "Process transactions, applications, claims, orders or data capture according to the standard operating procedure."
+            },
+            {
+              "code": "BPO-5.2",
+              "statement": "Check work for accuracy and complete within the turnaround time."
+            },
+            {
+              "code": "BPO-5.3",
+              "statement": "Deal with exceptions and escalate unusual cases."
+            },
+            {
+              "code": "BPO-5.4",
+              "statement": "Complete reconciliations and daily control checks where required."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Accuracy and turnaround report",
+              "type": "record"
+            },
+            {
+              "description": "Exception log",
+              "type": "record"
+            },
+            {
+              "description": "Sample of quality checks",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Complaints and sensitive interactions",
+          "outcomes": [
+            {
+              "code": "BPO-6.1",
+              "statement": "De-escalate angry or upset customers while staying within policy."
+            },
+            {
+              "code": "BPO-6.2",
+              "statement": "Recognise vulnerable customers, suspected fraud and abusive behaviour, and follow the escalation protocol."
+            },
+            {
+              "code": "BPO-6.3",
+              "statement": "Apply consumer-protection and privacy rules relevant to the sector."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Mentor observation of a complaint call",
+              "type": "observation"
+            },
+            {
+              "description": "Escalation records",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Teamwork and wellbeing",
+          "outcomes": [
+            {
+              "code": "BPO-7.1",
+              "statement": "Follow shifts, breaks and workforce management schedules."
+            },
+            {
+              "code": "BPO-7.2",
+              "statement": "Take part in team huddles and share useful customer insights."
+            },
+            {
+              "code": "BPO-7.3",
+              "statement": "Use support services and manage stress and fatigue."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Attendance and adherence records",
+              "type": "record"
+            },
+            {
+              "description": "Mentor observation",
+              "type": "observation"
+            }
+          ]
+        }
+      ],
+      "source_page": 15,
+      "checksum": "1af4703092309721"
+    },
+    {
+      "code": "robotics",
+      "prefix": "ROB",
+      "position": 5,
+      "title": "Robotics",
+      "summary": "Assembling, programming, maintaining and safely operating robotic and automated systems.",
+      "purpose": "To give the learner supervised exposure to real automation: working safely around moving equipment, assembling and wiring systems, programming and commissioning, and diagnosing faults across mechanical, electrical and software layers.",
+      "occupations": [
+        "Robotics technician",
+        "automation technician assistant",
+        "mechatronics support technician",
+        "robot cell operator",
+        "maintenance assistant"
+      ],
+      "qualifications": [
+        {
+          "kind": "note",
+          "saqa_id": null,
+          "title": null,
+          "nqf_level": null,
+          "credits": null,
+          "source_text": "Robotics is delivered through 4IR-related skills programmes and occupational or mechatronics-related qualifications."
+        }
+      ],
+      "to_confirm": [
+        "The qualification or skills programme, its NQF level and the workplace-hours requirement.",
+        "The specific robot platforms, controllers and programming languages the host workplace uses."
+      ],
+      "workplace_requirements": [
+        "A workplace with robots, automated cells, or an equivalent training cell with safety systems in place.",
+        "A competent mentor (for example an automation technician or engineer) and a written safe system of work.",
+        "Safety equipment, lock-out facilities and controlled access to robot work areas."
+      ],
+      "tools": [
+        "Robot or training cell with teach pendant or programming interface",
+        "Hand tools, torque tools and electrical test instruments",
+        "Programming software and simulation environment",
+        "Technical manuals, drawings and datasheets",
+        "Lock-out kits and safety equipment",
+        "Maintenance management system"
+      ],
+      "duty_areas": [
+        {
+          "number": 1,
+          "title": "Safety and risk management",
+          "outcomes": [
+            {
+              "code": "ROB-1.1",
+              "statement": "Apply lock-out, tag-out and emergency stop procedures every time."
+            },
+            {
+              "code": "ROB-1.2",
+              "statement": "Respect guarding, safe zones and permit-to-work rules."
+            },
+            {
+              "code": "ROB-1.3",
+              "statement": "Contribute to risk assessments and read safe operating procedures."
+            },
+            {
+              "code": "ROB-1.4",
+              "statement": "Use required protective equipment."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Signed safety induction",
+              "type": "sign_off"
+            },
+            {
+              "description": "Lock-out records",
+              "type": "record"
+            },
+            {
+              "description": "Risk assessment contribution",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Mechanical and electrical assembly",
+          "outcomes": [
+            {
+              "code": "ROB-2.1",
+              "statement": "Read drawings and schematics and assemble frames, mounts, grippers and end effectors."
+            },
+            {
+              "code": "ROB-2.2",
+              "statement": "Wire power and control circuits and tidy cable routing."
+            },
+            {
+              "code": "ROB-2.3",
+              "statement": "Torque fasteners and check alignment to specification."
+            },
+            {
+              "code": "ROB-2.4",
+              "statement": "Test continuity, polarity and power supply levels before energising."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Assembly checklist signed off",
+              "type": "sign_off"
+            },
+            {
+              "description": "Photos of completed wiring (before panel closure)",
+              "type": "photo"
+            },
+            {
+              "description": "Test readings recorded",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Sensors, actuators and controllers",
+          "outcomes": [
+            {
+              "code": "ROB-3.1",
+              "statement": "Install and calibrate sensors, motors, servos and drives."
+            },
+            {
+              "code": "ROB-3.2",
+              "statement": "Connect to controllers (microcontrollers or programmable logic controllers) and test inputs and outputs."
+            },
+            {
+              "code": "ROB-3.3",
+              "statement": "Interpret datasheets and wiring diagrams."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Input and output test sheet",
+              "type": "document"
+            },
+            {
+              "description": "Calibration record",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Programming and commissioning",
+          "outcomes": [
+            {
+              "code": "ROB-4.1",
+              "statement": "Write or modify robot programs in the platform's language and teach positions."
+            },
+            {
+              "code": "ROB-4.2",
+              "statement": "Test programs in simulation or at reduced speed before full operation."
+            },
+            {
+              "code": "ROB-4.3",
+              "statement": "Document parameters, versions and changes."
+            },
+            {
+              "code": "ROB-4.4",
+              "statement": "Take part in commissioning and acceptance tests."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Program listing with comments",
+              "type": "document"
+            },
+            {
+              "description": "Commissioning checklist",
+              "type": "document"
+            },
+            {
+              "description": "Version records",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Preventive maintenance and fault finding",
+          "outcomes": [
+            {
+              "code": "ROB-5.1",
+              "statement": "Carry out scheduled inspections, lubrication and cleaning from the maintenance plan."
+            },
+            {
+              "code": "ROB-5.2",
+              "statement": "Diagnose faults using multimeters and other instruments, and by reading error codes."
+            },
+            {
+              "code": "ROB-5.3",
+              "statement": "Replace worn or failed parts and verify correct operation."
+            },
+            {
+              "code": "ROB-5.4",
+              "statement": "Keep a fault and repair log."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Maintenance plan sign-offs",
+              "type": "sign_off"
+            },
+            {
+              "description": "Fault log with root cause",
+              "type": "record"
+            },
+            {
+              "description": "Mentor observation of a diagnosis",
+              "type": "observation"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Operations and integration",
+          "outcomes": [
+            {
+              "code": "ROB-6.1",
+              "statement": "Monitor running cells and report abnormal behaviour."
+            },
+            {
+              "code": "ROB-6.2",
+              "statement": "Assist with integration with conveyors, vision systems or other equipment."
+            },
+            {
+              "code": "ROB-6.3",
+              "statement": "Support operators with start-up, shut-down and changeover."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Shift notes",
+              "type": "document"
+            },
+            {
+              "description": "Integration task record",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Documentation and reporting",
+          "outcomes": [
+            {
+              "code": "ROB-7.1",
+              "statement": "Complete job cards, test sheets and handover notes."
+            },
+            {
+              "code": "ROB-7.2",
+              "statement": "Report near misses and defects promptly."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Job cards",
+              "type": "document"
+            },
+            {
+              "description": "Near-miss reports",
+              "type": "record"
+            }
+          ]
+        }
+      ],
+      "source_page": 18,
+      "checksum": "30f569ce5263ccb8"
+    },
+    {
+      "code": "data-analytics",
+      "prefix": "DA",
+      "position": 6,
+      "title": "Data Analytics",
+      "summary": "Collecting, cleaning, analysing and presenting data so that people can make better decisions.",
+      "purpose": "To show that data analytics is a business activity, not only a technical one. The learner should practise turning a vague question into a clean dataset, a defensible analysis and a clear message for decision makers.",
+      "occupations": [
+        "Junior data analyst",
+        "reporting analyst",
+        "business intelligence assistant",
+        "data capturer moving into analytics",
+        "operations analyst"
+      ],
+      "qualifications": [
+        {
+          "kind": "note",
+          "saqa_id": null,
+          "title": null,
+          "nqf_level": null,
+          "credits": null,
+          "source_text": "Data analytics is offered through 4IR-related skills programmes and occupational qualifications in the ICT field."
+        }
+      ],
+      "to_confirm": [
+        "The qualification or skills programme, its NQF level, credits and workplace-hours requirement.",
+        "The tools the host workplace uses (spreadsheets, SQL, a business intelligence platform, or a scripting language)."
+      ],
+      "workplace_requirements": [
+        "Access to real or properly anonymised business data with a clear business question.",
+        "Access to the tools the team uses, with permissions set by the data owner.",
+        "A mentor (analyst or manager) who can explain the business context and review the learner's work."
+      ],
+      "tools": [
+        "Spreadsheet software",
+        "Database and query tool (SQL)",
+        "Business intelligence or dashboard software",
+        "Scripting environment where the team uses one",
+        "Shared drive or repository with version history",
+        "Data dictionary and metadata catalogue"
+      ],
+      "duty_areas": [
+        {
+          "number": 1,
+          "title": "Data acquisition and understanding",
+          "outcomes": [
+            {
+              "code": "DA-1.1",
+              "statement": "Clarify the business question with the requester and write it down."
+            },
+            {
+              "code": "DA-1.2",
+              "statement": "Identify data sources, owners and refresh frequency."
+            },
+            {
+              "code": "DA-1.3",
+              "statement": "Extract data using queries, exports or connectors as permitted."
+            },
+            {
+              "code": "DA-1.4",
+              "statement": "Build or update a data dictionary describing each field."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Written problem statement",
+              "type": "document"
+            },
+            {
+              "description": "Data source list",
+              "type": "document"
+            },
+            {
+              "description": "Data dictionary",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Data cleaning and preparation",
+          "outcomes": [
+            {
+              "code": "DA-2.1",
+              "statement": "Detect and treat missing values, duplicates, inconsistent formats and outliers."
+            },
+            {
+              "code": "DA-2.2",
+              "statement": "Join and reshape data from more than one source."
+            },
+            {
+              "code": "DA-2.3",
+              "statement": "Validate results against totals or known figures."
+            },
+            {
+              "code": "DA-2.4",
+              "statement": "Document every transformation so it can be repeated."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Cleaning log or script",
+              "type": "record"
+            },
+            {
+              "description": "Before-and-after data checks",
+              "type": "document"
+            },
+            {
+              "description": "Reconciliation to source totals",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Analysis",
+          "outcomes": [
+            {
+              "code": "DA-3.1",
+              "statement": "Calculate key performance indicators and descriptive statistics."
+            },
+            {
+              "code": "DA-3.2",
+              "statement": "Look for trends, patterns, segments and relationships."
+            },
+            {
+              "code": "DA-3.3",
+              "statement": "Test assumptions and note limitations of the data."
+            },
+            {
+              "code": "DA-3.4",
+              "statement": "Ask a peer or the mentor to review the logic."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Analysis workbook, notebook or query set",
+              "type": "document"
+            },
+            {
+              "description": "Peer review notes",
+              "type": "feedback"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Visualisation and reporting",
+          "outcomes": [
+            {
+              "code": "DA-4.1",
+              "statement": "Choose the right chart or table for the message."
+            },
+            {
+              "code": "DA-4.2",
+              "statement": "Build and refresh dashboards or reports in the team's tool."
+            },
+            {
+              "code": "DA-4.3",
+              "statement": "Add titles, labels, units and short narrative so non-technical readers can follow."
+            },
+            {
+              "code": "DA-4.4",
+              "statement": "Check accessibility, for example colour contrast and clear labelling."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Dashboard or report produced",
+              "type": "record"
+            },
+            {
+              "description": "Stakeholder feedback",
+              "type": "feedback"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Communication and stakeholder engagement",
+          "outcomes": [
+            {
+              "code": "DA-5.1",
+              "statement": "Present findings and recommendations in plain language."
+            },
+            {
+              "code": "DA-5.2",
+              "statement": "Handle questions, admit limits and offer next steps."
+            },
+            {
+              "code": "DA-5.3",
+              "statement": "Agree deadlines and manage requests professionally."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Presentation or briefing note",
+              "type": "document"
+            },
+            {
+              "description": "Mentor observation of a presentation",
+              "type": "observation"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Data ethics, security and quality",
+          "outcomes": [
+            {
+              "code": "DA-6.1",
+              "statement": "Apply POPIA principles: use only the data needed, anonymise where possible and control access."
+            },
+            {
+              "code": "DA-6.2",
+              "statement": "Store files in approved locations and keep version history."
+            },
+            {
+              "code": "DA-6.3",
+              "statement": "Report data quality problems back to the data owner."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Evidence of anonymisation or masking",
+              "type": "document"
+            },
+            {
+              "description": "Data quality issues log",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Automation and improvement",
+          "outcomes": [
+            {
+              "code": "DA-7.1",
+              "statement": "Automate repeated steps through scheduled refreshes, templates or simple scripts."
+            },
+            {
+              "code": "DA-7.2",
+              "statement": "Suggest improvements to reports and data collection."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Automated process or template",
+              "type": "document"
+            },
+            {
+              "description": "Improvement suggestion reviewed by mentor",
+              "type": "feedback"
+            }
+          ]
+        }
+      ],
+      "source_page": 20,
+      "checksum": "51c5aaa61c5aa0fc"
+    },
+    {
+      "code": "cellphone-repair",
+      "prefix": "CPR",
+      "position": 7,
+      "title": "Cellphone Repair",
+      "summary": "Diagnosing and repairing mobile devices, serving customers and running a small repair workshop.",
+      "purpose": "To build speed, accuracy and customer trust on real devices. The workplace shows how diagnosis, parts quality, customer communication and honest pricing fit together in a repair business.",
+      "occupations": [
+        "Cellphone repair technician",
+        "service centre technician",
+        "workshop assistant",
+        "self-employed repairer or micro-enterprise owner"
+      ],
+      "qualifications": [
+        {
+          "kind": "note",
+          "saqa_id": null,
+          "title": null,
+          "nqf_level": null,
+          "credits": null,
+          "source_text": "Delivered mainly as short skills programmes (recent funded programmes run from about one to three months), so the exact registration status and credits must be confirmed."
+        }
+      ],
+      "to_confirm": [
+        "The skills programme or qualification, its credit value and any workplace component.",
+        "Whether the programme covers board-level repair or only module replacement and software services.",
+        "Applicable consumer, second-hand goods and e-waste rules for the business model."
+      ],
+      "workplace_requirements": [
+        "A working repair workshop, retail service desk or equipped repair container with a competent technician as mentor.",
+        "Real customer devices, spare parts supply and a clean antistatic workbench.",
+        "Ventilation, fire safety and safe battery handling facilities."
+      ],
+      "tools": [
+        "Precision screwdriver set, spudgers, suction cups and heat tools",
+        "Multimeter and power supply or USB power meter",
+        "Soldering station, hot air station and microscope (where covered)",
+        "Antistatic mat and strap",
+        "Diagnostic and flashing software",
+        "Job card system and parts inventory"
+      ],
+      "duty_areas": [
+        {
+          "number": 1,
+          "title": "Customer intake and job cards",
+          "outcomes": [
+            {
+              "code": "CPR-1.1",
+              "statement": "Receive the device, record make, model and serial or IMEI, and check condition with the customer."
+            },
+            {
+              "code": "CPR-1.2",
+              "statement": "Take photos of existing damage, and confirm what the customer wants repaired."
+            },
+            {
+              "code": "CPR-1.3",
+              "statement": "Explain data-loss risk, ask for consent and agree on the quote, timeframe and warranty."
+            },
+            {
+              "code": "CPR-1.4",
+              "statement": "Complete the job card and issue a receipt or acknowledgment."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Completed job cards",
+              "type": "document"
+            },
+            {
+              "description": "Intake photos",
+              "type": "photo"
+            },
+            {
+              "description": "Mentor observation of a customer intake",
+              "type": "observation"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Diagnostics",
+          "outcomes": [
+            {
+              "code": "CPR-2.1",
+              "statement": "Run structured tests: power, charging, display, touch, audio, camera, network and sensors."
+            },
+            {
+              "code": "CPR-2.2",
+              "statement": "Use a multimeter or USB power meter to check current draw and battery condition."
+            },
+            {
+              "code": "CPR-2.3",
+              "statement": "Check for liquid damage indicators and previous repairs."
+            },
+            {
+              "code": "CPR-2.4",
+              "statement": "Record findings and recommend repair, replace or decline."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Diagnostic checklist for at least several devices",
+              "type": "document"
+            },
+            {
+              "description": "Mentor review of diagnosis",
+              "type": "feedback"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Module-level hardware repairs",
+          "outcomes": [
+            {
+              "code": "CPR-3.1",
+              "statement": "Open devices safely using heat, suction and picks, and disconnect the battery first."
+            },
+            {
+              "code": "CPR-3.2",
+              "statement": "Replace screens, batteries, charging ports, buttons, speakers and cameras."
+            },
+            {
+              "code": "CPR-3.3",
+              "statement": "Handle adhesives, seals and connectors correctly and reassemble with the right screws."
+            },
+            {
+              "code": "CPR-3.4",
+              "statement": "Reseal or apply replacement seals where the design requires it."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Repair log with parts used",
+              "type": "record"
+            },
+            {
+              "description": "Before and after photos",
+              "type": "photo"
+            },
+            {
+              "description": "Post-repair test results",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Board-level basics (where covered)",
+          "outcomes": [
+            {
+              "code": "CPR-4.1",
+              "statement": "Practise soldering through-hole and basic surface-mount joints under supervision."
+            },
+            {
+              "code": "CPR-4.2",
+              "statement": "Clean boards after liquid damage using approved methods."
+            },
+            {
+              "code": "CPR-4.3",
+              "statement": "Learn to read simple board diagrams and identify common failure points."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Soldering practice assessment",
+              "type": "document"
+            },
+            {
+              "description": "Supervised board repair notes",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Software services",
+          "outcomes": [
+            {
+              "code": "CPR-5.1",
+              "statement": "Update, reinstall or restore the operating system and apps with the customer's consent."
+            },
+            {
+              "code": "CPR-5.2",
+              "statement": "Back up and restore data, and confirm with the customer afterwards."
+            },
+            {
+              "code": "CPR-5.3",
+              "statement": "Reset devices only with proof of ownership; decline lock-bypass requests without it."
+            },
+            {
+              "code": "CPR-5.4",
+              "statement": "Check IMEI status and refuse suspected stolen or blacklisted devices."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Software service log",
+              "type": "record"
+            },
+            {
+              "description": "Consent records",
+              "type": "record"
+            },
+            {
+              "description": "IMEI check records",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Quality control and handover",
+          "outcomes": [
+            {
+              "code": "CPR-6.1",
+              "statement": "Run a final test checklist covering all functions."
+            },
+            {
+              "code": "CPR-6.2",
+              "statement": "Clean the device, return all accessories and show the customer the working repair."
+            },
+            {
+              "code": "CPR-6.3",
+              "statement": "Explain the warranty clearly and record payment."
+            },
+            {
+              "code": "CPR-6.4",
+              "statement": "Follow up on returns and complaints."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Final QC checklist",
+              "type": "document"
+            },
+            {
+              "description": "Customer sign-off or feedback",
+              "type": "sign_off"
+            },
+            {
+              "description": "Complaint and return records",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Workshop operations",
+          "outcomes": [
+            {
+              "code": "CPR-7.1",
+              "statement": "Order and track parts and tell customers whether parts are original or aftermarket."
+            },
+            {
+              "code": "CPR-7.2",
+              "statement": "Keep workspace and tools organised and calibrated."
+            },
+            {
+              "code": "CPR-7.3",
+              "statement": "Dispose of damaged batteries and electronic waste responsibly."
+            },
+            {
+              "code": "CPR-7.4",
+              "statement": "Record income, expenses and stock for the repair business."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Parts order and stock records",
+              "type": "record"
+            },
+            {
+              "description": "E-waste disposal record",
+              "type": "record"
+            },
+            {
+              "description": "Simple income and expense record",
+              "type": "record"
+            }
+          ]
+        }
+      ],
+      "source_page": 22,
+      "checksum": "403957ec74a67961"
+    },
+    {
+      "code": "laptop-pc-repair",
+      "prefix": "LPR",
+      "position": 8,
+      "title": "Laptop and PC Repair",
+      "summary": "Diagnosing, repairing, upgrading and building computers, and recovering user data safely.",
+      "purpose": "To develop reliable bench skills on real machines. The learner should repair efficiently, communicate honestly with customers, and protect customer data throughout.",
+      "occupations": [
+        "PC repair technician",
+        "workshop technician",
+        "field service technician",
+        "IT support technician",
+        "refurbishment technician"
+      ],
+      "qualifications": [
+        {
+          "kind": "occupational",
+          "saqa_id": "101408",
+          "title": "Occupational Certificate: Computer Technician",
+          "nqf_level": 5,
+          "credits": 282,
+          "source_text": "Occupational Certificate: Computer Technician, SAQA ID 101408, NQF 5, 282 credits (QCTO), which lists PC repair technician among its occupations."
+        }
+      ],
+      "to_confirm": [
+        "Whether the learner is on the full occupational certificate or a shorter repair-focused programme.",
+        "The workplace hours and logbook structure set by the SDP."
+      ],
+      "workplace_requirements": [
+        "A workshop with antistatic workbenches, test equipment and a supply of spare parts and test components.",
+        "A mentor technician with current hardware experience (desktops, laptops and common brands).",
+        "A job tracking system and manufacturer service manuals or access to them."
+      ],
+      "tools": [
+        "Antistatic workbench, mat and strap",
+        "Precision tool kits and test components",
+        "Diagnostic software and bootable media",
+        "Multimeter, PSU tester and cable testers",
+        "Manufacturer service manuals",
+        "Job card and inventory system"
+      ],
+      "duty_areas": [
+        {
+          "number": 1,
+          "title": "Intake and diagnosis",
+          "outcomes": [
+            {
+              "code": "LPR-1.1",
+              "statement": "Log the machine, accessories and reported symptoms, and photograph its condition."
+            },
+            {
+              "code": "LPR-1.2",
+              "statement": "Back up data before any repair when the customer consents."
+            },
+            {
+              "code": "LPR-1.3",
+              "statement": "Check power-on behaviour, beep or LED codes, BIOS or UEFI settings and storage health."
+            },
+            {
+              "code": "LPR-1.4",
+              "statement": "Run component stress tests and interpret results."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Job card and intake photos",
+              "type": "photo"
+            },
+            {
+              "description": "Diagnostic test reports",
+              "type": "record"
+            },
+            {
+              "description": "Mentor review of a diagnosis",
+              "type": "feedback"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Component replacement",
+          "outcomes": [
+            {
+              "code": "LPR-2.1",
+              "statement": "Replace memory, storage drives, batteries, keyboards, fans, screens and power connectors."
+            },
+            {
+              "code": "LPR-2.2",
+              "statement": "Use service manuals, label and track screws, and apply thermal paste correctly."
+            },
+            {
+              "code": "LPR-2.3",
+              "statement": "Replace power supplies, graphics cards and motherboards in desktop systems."
+            },
+            {
+              "code": "LPR-2.4",
+              "statement": "Follow antistatic procedures throughout."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Repair log with parts used",
+              "type": "record"
+            },
+            {
+              "description": "Photos of disassembly steps",
+              "type": "photo"
+            },
+            {
+              "description": "Post-repair test results",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Operating system, drivers and data",
+          "outcomes": [
+            {
+              "code": "LPR-3.1",
+              "statement": "Install or reinstall operating systems and drivers, and apply updates."
+            },
+            {
+              "code": "LPR-3.2",
+              "statement": "Remove malware and repair corrupted installations."
+            },
+            {
+              "code": "LPR-3.3",
+              "statement": "Recover and migrate user data safely."
+            },
+            {
+              "code": "LPR-3.4",
+              "statement": "Make sure software licences are valid and recorded."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Software service log",
+              "type": "record"
+            },
+            {
+              "description": "Data recovery record",
+              "type": "record"
+            },
+            {
+              "description": "Licence record",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Power and thermal faults",
+          "outcomes": [
+            {
+              "code": "LPR-4.1",
+              "statement": "Test chargers, DC jacks and battery health."
+            },
+            {
+              "code": "LPR-4.2",
+              "statement": "Diagnose overheating: clean fans and heatsinks, replace paste and check airflow."
+            },
+            {
+              "code": "LPR-4.3",
+              "statement": "Identify when a fault needs board-level repair and refer it."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Power test readings",
+              "type": "document"
+            },
+            {
+              "description": "Thermal test before and after",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Networking and peripherals",
+          "outcomes": [
+            {
+              "code": "LPR-5.1",
+              "statement": "Fix wireless and wired connection issues on the device."
+            },
+            {
+              "code": "LPR-5.2",
+              "statement": "Install and configure printers, monitors and docking stations."
+            },
+            {
+              "code": "LPR-5.3",
+              "statement": "Set up basic home or small-office connectivity."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Ticket notes",
+              "type": "document"
+            },
+            {
+              "description": "Mentor observation of a setup",
+              "type": "observation"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Build and upgrade",
+          "outcomes": [
+            {
+              "code": "LPR-6.1",
+              "statement": "Specify and assemble a desktop from components, checking compatibility."
+            },
+            {
+              "code": "LPR-6.2",
+              "statement": "Manage cables for airflow and run burn-in tests."
+            },
+            {
+              "code": "LPR-6.3",
+              "statement": "Advise customers on sensible upgrades within budget."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Build specification and checklist",
+              "type": "document"
+            },
+            {
+              "description": "Burn-in test report",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Workshop process and customer service",
+          "outcomes": [
+            {
+              "code": "LPR-7.1",
+              "statement": "Quote clearly, including a repair versus replace recommendation."
+            },
+            {
+              "code": "LPR-7.2",
+              "statement": "Work within turnaround targets and update the customer on delays."
+            },
+            {
+              "code": "LPR-7.3",
+              "statement": "Run final quality checks and explain the warranty."
+            },
+            {
+              "code": "LPR-7.4",
+              "statement": "Dispose of e-waste and drives correctly and securely."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Quotes issued",
+              "type": "document"
+            },
+            {
+              "description": "Turnaround report",
+              "type": "record"
+            },
+            {
+              "description": "Disposal and data wipe certificates",
+              "type": "document"
+            }
+          ]
+        }
+      ],
+      "source_page": 25,
+      "checksum": "b654dfbeb986fb23"
+    },
+    {
+      "code": "drone-piloting-repairs",
+      "prefix": "DRN",
+      "position": 9,
+      "title": "Drone Piloting and Repairs",
+      "summary": "Safe, lawful remotely piloted aircraft operations, data capture, maintenance and repair.",
+      "purpose": "To give the learner supervised real-world flight and maintenance experience, which cannot be replaced by simulation where regulation or competence standards require actual flying hours. It also shows how planning, compliance and data handling make flying commercially useful.",
+      "occupations": [
+        "Remote pilot",
+        "drone technician",
+        "aerial data capture operator",
+        "inspection or mapping assistant",
+        "drone maintenance assistant"
+      ],
+      "qualifications": [
+        {
+          "kind": "occupational",
+          "saqa_id": "121161",
+          "title": "National Occupational Certificate: Remotely Piloted Aircraft Systems (RPAS) Pilot",
+          "nqf_level": null,
+          "credits": null,
+          "source_text": "SAQA ID 121161: National Occupational Certificate: Remotely Piloted Aircraft Systems (RPAS) Pilot."
+        },
+        {
+          "kind": "related",
+          "saqa_id": "121155",
+          "title": null,
+          "nqf_level": null,
+          "credits": null,
+          "source_text": "SAQA ID 121155: a related qualification whose outcomes include diagnosing and repairing faults in RPAS (confirm exact title and level)."
+        },
+        {
+          "kind": "skills_programme",
+          "saqa_id": null,
+          "title": "MICT SETA 4IR Skills Programme: Drone Piloting",
+          "nqf_level": null,
+          "credits": null,
+          "source_text": "MICT SETA 4IR Skills Programme: Drone Piloting (short programme; placement rules vary)."
+        }
+      ],
+      "to_confirm": [
+        "The current South African Civil Aviation Authority (SACAA) requirements for remote pilot licensing, operator certification and logged flight hours.",
+        "Whether the learner is on a pilot pathway, a maintenance pathway, or both.",
+        "Insurance, landowner permission and airspace approvals for each site."
+      ],
+      "workplace_requirements": [
+        "An approved operator or training organisation with the necessary regulatory authorisations and insurance.",
+        "Approved flying sites, trained safety observers and written operations manuals.",
+        "A workshop for inspection and repair with safe battery storage and charging."
+      ],
+      "tools": [
+        "Drone and controller with spare propellers and batteries",
+        "Pre-flight and post-flight checklists",
+        "Airspace maps and weather information",
+        "Flight planning and data processing software",
+        "Maintenance tools, calibration equipment and fire-safe battery storage",
+        "Pilot logbook and maintenance logbook"
+      ],
+      "duty_areas": [
+        {
+          "number": 1,
+          "title": "Regulatory compliance and airspace",
+          "outcomes": [
+            {
+              "code": "DRN-1.1",
+              "statement": "Confirm the operator's authorisations and the pilot's licence status before each operation."
+            },
+            {
+              "code": "DRN-1.2",
+              "statement": "Check airspace restrictions, no-fly zones, notices and permissions for the site."
+            },
+            {
+              "code": "DRN-1.3",
+              "statement": "Obtain landowner or client permission and consider privacy."
+            },
+            {
+              "code": "DRN-1.4",
+              "statement": "Keep flight and compliance records up to date."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Pre-flight compliance checklist",
+              "type": "document"
+            },
+            {
+              "description": "Airspace check record",
+              "type": "record"
+            },
+            {
+              "description": "Permission documents",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Pre-flight planning and risk assessment",
+          "outcomes": [
+            {
+              "code": "DRN-2.1",
+              "statement": "Survey the site and assess weather, obstacles, people and property at risk."
+            },
+            {
+              "code": "DRN-2.2",
+              "statement": "Plan the mission, battery needs, flight path and emergency landing options."
+            },
+            {
+              "code": "DRN-2.3",
+              "statement": "Brief the crew and agree roles and signals."
+            },
+            {
+              "code": "DRN-2.4",
+              "statement": "Complete the risk assessment and obtain sign-off."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Risk assessment",
+              "type": "document"
+            },
+            {
+              "description": "Mission plan",
+              "type": "document"
+            },
+            {
+              "description": "Crew briefing record",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Flight operations",
+          "outcomes": [
+            {
+              "code": "DRN-3.1",
+              "statement": "Complete the pre-flight inspection and checklists on aircraft, controller and batteries."
+            },
+            {
+              "code": "DRN-3.2",
+              "statement": "Launch, fly and land safely, keeping the aircraft within the permitted operating limits."
+            },
+            {
+              "code": "DRN-3.3",
+              "statement": "Respond correctly to emergencies such as lost link, low battery or GPS drift."
+            },
+            {
+              "code": "DRN-3.4",
+              "statement": "Complete post-flight checks and log every flight."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Pilot logbook entries signed by the instructor",
+              "type": "sign_off"
+            },
+            {
+              "description": "Checklists",
+              "type": "document"
+            },
+            {
+              "description": "Instructor observation of emergency drills",
+              "type": "observation"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Data capture and delivery",
+          "outcomes": [
+            {
+              "code": "DRN-4.1",
+              "statement": "Capture photos, video or other data according to the client brief."
+            },
+            {
+              "code": "DRN-4.2",
+              "statement": "Process and store data safely and deliver it in the agreed format."
+            },
+            {
+              "code": "DRN-4.3",
+              "statement": "Respect privacy and confidentiality of people and sites captured."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Sample deliverable",
+              "type": "document"
+            },
+            {
+              "description": "Data handling record",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Inspection, maintenance and repair",
+          "outcomes": [
+            {
+              "code": "DRN-5.1",
+              "statement": "Carry out scheduled airframe, propeller, motor, gimbal and battery inspections."
+            },
+            {
+              "code": "DRN-5.2",
+              "statement": "Calibrate compass and inertial sensors and update firmware as approved."
+            },
+            {
+              "code": "DRN-5.3",
+              "statement": "Diagnose and repair common faults such as damaged propellers, motors, speed controllers and camera mounts."
+            },
+            {
+              "code": "DRN-5.4",
+              "statement": "Maintain a maintenance log with parts traceability."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Maintenance log",
+              "type": "record"
+            },
+            {
+              "description": "Inspection checklists",
+              "type": "document"
+            },
+            {
+              "description": "Repair records and test flights",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Battery safety",
+          "outcomes": [
+            {
+              "code": "DRN-6.1",
+              "statement": "Charge, store and transport lithium batteries according to the manufacturer and company procedure."
+            },
+            {
+              "code": "DRN-6.2",
+              "statement": "Identify swelling or damage and remove batteries from service."
+            },
+            {
+              "code": "DRN-6.3",
+              "statement": "Dispose of damaged batteries through safe channels."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Battery register",
+              "type": "record"
+            },
+            {
+              "description": "Mentor observation of charging and storage",
+              "type": "observation"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Incident reporting and safety management",
+          "outcomes": [
+            {
+              "code": "DRN-7.1",
+              "statement": "Report incidents, near misses and equipment failures immediately."
+            },
+            {
+              "code": "DRN-7.2",
+              "statement": "Help investigate causes and record corrective actions."
+            },
+            {
+              "code": "DRN-7.3",
+              "statement": "Understand the regulatory reporting duties of the operator."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Incident or near-miss reports",
+              "type": "record"
+            },
+            {
+              "description": "Corrective action records",
+              "type": "record"
+            }
+          ]
+        }
+      ],
+      "source_page": 27,
+      "checksum": "41364d18e9d6e2d6"
+    },
+    {
+      "code": "technopreneur",
+      "prefix": "TPR",
+      "position": 10,
+      "title": "Technopreneur",
+      "summary": "Starting and growing a technology-based business, with a business mentor in an incubator or host enterprise.",
+      "purpose": "To test business ideas against real customers and real constraints. The workplace component is judged on what the learner actually does: talks to customers, builds and tests a product, sells, keeps records and manages money, not just on a business plan document.",
+      "occupations": [
+        "Founder or co-founder of a technology start-up",
+        "small-business owner",
+        "product developer in a small enterprise",
+        "business development assistant"
+      ],
+      "qualifications": [
+        {
+          "kind": "note",
+          "saqa_id": null,
+          "title": null,
+          "nqf_level": null,
+          "credits": null,
+          "source_text": "Technopreneurship is typically delivered through entrepreneurship or new-venture-creation skills programmes and qualifications, combined with 4IR technology content."
+        }
+      ],
+      "to_confirm": [
+        "The qualification or skills programme, its NQF level and credits.",
+        "Whether the workplace component is placement in an established business, an incubator, or building the learner's own venture with a mentor."
+      ],
+      "workplace_requirements": [
+        "An incubator, enterprise development centre or host business with a mentor who has real business experience.",
+        "Access to customers or a market, basic equipment and connectivity.",
+        "A structured programme of mentor meetings, milestones and written feedback."
+      ],
+      "tools": [
+        "Business model canvas or similar planning tool",
+        "Spreadsheet or accounting package",
+        "Prototyping tools (no-code, web, app or hardware as relevant)",
+        "Customer relationship tracking",
+        "Social media and basic website tools",
+        "Templates for contracts, invoices and quotes"
+      ],
+      "duty_areas": [
+        {
+          "number": 1,
+          "title": "Opportunity identification and validation",
+          "outcomes": [
+            {
+              "code": "TPR-1.1",
+              "statement": "Identify a real problem and write a clear problem statement."
+            },
+            {
+              "code": "TPR-1.2",
+              "statement": "Interview potential customers and record what they say."
+            },
+            {
+              "code": "TPR-1.3",
+              "statement": "Analyse competitors and estimate the size of the market."
+            },
+            {
+              "code": "TPR-1.4",
+              "statement": "Test the riskiest assumptions with small experiments."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Customer interview notes",
+              "type": "document"
+            },
+            {
+              "description": "Competitor analysis",
+              "type": "document"
+            },
+            {
+              "description": "Assumption test results",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Business model and planning",
+          "outcomes": [
+            {
+              "code": "TPR-2.1",
+              "statement": "Describe the value proposition, customers, channels and revenue streams in a business model canvas."
+            },
+            {
+              "code": "TPR-2.2",
+              "statement": "Set prices and work out unit costs and break-even."
+            },
+            {
+              "code": "TPR-2.3",
+              "statement": "Prepare a cash flow forecast and basic budget."
+            },
+            {
+              "code": "TPR-2.4",
+              "statement": "Identify funding and support options and the requirements of each."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Business model canvas",
+              "type": "document"
+            },
+            {
+              "description": "Pricing and cost workings",
+              "type": "document"
+            },
+            {
+              "description": "Cash flow forecast",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Product or service development",
+          "outcomes": [
+            {
+              "code": "TPR-3.1",
+              "statement": "Build or configure a first working version of the product or service."
+            },
+            {
+              "code": "TPR-3.2",
+              "statement": "Test it with real users and make documented improvements."
+            },
+            {
+              "code": "TPR-3.3",
+              "statement": "Protect ideas and names appropriately and respect others' intellectual property."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Prototype or demo",
+              "type": "document"
+            },
+            {
+              "description": "User testing notes",
+              "type": "document"
+            },
+            {
+              "description": "Version history",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Marketing and sales",
+          "outcomes": [
+            {
+              "code": "TPR-4.1",
+              "statement": "Set up a professional online presence and customer contact channels."
+            },
+            {
+              "code": "TPR-4.2",
+              "statement": "Run small marketing activities and track results."
+            },
+            {
+              "code": "TPR-4.3",
+              "statement": "Manage leads and customers in a simple pipeline."
+            },
+            {
+              "code": "TPR-4.4",
+              "statement": "Prepare and deliver a sales pitch and handle objections."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Marketing activity records",
+              "type": "record"
+            },
+            {
+              "description": "Lead and sales log",
+              "type": "record"
+            },
+            {
+              "description": "Pitch delivered to mentor",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Operations, finance and compliance",
+          "outcomes": [
+            {
+              "code": "TPR-5.1",
+              "statement": "Understand the steps to register a business and meet tax obligations."
+            },
+            {
+              "code": "TPR-5.2",
+              "statement": "Keep bookkeeping records, issue invoices and track income and expenses."
+            },
+            {
+              "code": "TPR-5.3",
+              "statement": "Use simple contracts and understand privacy and consumer obligations."
+            },
+            {
+              "code": "TPR-5.4",
+              "statement": "Consider insurance and risk."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Registration documents or plan",
+              "type": "document"
+            },
+            {
+              "description": "Bookkeeping records",
+              "type": "record"
+            },
+            {
+              "description": "Sample invoice and contract",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Leadership, teamwork and ethics",
+          "outcomes": [
+            {
+              "code": "TPR-6.1",
+              "statement": "Plan time, set goals and review progress weekly."
+            },
+            {
+              "code": "TPR-6.2",
+              "statement": "Work with partners, suppliers and team members fairly."
+            },
+            {
+              "code": "TPR-6.3",
+              "statement": "Network with other entrepreneurs and mentors."
+            },
+            {
+              "code": "TPR-6.4",
+              "statement": "Act honestly and fulfil commitments to customers."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Weekly plans",
+              "type": "document"
+            },
+            {
+              "description": "Mentor meeting notes",
+              "type": "document"
+            },
+            {
+              "description": "References or customer feedback",
+              "type": "feedback"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Pitching and progress reporting",
+          "outcomes": [
+            {
+              "code": "TPR-7.1",
+              "statement": "Present the venture clearly to mentors, funders or a panel."
+            },
+            {
+              "code": "TPR-7.2",
+              "statement": "Report on key numbers: customers, revenue, costs and learning."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Pitch deck and delivery",
+              "type": "document"
+            },
+            {
+              "description": "Progress reports",
+              "type": "record"
+            }
+          ]
+        }
+      ],
+      "source_page": 30,
+      "checksum": "0db3e8fe9b634360"
+    },
+    {
+      "code": "cybersecurity-defender",
+      "prefix": "CYD",
+      "position": 11,
+      "title": "Cybersecurity Defender",
+      "summary": "Monitoring, protecting and responding to threats against an organisation's systems and data.",
+      "purpose": "To develop disciplined, ethical defenders. The workplace shows how alerts become investigations, how incidents are contained, and how policy, people and technology work together to reduce risk.",
+      "occupations": [
+        "Security operations (SOC) analyst",
+        "cybersecurity analyst",
+        "vulnerability analyst",
+        "security support technician",
+        "information security officer assistant"
+      ],
+      "qualifications": [
+        {
+          "kind": "occupational",
+          "saqa_id": "118986",
+          "title": "Occupational Certificate: Cybersecurity Analyst",
+          "nqf_level": 5,
+          "credits": 173,
+          "source_text": "SAQA ID 118986: Occupational Certificate: Cybersecurity Analyst, NQF 5, 173 credits (QCTO; MICT SETA is the development quality partner). This is the closest registered occupational qualification found."
+        },
+        {
+          "kind": "note",
+          "saqa_id": null,
+          "title": null,
+          "nqf_level": null,
+          "credits": null,
+          "source_text": "Further occupational qualifications at higher levels exist, for example an advanced cybersecurity practitioner qualification at NQF 6."
+        }
+      ],
+      "to_confirm": [
+        "\"Cybersecurity Defender\" may be a provider or programme name: confirm the exact registered qualification and ID.",
+        "What level of access to security tools and live data a learner may hold, and what vetting or confidentiality agreements are required."
+      ],
+      "workplace_requirements": [
+        "A security team or security-aware IT team with monitoring tools and a defined incident response process.",
+        "A mentor with demonstrable security experience and authority to approve learner actions.",
+        "Written authorisation, confidentiality agreements and a clear scope for everything the learner does."
+      ],
+      "tools": [
+        "Security monitoring platform (SIEM) and log sources",
+        "Endpoint detection and response tools",
+        "Vulnerability scanner",
+        "Ticketing and incident management system",
+        "Threat intelligence feeds and attack framework references",
+        "Isolated lab environment for practice"
+      ],
+      "duty_areas": [
+        {
+          "number": 1,
+          "title": "Security monitoring and triage",
+          "outcomes": [
+            {
+              "code": "CYD-1.1",
+              "statement": "Monitor alerts and logs in the security information and event management tool or equivalent."
+            },
+            {
+              "code": "CYD-1.2",
+              "statement": "Distinguish false positives from real events and classify severity."
+            },
+            {
+              "code": "CYD-1.3",
+              "statement": "Record the investigation steps and findings in the ticketing system."
+            },
+            {
+              "code": "CYD-1.4",
+              "statement": "Hand over clearly between shifts."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Alert triage log",
+              "type": "record"
+            },
+            {
+              "description": "Investigation notes",
+              "type": "document"
+            },
+            {
+              "description": "Shift handover records",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Incident response",
+          "outcomes": [
+            {
+              "code": "CYD-2.1",
+              "statement": "Follow incident playbooks to contain, eradicate and recover from incidents under supervision."
+            },
+            {
+              "code": "CYD-2.2",
+              "statement": "Preserve evidence and maintain a chain of custody."
+            },
+            {
+              "code": "CYD-2.3",
+              "statement": "Communicate with affected users and stakeholders as directed."
+            },
+            {
+              "code": "CYD-2.4",
+              "statement": "Contribute to post-incident reports and lessons learned."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Incident tickets",
+              "type": "document"
+            },
+            {
+              "description": "Evidence handling forms",
+              "type": "document"
+            },
+            {
+              "description": "Post-incident report contribution",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Vulnerability and patch management",
+          "outcomes": [
+            {
+              "code": "CYD-3.1",
+              "statement": "Run authorised vulnerability scans and interpret the results."
+            },
+            {
+              "code": "CYD-3.2",
+              "statement": "Prioritise findings by risk and business impact."
+            },
+            {
+              "code": "CYD-3.3",
+              "statement": "Track remediation to completion and verify fixes."
+            },
+            {
+              "code": "CYD-3.4",
+              "statement": "Record exceptions approved by the system owner."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Scan reports with scope authorisation",
+              "type": "record"
+            },
+            {
+              "description": "Remediation tracker",
+              "type": "document"
+            },
+            {
+              "description": "Verification records",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Endpoint, network and identity defence",
+          "outcomes": [
+            {
+              "code": "CYD-4.1",
+              "statement": "Monitor endpoint protection alerts and respond as per procedure."
+            },
+            {
+              "code": "CYD-4.2",
+              "statement": "Review firewall and access rules, and check multi-factor authentication coverage."
+            },
+            {
+              "code": "CYD-4.3",
+              "statement": "Triage reported phishing emails and take approved actions."
+            },
+            {
+              "code": "CYD-4.4",
+              "statement": "Check systems against hardening baselines."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Phishing triage log",
+              "type": "record"
+            },
+            {
+              "description": "Hardening checklist",
+              "type": "document"
+            },
+            {
+              "description": "Access review notes",
+              "type": "feedback"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Threat intelligence and hunting basics",
+          "outcomes": [
+            {
+              "code": "CYD-5.1",
+              "statement": "Use threat feeds and indicators of compromise to check for matching activity."
+            },
+            {
+              "code": "CYD-5.2",
+              "statement": "Map observed behaviour to a recognised attack framework."
+            },
+            {
+              "code": "CYD-5.3",
+              "statement": "Support simple, supervised hunting exercises."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Intelligence check records",
+              "type": "record"
+            },
+            {
+              "description": "Hunting exercise report",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Governance, risk and compliance",
+          "outcomes": [
+            {
+              "code": "CYD-6.1",
+              "statement": "Apply information security policies and help maintain the risk register."
+            },
+            {
+              "code": "CYD-6.2",
+              "statement": "Support audits and evidence collection for relevant standards and POPIA requirements."
+            },
+            {
+              "code": "CYD-6.3",
+              "statement": "Help deliver security awareness activities to staff."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Risk register updates",
+              "type": "record"
+            },
+            {
+              "description": "Audit evidence submitted",
+              "type": "document"
+            },
+            {
+              "description": "Awareness material or session",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Reporting and communication",
+          "outcomes": [
+            {
+              "code": "CYD-7.1",
+              "statement": "Write clear technical and management summaries of events."
+            },
+            {
+              "code": "CYD-7.2",
+              "statement": "Escalate quickly and keep calm during incidents."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Sample reports",
+              "type": "record"
+            },
+            {
+              "description": "Mentor feedback on communication",
+              "type": "feedback"
+            }
+          ]
+        }
+      ],
+      "source_page": 32,
+      "checksum": "7798bfaa23cbf4b1"
+    },
+    {
+      "code": "end-user-computing-intermediate",
+      "prefix": "EUC-I",
+      "position": 12,
+      "title": "Intermediate End User Computing",
+      "summary": "Confident, accurate everyday use of office software, collaboration tools and digital services at work.",
+      "purpose": "To make sure learners can apply computer skills to real tasks: producing correct documents, working with data, communicating professionally online and keeping information organised and secure.",
+      "occupations": [
+        "Administrative assistant",
+        "data capturer",
+        "receptionist",
+        "clerk",
+        "office or project support assistant",
+        "junior team member in any department"
+      ],
+      "qualifications": [
+        {
+          "kind": "legacy",
+          "saqa_id": null,
+          "title": "National Certificate: Information Technology: End User Computing",
+          "nqf_level": 3,
+          "credits": null,
+          "source_text": "Offered as end-user computing skills programmes. A legacy National Certificate: Information Technology: End User Computing (NQF 3) is listed by providers; intermediate and advanced skills programmes are described as pending or recent in some provider material. Confirm the current status."
+        }
+      ],
+      "to_confirm": [
+        "The programme or qualification, its credits and whether a workplace component is formally required.",
+        "The office suite (for example Microsoft 365 or Google Workspace) used in the host workplace."
+      ],
+      "workplace_requirements": [
+        "A real office role with regular document, spreadsheet, email and presentation tasks.",
+        "Access to the office suite and shared storage with limited, appropriate permissions.",
+        "A supervisor or colleague who can set tasks, check quality and give feedback."
+      ],
+      "tools": [
+        "Office suite: word processor, spreadsheet, presentation and email",
+        "Cloud storage and collaboration platform",
+        "Video conferencing tools",
+        "Printers, scanners and shared devices",
+        "Company templates and style guide",
+        "Password manager or approved credential practices"
+      ],
+      "duty_areas": [
+        {
+          "number": 1,
+          "title": "Documents and correspondence",
+          "outcomes": [
+            {
+              "code": "EUC-I-1.1",
+              "statement": "Produce letters, reports and minutes using styles, templates and company formatting standards."
+            },
+            {
+              "code": "EUC-I-1.2",
+              "statement": "Use tables, headers, footers, page numbering and a contents list in longer documents."
+            },
+            {
+              "code": "EUC-I-1.3",
+              "statement": "Use mail merge to produce personalised letters or labels."
+            },
+            {
+              "code": "EUC-I-1.4",
+              "statement": "Proofread, track changes and respond to review comments."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Sample documents produced for real work",
+              "type": "document"
+            },
+            {
+              "description": "Supervisor feedback",
+              "type": "feedback"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Spreadsheets",
+          "outcomes": [
+            {
+              "code": "EUC-I-2.1",
+              "statement": "Enter and format data accurately and apply sorting and filtering."
+            },
+            {
+              "code": "EUC-I-2.2",
+              "statement": "Use formulas and functions such as SUM, AVERAGE, IF, COUNTIF and lookup functions."
+            },
+            {
+              "code": "EUC-I-2.3",
+              "statement": "Create charts and simple pivot tables to summarise data."
+            },
+            {
+              "code": "EUC-I-2.4",
+              "statement": "Check results for errors and protect sheets where needed."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Workbooks used in real tasks",
+              "type": "document"
+            },
+            {
+              "description": "Error checks or reconciliations",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Presentations and visual communication",
+          "outcomes": [
+            {
+              "code": "EUC-I-3.1",
+              "statement": "Build clear presentations using slide masters, consistent design, charts and images."
+            },
+            {
+              "code": "EUC-I-3.2",
+              "statement": "Present to colleagues, using notes and appropriate delivery."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Presentation file",
+              "type": "document"
+            },
+            {
+              "description": "Observation by supervisor",
+              "type": "observation"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Email, calendar and collaboration",
+          "outcomes": [
+            {
+              "code": "EUC-I-4.1",
+              "statement": "Manage email, folders, rules, shared mailboxes and out-of-office settings."
+            },
+            {
+              "code": "EUC-I-4.2",
+              "statement": "Schedule meetings, share calendars and use video conferencing tools."
+            },
+            {
+              "code": "EUC-I-4.3",
+              "statement": "Share and co-edit files in cloud storage with correct permissions."
+            },
+            {
+              "code": "EUC-I-4.4",
+              "statement": "Follow professional email etiquette and naming conventions."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Meeting invitations organised",
+              "type": "document"
+            },
+            {
+              "description": "Shared document examples",
+              "type": "document"
+            },
+            {
+              "description": "Supervisor feedback",
+              "type": "feedback"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Files, devices and information management",
+          "outcomes": [
+            {
+              "code": "EUC-I-5.1",
+              "statement": "Organise files and folders logically and keep version control."
+            },
+            {
+              "code": "EUC-I-5.2",
+              "statement": "Back up work and use approved cloud storage."
+            },
+            {
+              "code": "EUC-I-5.3",
+              "statement": "Perform basic troubleshooting: restart, printer setup and basic connectivity."
+            },
+            {
+              "code": "EUC-I-5.4",
+              "statement": "Practise good security: strong passwords, multi-factor authentication and phishing awareness."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Folder structure example",
+              "type": "document"
+            },
+            {
+              "description": "Security awareness checklist",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Online research and digital services",
+          "outcomes": [
+            {
+              "code": "EUC-I-6.1",
+              "statement": "Search for, evaluate and cite reliable information."
+            },
+            {
+              "code": "EUC-I-6.2",
+              "statement": "Use online forms, portals and government or company digital services safely."
+            },
+            {
+              "code": "EUC-I-6.3",
+              "statement": "Download and share files responsibly."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Research task output",
+              "type": "document"
+            },
+            {
+              "description": "Portal use record",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Workflow, accuracy and deadlines",
+          "outcomes": [
+            {
+              "code": "EUC-I-7.1",
+              "statement": "Plan tasks, meet deadlines and communicate delays early."
+            },
+            {
+              "code": "EUC-I-7.2",
+              "statement": "Check own work for accuracy before submission."
+            },
+            {
+              "code": "EUC-I-7.3",
+              "statement": "Accept and apply feedback."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Task list with completion dates",
+              "type": "document"
+            },
+            {
+              "description": "Supervisor feedback",
+              "type": "feedback"
+            }
+          ]
+        }
+      ],
+      "source_page": 35,
+      "checksum": "8f343adb0ecc43ba"
+    },
+    {
+      "code": "end-user-computing-advanced",
+      "prefix": "EUC-A",
+      "position": 13,
+      "title": "Advanced End User Computing",
+      "summary": "Expert use of office and data tools to automate work, analyse information and support colleagues.",
+      "purpose": "To show that advanced end-user skills save the organisation time and reduce errors. Learners should build reliable templates, models and automated workflows that other people use.",
+      "occupations": [
+        "Senior administrator",
+        "executive or project assistant",
+        "reporting officer",
+        "office systems coordinator",
+        "super-user or first-line application support"
+      ],
+      "qualifications": [
+        {
+          "kind": "note",
+          "saqa_id": null,
+          "title": null,
+          "nqf_level": null,
+          "credits": null,
+          "source_text": "Offered as end-user computing skills programmes. Confirm the current registration, NQF level and credits with Services SETA or your SDP, since provider listings describe advanced end-user programmes as recent or pending."
+        }
+      ],
+      "to_confirm": [
+        "The programme or qualification and the specific advanced skills assessed (for example automation, databases or dashboards).",
+        "Which automation and scripting features the employer allows on company systems."
+      ],
+      "workplace_requirements": [
+        "Real reporting, document and data tasks with enough complexity to need advanced features.",
+        "Permission to use automation features within company IT policy.",
+        "A supervisor who can review output and a colleague group the learner can support."
+      ],
+      "tools": [
+        "Advanced features of the office suite",
+        "Data transformation and dashboard tools",
+        "Workflow or automation platform approved by IT",
+        "Database tool",
+        "Shared document repositories with version history",
+        "Template and documentation library"
+      ],
+      "duty_areas": [
+        {
+          "number": 1,
+          "title": "Advanced documents and templates",
+          "outcomes": [
+            {
+              "code": "EUC-A-1.1",
+              "statement": "Create long, structured documents with styles, cross-references, automatic contents and citations."
+            },
+            {
+              "code": "EUC-A-1.2",
+              "statement": "Design reusable templates and fillable forms."
+            },
+            {
+              "code": "EUC-A-1.3",
+              "statement": "Use protection, comments, version history and compare tools in collaborative work."
+            },
+            {
+              "code": "EUC-A-1.4",
+              "statement": "Record or edit basic macros where permitted."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Template library built",
+              "type": "document"
+            },
+            {
+              "description": "Long document produced",
+              "type": "document"
+            },
+            {
+              "description": "Reviewer feedback",
+              "type": "feedback"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Advanced spreadsheets and data",
+          "outcomes": [
+            {
+              "code": "EUC-A-2.1",
+              "statement": "Use nested and lookup functions, dynamic arrays, named ranges and data validation."
+            },
+            {
+              "code": "EUC-A-2.2",
+              "statement": "Build pivot tables and charts and clean data with a data-transformation tool."
+            },
+            {
+              "code": "EUC-A-2.3",
+              "statement": "Create what-if analyses, financial calculations and models with clear assumptions."
+            },
+            {
+              "code": "EUC-A-2.4",
+              "statement": "Audit formulas and document the model."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Model or report built for real use",
+              "type": "record"
+            },
+            {
+              "description": "Model documentation",
+              "type": "document"
+            },
+            {
+              "description": "Error check results",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Databases and data tools",
+          "outcomes": [
+            {
+              "code": "EUC-A-3.1",
+              "statement": "Build or use simple databases with tables, queries, forms and reports."
+            },
+            {
+              "code": "EUC-A-3.2",
+              "statement": "Import, export and link data between applications."
+            },
+            {
+              "code": "EUC-A-3.3",
+              "statement": "Maintain data quality and prevent duplicates."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Database or query set",
+              "type": "document"
+            },
+            {
+              "description": "Report produced",
+              "type": "record"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Dashboards and presentations",
+          "outcomes": [
+            {
+              "code": "EUC-A-4.1",
+              "statement": "Design dashboards and executive summaries that show the key indicators clearly."
+            },
+            {
+              "code": "EUC-A-4.2",
+              "statement": "Create professional presentations with consistent templates and interactive elements."
+            },
+            {
+              "code": "EUC-A-4.3",
+              "statement": "Explain the data and answer questions from managers."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Dashboard or executive report",
+              "type": "record"
+            },
+            {
+              "description": "Presentation delivered",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Process automation and integration",
+          "outcomes": [
+            {
+              "code": "EUC-A-5.1",
+              "statement": "Automate repeated tasks using workflow tools, macros or scripts permitted by the employer."
+            },
+            {
+              "code": "EUC-A-5.2",
+              "statement": "Connect forms, spreadsheets and email to reduce manual work."
+            },
+            {
+              "code": "EUC-A-5.3",
+              "statement": "Test automations and document how they work and who owns them."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Automated workflow",
+              "type": "document"
+            },
+            {
+              "description": "Documentation and test record",
+              "type": "record"
+            },
+            {
+              "description": "Time saved estimate",
+              "type": "document"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Training and supporting colleagues",
+          "outcomes": [
+            {
+              "code": "EUC-A-6.1",
+              "statement": "Write simple guides and run short demonstrations for colleagues."
+            },
+            {
+              "code": "EUC-A-6.2",
+              "statement": "Provide first-line help for software questions and escalate when needed."
+            },
+            {
+              "code": "EUC-A-6.3",
+              "statement": "Promote good file, naming and version practices."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "User guides produced",
+              "type": "document"
+            },
+            {
+              "description": "Feedback from colleagues",
+              "type": "feedback"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Information governance and security",
+          "outcomes": [
+            {
+              "code": "EUC-A-7.1",
+              "statement": "Apply permissions, sensitivity labels and sharing settings correctly."
+            },
+            {
+              "code": "EUC-A-7.2",
+              "statement": "Protect personal information in files, reports and automated flows."
+            },
+            {
+              "code": "EUC-A-7.3",
+              "statement": "Follow retention, backup and version rules."
+            }
+          ],
+          "evidence": [
+            {
+              "description": "Permissions review",
+              "type": "feedback"
+            },
+            {
+              "description": "Governance checklist",
+              "type": "document"
+            }
+          ]
+        }
+      ],
+      "source_page": 38,
+      "checksum": "cdca082dade71c18"
+    }
+  ],
+  "reference_pages": [
+    {
+      "slug": "the-framework-saqa-qcto-and-services-seta",
+      "position": 1,
+      "title": "The framework: SAQA, QCTO and Services SETA",
+      "markdown": "| Body or person | Role in workplace learning |\n|---|---|\n| SAQA | Oversees the NQF and maintains the register of qualifications. Each registered qualification has a record showing purpose, outcomes, credits, level and assessment criteria. |\n| QCTO | Quality council for trades and occupations. Registers occupational qualifications and sets the requirements for training, workplace experience and external assessment. |\n| Services SETA | The SETA for the services sector. Funds and supports learning programmes, approves workplaces and learner agreements, and performs quality assurance functions delegated by the QCTO. |\n| Skills Development Provider (SDP) | The accredited institution that delivers the knowledge and practical skill modules, supports learners in the workplace, and submits evidence for assessment. |\n| Employer or host workplace | Provides the real work environment, resources and a mentor, and meets the obligations in the learner or placement agreement. |\n| Workplace mentor | The person who guides, supervises and verifies the learner's workplace performance day to day. |\n| Assessor and moderator | Assessors judge evidence against the criteria. Moderators check that assessment is consistent and fair. In occupational qualifications a final external assessment is typically conducted at an accredited assessment centre. |\n\n## How occupational qualifications are structured\n\nQCTO occupational qualifications are generally built from three kinds of learning component, followed by an external assessment. Always confirm the exact structure, credits and hours in the curriculum document of the learner's qualification.\n\n| Component | Where it happens | What it covers and how it is evidenced |\n|---|---|---|\n| Knowledge modules | SDP classroom, online or blended | The theory behind the occupation. Evidenced by tests and assignments set and marked by the SDP. |\n| Practical skill modules | SDP workshop, simulated environment or workplace | Hands-on tasks done to a standard. Evidenced by observed performance, work products and practical assessments. |\n| Work experience modules | Real workplace | Supervised workplace duties over a set number of hours or tasks. Evidenced by a logbook signed by the mentor, workplace reports and supervisor confirmation. |\n| External integrated summative assessment | Accredited assessment centre | A final assessment of the occupation as a whole, usually combining knowledge and practical components. |\n\nOlder qualifications built on unit standards use specific outcomes and assessment criteria, often with a portfolio of evidence. The workplace expectations are similar: the learner must show, not just describe, what they can do.\n\n## Workplace readiness checklist\n\nBefore a learner starts, the employer, SDP and mentor should be able to answer yes to each point. Check your SDP and SETA documentation for any additional requirements.\n\n- [ ] The employer has a signed placement or learner agreement and understands its obligations.\n- [ ] The workplace can offer the duties listed in the learner's profile in Part 5, or has agreed an arrangement for missing duties (for example short rotation or supervised simulation).\n- [ ] A named mentor with current competence in the occupation, and time to supervise, has been appointed.\n- [ ] The mentor has received the logbook, evidence requirements and contact details for the SDP.\n- [ ] Health and safety induction, personal protective equipment and emergency procedures are in place.\n- [ ] Access to systems, tools and equipment has been approved with the right permissions and confidentiality agreements.\n- [ ] A workplace policy exists on harassment, grievances and reporting concerns, and the learner has been told how to use it.\n\n## Principles of competence assessment\n\nWorkplace sign-off is a form of assessment. Mentors should understand the principles assessors apply when they review evidence.\n\n| Principle | In practice |\n|---|---|\n| Valid | The evidence matches the task the outcome describes. A signed statement that the learner \"was present\" is not evidence of performance. |\n| Authentic | The work is the learner's own. Mentors should be able to say they saw it done or can verify who did it. |\n| Current | The evidence is recent and relevant to current tools and practice. |\n| Sufficient | Enough evidence across enough occasions to show the learner can do the task consistently, not once. |\n| Reliable and fair | Different assessors would reach the same conclusion. Learners are assessed against the same standard regardless of background, and know the criteria beforehand. |\n| Competent or not yet competent | Judgement is binary at the point of assessment. \"Not yet competent\" means more practice and re-assessment, not failure. |"
+    },
+    {
+      "slug": "the-workplace-mentor-s-guide",
+      "position": 2,
+      "title": "The workplace mentor's guide",
+      "markdown": "## What a mentor is expected to do\n\n- Welcome and orient the learner, and explain how the workplace runs, who does what and where to get help.\n- Plan and sequence duties so the learner is exposed to each duty area in the profile, building from observation to independence.\n- Supervise the work, ensure safety and protect the employer's customers, data and equipment.\n- Give regular, specific feedback in writing as well as in conversation.\n- Verify and sign the logbook only for work that you have seen, or can reliably confirm.\n- Communicate with the SDP about progress, problems and any gaps in available duties.\n- Model professional behaviour: punctuality, respect, honesty, safety and ethical use of information.\n\n## The first two weeks: an induction checklist\n\n- [ ] Health and safety induction completed and recorded.\n- [ ] Workplace rules, code of conduct, confidentiality and POPIA briefing completed.\n- [ ] Introduced to the team, key contacts and escalation routes.\n- [ ] Access to systems and equipment issued at the correct, limited permission level.\n- [ ] Logbook explained; first week's tasks agreed in writing.\n- [ ] Expectations on working hours, attendance, dress, communication and reporting absences explained.\n- [ ] Learner told who to speak to about a concern, including someone other than the mentor.\n\n| Phase | Typical timing | Learner activity | Mentor role |\n|---|---|---|---|\n| 1. Observe and assist | First weeks | Shadows the mentor and team, completes safe low-risk tasks (level O and A). | Explains what is being done and why; checks understanding; corrects early habits. |\n| 2. Supervised practice | Middle of the placement | Performs whole tasks with the mentor present or checking afterwards (level S). | Observes, gives feedback, increases complexity, records evidence. |\n| 3. Independent performance | Final stage | Performs routine tasks alone and consistently, escalating when appropriate (level I). | Samples work, confirms consistency, completes sign-off. |\n\n## Logbook and evidence\n\n| Good practice | Poor practice |\n|---|---|\n| Entries made the same day or week, with specific tasks and outcomes. | Entries filled in at the end of the placement from memory. |\n| The mentor signs only work they observed or can verify. | Blanket signing of a month's entries without checking. |\n| Evidence is attached or referenced (ticket numbers, job cards, photographs, reports) with sensitive information removed. | Vague entries such as \"helped customers\" or \"did repairs\". |\n| Entries cover all duty areas, including the less exciting ones such as documentation and safety. | Only the favourite or easiest duties are recorded. |\n| Feedback and corrective action are recorded, and the learner can show improvement. | No record of mistakes, feedback or learning. |"
+    },
+    {
+      "slug": "qualification-and-programme-profiles",
+      "position": 3,
+      "title": "Qualification and programme profiles",
+      "markdown": "The thirteen profiles that follow use the same structure so mentors can compare them and the simulation developer can reuse common features. Each profile starts on a new page.\n\n| # | Qualification or programme | Typical occupations |\n|---|---|---|\n| 1 | Technical Support | IT support technician, help desk analyst |\n| 2 | Systems Support | Systems support technician, junior systems administrator |\n| 3 | Systems Development | Junior software developer, graduate developer |\n| 4 | Business Process Outsourcing and Contact Centre | Contact centre agent, customer service representative |\n| 5 | Robotics | Robotics technician, automation technician assistant |\n| 6 | Data Analytics | Junior data analyst, reporting analyst |\n| 7 | Cellphone Repair | Cellphone repair technician, service centre technician |\n| 8 | Laptop and PC Repair | PC repair technician, workshop technician |\n| 9 | Drone Piloting and Repairs | Remote pilot, drone technician |\n| 10 | Technopreneur | Founder or co-founder of a technology start-up, small-business owner |\n| 11 | Cybersecurity Defender | Security operations (SOC) analyst, cybersecurity analyst |\n| 12 | Intermediate End User Computing | Administrative assistant, data capturer |\n| 13 | Advanced End User Computing | Senior administrator, executive or project assistant |"
+    }
+  ]
+}
