@@ -1,0 +1,143 @@
+name: CI
+
+# Draft PRs run only the quick checks (style, static analysis, lint, types).
+# The full suite runs once when a PR is marked ready. No re-run on main after merge.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      web: ${{ steps.filter.outputs.web }}
+      mobile: ${{ steps.filter.outputs.mobile }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            api:
+              - 'api/**'
+              - '.github/workflows/ci.yml'
+            web:
+              - 'web/**'
+              - 'packages/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - '.github/workflows/ci.yml'
+            mobile:
+              - 'mobile/**'
+              - '.github/workflows/ci.yml'
+
+  api:
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: api
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: simuwork
+          POSTGRES_PASSWORD: simuwork
+          POSTGRES_DB: simuwork_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U simuwork" --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, pgsql, redis, intl, mbstring, zip
+          coverage: none
+          tools: composer:v2
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: composer-${{ hashFiles('api/composer.lock') }}
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Code style (Pint)
+        run: vendor/bin/pint --test
+      - name: Static analysis (Larastan level 6)
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+      - name: Prepare environment
+        if: github.event.pull_request.draft != true
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+      - name: Tests
+        if: github.event.pull_request.draft != true
+        env:
+          DB_HOST: 127.0.0.1
+          DB_USERNAME: simuwork
+          DB_PASSWORD: simuwork
+          REDIS_HOST: 127.0.0.1
+        run: php artisan test
+
+  web:
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Type check
+        run: npm run typecheck
+      - name: Tests
+        if: github.event.pull_request.draft != true
+        run: npm test
+      - name: Build
+        if: github.event.pull_request.draft != true
+        run: npm run build
+      - name: Performance budget (bundle size)
+        if: github.event.pull_request.draft != true
+        run: npm run size
+
+  mobile:
+    needs: changes
+    if: needs.changes.outputs.mobile == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci
+      - name: Type check
+        run: npm run typecheck

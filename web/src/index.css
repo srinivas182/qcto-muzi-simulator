@@ -1,0 +1,24 @@
+@import 'tailwindcss';
+@import '@simuwork/ui/tokens.css';
+
+@theme {
+  --color-midnight: var(--color-midnight);
+  --color-brand: var(--brand-primary);
+  --color-accent: var(--brand-accent);
+  --font-sans: var(--font-ui);
+  --font-display: var(--font-display);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
