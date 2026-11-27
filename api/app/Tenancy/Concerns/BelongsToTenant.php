@@ -28,7 +28,13 @@ trait BelongsToTenant
                 return;
             }
 
-            $tenantId = app(TenantContext::class)->tenantId();
+            $context = app(TenantContext::class);
+            $tenantId = $context->tenantId();
+
+            // Platform-owned rows (e.g. HQ staff) may have no tenant, but only in platform context.
+            if ($tenantId === null && $context->isPlatform() && static::allowsPlatformRows()) {
+                return;
+            }
 
             if ($tenantId === null) {
                 throw new LogicException(sprintf('Cannot create %s without a tenant context.', $model::class));
@@ -36,6 +42,12 @@ trait BelongsToTenant
 
             $model->setAttribute('tenant_id', $tenantId);
         });
+    }
+
+    /** Override to true on models that may also hold platform-level rows (tenant_id NULL). */
+    public static function allowsPlatformRows(): bool
+    {
+        return false;
     }
 
     /** @return BelongsTo<Tenant, $this> */

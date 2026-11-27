@@ -50,3 +50,12 @@ It is rendered by the platform (not tenant-editable content) and covered by auto
 - Repeat navigation: tens of milliseconds (cached + prefetched).
 - First load: < 1.5 s on mid-range Android over 4G.
 - API p95 < 150 ms for standard reads.
+
+## Sub-sprint 1.3 decisions (identity)
+- **Learners:** mobile number + 6-digit one-time code by WhatsApp, falling back to SMS (Clickatell). Codes stored hashed, 10-minute life, 5 attempts, 3 sends per 10 minutes per number. Unknown numbers get the same answer (no account discovery).
+- **Staff:** email + password (5 attempts/minute), optional authenticator-app 2FA (RFC 6238) with 8 single-use recovery codes. HQ staff sign in only on platform hosts (`/api/v1/platform/auth/*`).
+- **Tokens:** Sanctum bearer tokens per device (web 7 days, mobile 60 days); people can see and sign out devices. A token only works at the provider that issued it (row-level security hides the user elsewhere).
+- **Invitations:** link or QR (`/join/<token>`), 14 days, single use; phone invites prove the number with a code, email invites set a password.
+- **POPIA:** terms + privacy notice accepted at join or first sign-in, versioned; a new version asks again. Records keep time, IP and device. The `consented` middleware guards learning routes from Sprint 1.5 onwards.
+- **Password reset:** email link valid 60 minutes, single use, signs out all devices; never reveals whether an email exists.
+- Web token storage approach is finalised in 1.5 together with the app shell (memory + secure refresh).

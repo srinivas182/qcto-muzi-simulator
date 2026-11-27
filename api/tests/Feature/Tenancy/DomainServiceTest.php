@@ -10,6 +10,7 @@ use App\Tenancy\Dns\DnsResolver;
 use App\Tenancy\DomainService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 final class DomainServiceTest extends TestCase
@@ -103,7 +104,7 @@ final class DomainServiceTest extends TestCase
         ];
     }
 
-    /** @dataProvider invalidHosts */
+    #[DataProvider('invalidHosts')]
     public function test_invalid_or_platform_hosts_are_rejected(string $host): void
     {
         $this->expectException(ValidationException::class);
