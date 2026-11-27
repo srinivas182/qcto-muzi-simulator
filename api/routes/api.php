@@ -16,6 +16,9 @@ use App\Http\Controllers\Api\V1\Auth\TwoFactorController;
 use App\Http\Controllers\Api\V1\CurrentTenantController;
 use App\Http\Controllers\Api\V1\DomainAllowedController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\Programmes\CatalogueController;
+use App\Http\Controllers\Api\V1\Programmes\PlatformProgrammeController;
+use App\Http\Controllers\Api\V1\Programmes\ReferencePageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -90,6 +93,13 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
             $accessRoutes(false);
             Route::get('/audit', [AuditController::class, 'index'])->middleware('permission:audit.view_tenant')->name('audit.index');
             Route::patch('/branding', [BrandingController::class, 'update'])->middleware('permission:branding.manage')->name('branding.update');
+
+            Route::middleware('permission:catalogue.view')->group(function (): void {
+                Route::get('/programmes', [CatalogueController::class, 'index'])->name('programmes.index');
+                Route::get('/programmes/{programme}', [CatalogueController::class, 'show'])->name('programmes.show');
+                Route::get('/reference-pages', [ReferencePageController::class, 'index'])->name('reference-pages.index');
+                Route::get('/reference-pages/{page}', [ReferencePageController::class, 'show'])->name('reference-pages.show');
+            });
             Route::get('/support-sessions', [SupportSessionController::class, 'index'])->middleware('permission:audit.view_tenant')->name('support-sessions.index');
             Route::delete('/support-sessions/{session}', [SupportSessionController::class, 'destroy'])->middleware('permission:audit.view_tenant')->name('support-sessions.destroy');
         });
@@ -102,6 +112,14 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
         Route::middleware(['auth:sanctum', 'platform.staff', 'active'])->group(function () use ($accessRoutes): void {
             $accessRoutes(true);
             Route::get('/audit', [AuditController::class, 'index'])->middleware('permission:audit.view_all')->name('audit.index');
+
+            Route::middleware('permission:programmes.view')->group(function (): void {
+                Route::get('/programmes', [PlatformProgrammeController::class, 'index'])->name('programmes.index');
+                Route::get('/programmes/{programme}', [PlatformProgrammeController::class, 'show'])->name('programmes.show');
+                Route::get('/programmes/{programme}/versions/{number}', [PlatformProgrammeController::class, 'version'])->whereNumber('number')->name('programmes.version');
+                Route::get('/reference-pages', [ReferencePageController::class, 'index'])->name('reference-pages.index');
+                Route::get('/reference-pages/{page}', [ReferencePageController::class, 'show'])->name('reference-pages.show');
+            });
             Route::get('/support-sessions', [SupportSessionController::class, 'index'])->middleware('permission:support.login')->name('support-sessions.index');
             Route::post('/support-sessions', [SupportSessionController::class, 'store'])->middleware('permission:support.login')->name('support-sessions.store');
             Route::delete('/support-sessions/{session}', [SupportSessionController::class, 'destroy'])->middleware('permission:support.login')->name('support-sessions.destroy');

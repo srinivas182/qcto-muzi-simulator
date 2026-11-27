@@ -8,6 +8,7 @@ use App\Identity\ConsentService;
 use App\Models\Role;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Programmes\GuideImporter;
 use App\Tenancy\DomainService;
 use App\Tenancy\TenantContext;
 use Illuminate\Database\Seeder;
@@ -67,6 +68,8 @@ final class DemoSeeder extends Seeder
                 $user->roles()->syncWithoutDetaching([$role->id => ['tenant_id' => null]]);
             }
         }, platform: true);
+
+        app(GuideImporter::class)->import(null, publish: true);
 
         $this->command?->info('Demo ready. Password for every account: '.self::PASSWORD);
     }
