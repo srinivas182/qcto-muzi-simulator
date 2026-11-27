@@ -132,7 +132,7 @@ final class ShellApiTest extends AccessTestCase
     /** Menu ids are translated by the apps as nav.<id>; every id needs an English label there. */
     public function test_every_menu_item_has_a_web_translation(): void
     {
-        $file = base_path('../web/src/locales/en.ts');
+        $file = base_path('../packages/core/src/locales/en.ts');
         if (! is_file($file)) {
             $this->markTestSkipped('Web app not checked out.');
         }
@@ -140,7 +140,7 @@ final class ShellApiTest extends AccessTestCase
 
         foreach (['tenant', 'platform'] as $area) {
             foreach ((array) config("navigation.{$area}") as $item) {
-                $this->assertContains($item['id'], $m[1], "web/src/locales/en.ts is missing nav.{$item['id']}");
+                $this->assertContains($item['id'], $m[1], "packages/core/src/locales/en.ts is missing nav.{$item['id']}");
                 $this->assertSame('/'.str_replace('.', '/', $item['id']), $item['path'], "id and path of {$item['id']} must match");
             }
         }

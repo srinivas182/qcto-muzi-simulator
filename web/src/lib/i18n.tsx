@@ -1,21 +1,21 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import en, { type MessageKey, type Messages } from '../locales/en';
+import en, { type MessageKey, type Messages } from '@simuwork/core/locales/en';
 
 /**
  * Tiny i18n: English ships with the app; other languages load on demand (a few KB each),
  * so changing language never slows the first page.
  */
-export const LOCALES = { en: 'English', zu: 'isiZulu', af: 'Afrikaans', xh: 'isiXhosa' } as const;
-export type Locale = keyof typeof LOCALES;
+import { format, isLocale, type Locale } from '@simuwork/core';
+
+export { format, isLocale, LOCALES, sectionKey, type Locale } from '@simuwork/core';
 
 const loaders: Record<Exclude<Locale, 'en'>, () => Promise<{ default: Messages }>> = {
-  zu: () => import('../locales/zu'),
-  af: () => import('../locales/af'),
-  xh: () => import('../locales/xh'),
+  zu: () => import('@simuwork/core/locales/zu'),
+  af: () => import('@simuwork/core/locales/af'),
+  xh: () => import('@simuwork/core/locales/xh'),
 };
 
 const KEY = 'sw-locale';
-export const isLocale = (v: unknown): v is Locale => typeof v === 'string' && v in LOCALES;
 
 export function storedLocale(): Locale | null {
   try {
@@ -24,11 +24,6 @@ export function storedLocale(): Locale | null {
   } catch {
     return null;
   }
-}
-
-export function format(template: string, vars?: Record<string, string | number>): string {
-  if (!vars) return template;
-  return template.replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m));
 }
 
 type T = (key: MessageKey, vars?: Record<string, string | number>) => string;
@@ -89,5 +84,3 @@ export function useI18n(): I18n {
   if (!ctx) throw new Error('useI18n must be used inside I18nProvider');
   return ctx;
 }
-
-export const sectionKey = (section: string) => 'section.' + section.toLowerCase().replace(/\s+/g, '_');

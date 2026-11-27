@@ -40,6 +40,7 @@ jobs:
               - '.github/workflows/ci.yml'
             mobile:
               - 'mobile/**'
+              - 'packages/core/**'
               - '.github/workflows/ci.yml'
 
   api:
@@ -134,7 +135,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.mobile == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: mobile
@@ -146,5 +147,16 @@ jobs:
           cache: npm
           cache-dependency-path: mobile/package-lock.json
       - run: npm ci
+      - name: Lint
+        run: npm run lint
       - name: Type check
         run: npm run typecheck
+      - name: Tests (incl. locked footer on every screen)
+        if: github.event.pull_request.draft != true
+        run: npm test -- --ci
+      - name: Android bundle
+        if: github.event.pull_request.draft != true
+        run: npm run bundle
+      - name: Performance budget (app bundle)
+        if: github.event.pull_request.draft != true
+        run: npm run size

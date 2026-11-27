@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { detectArea } from '../lib/area';
-import { contrastWithWhite } from '../lib/colour';
+import { contrastWithWhite } from '@simuwork/core';
 import { format } from '../lib/i18n';
 import { filterItems } from '../components/shell/palette';
-import en from '../locales/en';
-import af from '../locales/af';
-import xh from '../locales/xh';
-import zu from '../locales/zu';
+import en from '@simuwork/core/locales/en';
+import af from '@simuwork/core/locales/af';
+import xh from '@simuwork/core/locales/xh';
+import zu from '@simuwork/core/locales/zu';
 import { KNOWN_PATHS } from '../app/access';
 
 const placeholders = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();

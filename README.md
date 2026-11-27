@@ -45,11 +45,21 @@ npm run dev:web                        # web on :5173 (from the repo root)
 
 Phone sign-in codes are written to `api/storage/logs/laravel.log` in development.
 
+### Mobile app
+
+```bash
+cd mobile && npm install
+EXPO_PUBLIC_API_URL=http://<your-computer-ip>:8000 npx expo start   # scan the QR with Expo Go
+```
+
+The API must accept the phone's requests as a platform host (for example `PLATFORM_DOMAIN=<your-computer-ip>`).
+In the app, choose a language, enter academy code `ubuntu`, then sign in with a demo account.
+
 ## Quality gates (CI)
 
 - **API:** Pint (style), Larastan level 6 (static analysis), PHPUnit on PostgreSQL.
 - **Web:** oxlint, TypeScript (strict), Vitest, production build, first-load JavaScript budget (≤ 170 KB gzip), Lighthouse mobile (performance and accessibility ≥ 95).
-- **Mobile:** TypeScript.
+- **Mobile:** oxlint, TypeScript (strict), Jest (every screen shows the locked footer), Android bundle budget (≤ 3.5 MB).
 - Draft PRs run quick checks only; the full suite runs when a PR is marked ready. Only changed areas run.
 
 ## Platform rule

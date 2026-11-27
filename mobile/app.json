@@ -5,10 +5,13 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mayuraconsultancy.simuwork"
+      "bundleIdentifier": "com.mayuraconsultancy.simuwork",
+      "infoPlist": {
+        "NSCameraUsageDescription": "SimuWork uses the camera to scan your academy's QR codes and, when your academy requires it, for attendance check-in."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -18,10 +21,38 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.mayuraconsultancy.simuwork"
+      "package": "com.mayuraconsultancy.simuwork",
+      "permissions": [
+        "android.permission.CAMERA"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single"
+    },
+    "scheme": "simuwork",
+    "newArchEnabled": true,
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "SimuWork uses the camera to scan your academy's QR codes and, when your academy requires it, for attendance check-in.",
+          "recordAudioAndroid": false
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "apiUrl": "https://api.simuwork.co.za",
+      "webPortalDomain": "simuwork.co.za"
     }
   }
 }

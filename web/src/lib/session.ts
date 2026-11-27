@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, ApiError } from './api';
 import { AREA, areaPrefix } from './area';
-import type { PublicTenant, Session } from './types';
+import type { PublicTenant, Session } from '@simuwork/core';
 
 export const sessionKey = ['session', AREA] as const;
 

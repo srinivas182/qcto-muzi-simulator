@@ -1,0 +1,14 @@
+{
+  "name": "@simuwork/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Platform foundations shared by the SimuWork web and mobile apps: API types, translations, brand defaults, contrast rules, menu helpers and the locked MCS footer wording. No UI components (each app has its own design).",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./locales/*": "./src/locales/*.ts"
+  },
+  "sideEffects": false
+}

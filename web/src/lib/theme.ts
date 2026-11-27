@@ -1,4 +1,4 @@
-import type { Branding } from './types';
+import type { Branding } from '@simuwork/core';
 
 /** Apply a provider's brand colours. Only --brand-* variables change; platform UI is untouched. */
 export function applyBranding(branding: Pick<Branding, 'primary' | 'accent' | 'nav'> | null | undefined): void {

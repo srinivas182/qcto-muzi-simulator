@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router';
 import { AccessGuard } from '../../app/access';
-import { activeItem, sections } from './nav';
+import { activeItem, sections } from '@simuwork/core';
 import { ChevronsLeft, ChevronsRight, LogOut, Menu, Search, ShieldAlert } from 'lucide-react';
 import { AREA } from '../../lib/area';
 import { navIcon } from '../../lib/icons';
 import { LOCALES, sectionKey, useI18n, type Locale } from '../../lib/i18n';
 import { homePath, useSignOut } from '../../lib/session';
 import { applyTheme, isDark } from '../../lib/theme';
-import type { NavItem, Session } from '../../lib/types';
+import type { NavItem, Session } from '@simuwork/core';
 import { Avatar, cx, Drawer, Kbd } from '../ui';
 import { CommandPalette } from './CommandPalette';
 import { ConsentGate } from './ConsentGate';

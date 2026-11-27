@@ -7,8 +7,8 @@ import { api } from '../../lib/api';
 import { areaPrefix } from '../../lib/area';
 import { useI18n } from '../../lib/i18n';
 import { relativeTime } from '../../lib/time';
-import type { MessageKey } from '../../locales/en';
-import type { AuditEntry, CursorPage, SupportSessionRow } from '../../lib/types';
+import type { MessageKey } from '@simuwork/core/locales/en';
+import type { AuditEntry, CursorPage, SupportSessionRow } from '@simuwork/core';
 
 const FILTERS = ['', 'auth', 'roles', 'consent', 'support', 'branding'] as const;
 

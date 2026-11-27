@@ -3,7 +3,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { vi } from 'vitest';
 import { createQueryClient, Providers } from '../app/Providers';
 import { routes } from '../app/routes';
-import type { NavItem, Session } from '../lib/types';
+import type { NavItem, Session } from '@simuwork/core';
 
 export const branding = {
   display_name: 'Ubuntu Skills Academy', logo_url: null, primary: '#0F766E', accent: '#C9A24B', nav: '#0D1230', default_locale: 'en',

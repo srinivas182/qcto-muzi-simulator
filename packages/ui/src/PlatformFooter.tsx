@@ -1,3 +1,7 @@
+import { MCS_FOOTER } from '@simuwork/core';
+
+export { MCS_FOOTER };
+
 /**
  * Platform-owned footer. PLATFORM RULE: it appears on every tenant page and cannot be
  * changed, hidden or restyled by a training provider. It takes no props on purpose —
@@ -7,12 +11,6 @@
  * so the credit stays readable in light and dark mode. The wording is a legal credit and is
  * not translated.
  */
-export const MCS_FOOTER = {
-  prefix: 'Developed and Maintained by',
-  company: 'Mayura Consultancy Services',
-  url: 'https://www.mayuraconsultancy.com',
-} as const;
-
 export function PlatformFooter() {
   return (
     <footer

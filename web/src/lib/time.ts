@@ -1,4 +1,4 @@
-import type { MessageKey } from '../locales/en';
+import type { MessageKey } from '@simuwork/core/locales/en';
 
 export function greetingKey(hour: number): MessageKey {
   return hour < 12 ? 'home.morning' : hour < 17 ? 'home.afternoon' : 'home.evening';

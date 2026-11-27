@@ -8,8 +8,8 @@ import { areaPrefix } from '../../lib/area';
 import { navIcon } from '../../lib/icons';
 import { sectionKey, useI18n } from '../../lib/i18n';
 import { can } from '../../lib/session';
-import type { PermissionGroup, Role, RolePreview } from '../../lib/types';
-import { sections } from '../../components/shell/nav';
+import type { PermissionGroup, Role, RolePreview } from '@simuwork/core';
+import { sections } from '@simuwork/core';
 
 const base = () => areaPrefix();
 
