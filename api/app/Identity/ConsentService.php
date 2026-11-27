@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity;
 
+use App\Audit\AuditLogger;
 use App\Models\User;
 use App\Models\UserConsent;
 use Illuminate\Http\Request;
@@ -55,6 +56,7 @@ final class ConsentService
         ]);
         $consent->tenant_id = $user->tenant_id;
         $consent->save();
+        app(AuditLogger::class)->record($granted ? 'consent.granted' : 'consent.withdrawn', $user, null, ['purpose' => $purpose, 'version' => $consent->version], $user);
 
         return $consent;
     }

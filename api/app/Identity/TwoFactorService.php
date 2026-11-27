@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity;
 
+use App\Audit\AuditLogger;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -11,6 +12,8 @@ use Illuminate\Validation\ValidationException;
 /** Authenticator-app two-factor authentication: set up, confirm, disable. */
 final class TwoFactorService
 {
+    public function __construct(private readonly AuditLogger $audit) {}
+
     /** @return array{secret: string, otpauth_uri: string} */
     public function begin(User $user): array
     {
@@ -40,6 +43,7 @@ final class TwoFactorService
         }
 
         $user->forceFill(['two_factor_confirmed_at' => now(), 'two_factor_recovery_codes' => $codes])->save();
+        $this->audit->record('auth.two_factor_enabled', $user, null, [], $user);
 
         return $codes;
     }
@@ -51,5 +55,6 @@ final class TwoFactorService
         }
 
         $user->forceFill(['two_factor_secret' => null, 'two_factor_confirmed_at' => null, 'two_factor_recovery_codes' => null])->save();
+        $this->audit->record('auth.two_factor_disabled', $user, null, [], $user);
     }
 }

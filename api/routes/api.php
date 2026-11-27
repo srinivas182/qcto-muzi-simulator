@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Access\AuditController;
+use App\Http\Controllers\Api\V1\Access\RoleController;
+use App\Http\Controllers\Api\V1\Access\SupportSessionController;
+use App\Http\Controllers\Api\V1\Access\UserRoleController;
 use App\Http\Controllers\Api\V1\Auth\AccountController;
 use App\Http\Controllers\Api\V1\Auth\InvitationController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
@@ -43,7 +47,22 @@ $authRoutes = function (bool $platform): void {
     });
 };
 
-Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes): void {
+/** Roles, permissions and people's roles (a provider's, or HQ's own when $platform). */
+$accessRoutes = function (bool $platform): void {
+    $manage = $platform ? 'permission:roles.manage_platform' : 'permission:roles.manage_tenant';
+    $view = $platform ? 'permission:roles.manage_platform' : 'permission:roles.manage_tenant|staff.manage';
+
+    Route::get('/permissions', [RoleController::class, 'permissions'])->middleware($view)->name('permissions.index');
+    Route::get('/roles', [RoleController::class, 'index'])->middleware($view)->name('roles.index');
+    Route::post('/roles', [RoleController::class, 'store'])->middleware($manage)->name('roles.store');
+    Route::patch('/roles/{role}', [RoleController::class, 'update'])->middleware($manage)->name('roles.update');
+    Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->middleware($manage)->name('roles.destroy');
+    Route::get('/roles/{role}/preview', [RoleController::class, 'preview'])->middleware($view)->name('roles.preview');
+    Route::get('/users/{user}/roles', [UserRoleController::class, 'show'])->middleware($view)->name('users.roles.show');
+    Route::put('/users/{user}/roles', [UserRoleController::class, 'update'])->middleware($platform ? $manage : 'permission:staff.manage')->name('users.roles.update');
+};
+
+Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $accessRoutes): void {
     Route::get('/health', HealthController::class)->name('health');
 
     // Edge server asks this before issuing an HTTPS certificate for a host.
@@ -52,7 +71,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes): void 
         ->name('internal.domain-allowed');
 
     // Training provider context (provider sub-domain, custom domain, or X-Tenant on platform hosts).
-    Route::middleware('tenant')->group(function () use ($authRoutes): void {
+    Route::middleware(['tenant', 'support'])->group(function () use ($authRoutes, $accessRoutes): void {
         Route::get('/tenant', CurrentTenantController::class)->name('tenant.current');
 
         Route::middleware('throttle:auth')->group(function (): void {
@@ -62,10 +81,25 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes): void 
         });
 
         $authRoutes(false);
+
+        Route::middleware(['auth:sanctum', 'active', 'consented'])->group(function () use ($accessRoutes): void {
+            $accessRoutes(false);
+            Route::get('/audit', [AuditController::class, 'index'])->middleware('permission:audit.view_tenant')->name('audit.index');
+            Route::get('/support-sessions', [SupportSessionController::class, 'index'])->middleware('permission:audit.view_tenant')->name('support-sessions.index');
+            Route::delete('/support-sessions/{session}', [SupportSessionController::class, 'destroy'])->middleware('permission:audit.view_tenant')->name('support-sessions.destroy');
+        });
     });
 
     // HQ (Super Admin and platform team) on platform hosts only.
-    Route::prefix('platform')->name('platform.')->middleware('platform')->group(function () use ($authRoutes): void {
+    Route::prefix('platform')->name('platform.')->middleware('platform')->group(function () use ($authRoutes, $accessRoutes): void {
         $authRoutes(true);
+
+        Route::middleware(['auth:sanctum', 'platform.staff', 'active'])->group(function () use ($accessRoutes): void {
+            $accessRoutes(true);
+            Route::get('/audit', [AuditController::class, 'index'])->middleware('permission:audit.view_all')->name('audit.index');
+            Route::get('/support-sessions', [SupportSessionController::class, 'index'])->middleware('permission:support.login')->name('support-sessions.index');
+            Route::post('/support-sessions', [SupportSessionController::class, 'store'])->middleware('permission:support.login')->name('support-sessions.store');
+            Route::delete('/support-sessions/{session}', [SupportSessionController::class, 'destroy'])->middleware('permission:support.login')->name('support-sessions.destroy');
+        });
     });
 });

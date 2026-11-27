@@ -27,8 +27,10 @@ final class CommandsTest extends IdentityTestCase
             ->expectsOutputToContain('Temporary password')
             ->assertSuccessful();
 
-        $exists = app(TenantContext::class)->runAs(null, fn () => User::query()->whereNull('tenant_id')->where('email', 'srini@mayuraconsultancy.com')->exists(), platform: true);
-        $this->assertTrue($exists);
+        $staff = app(TenantContext::class)->runAs(null, fn () => User::query()->whereNull('tenant_id')->where('email', 'srini@mayuraconsultancy.com')->firstOrFail(), platform: true);
+        $this->assertTrue(app(TenantContext::class)->runAs(null, fn () => $staff->hasPermission('packages.manage'), platform: true));
+
+        $this->artisan('platform:staff-create', ['name' => 'Ayanda', 'email' => 'ayanda@mayuraconsultancy.com', '--role' => 'tp_admin'])->assertFailed();
 
         $this->artisan('platform:staff-create', ['name' => 'Srini', 'email' => 'srini@mayuraconsultancy.com'])->assertFailed();
     }
