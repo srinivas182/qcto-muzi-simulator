@@ -1,6 +1,6 @@
 # Sprint 2 — Programmes and workplace outcomes
 
-Status: **proposed, awaiting approval** · Date: 27 Nov 2026
+Status: **approved** (Srini, 27 Nov 2026) · Date: 27 Nov 2026
 
 ## Why this sprint
 Every simulator, course, logbook entry, assessment and report hangs off one thing: **what a learner must be
@@ -97,6 +97,8 @@ current QCTO route, so the data must hold both and say clearly which is current.
   (description, type, minimum count) — all belong to a version; a new draft copies the published version.
 - `outcome_coverage` — outcome × (simulator | course) with status planned · in production · linked.
 - `provider_programme_checks` (tenant-owned, RLS) — the provider's answers to the "to confirm" checklist.
+- `provider_outcomes` / `provider_evidence_requirements` (tenant-owned, RLS) — provider additions, allowed only
+  when HQ has switched them on for that provider (`tenants.settings.programme_additions`, default off).
 - `reference_pages` — the guide's general chapters (markdown), versioned with the guide edition.
 
 Platform tables have no `tenant_id`: providers read **published** versions through the API only; the
@@ -108,7 +110,7 @@ checklist table is tenant-owned with row-level security like everything else.
 |---|---|---|
 | 2.1 | Data model, read-only rules, guide import (13 programmes + reference pages), HQ and provider read APIs | Import is repeatable; tests count every programme, duty area, outcome, evidence item and tool against the guide; providers only ever see published versions |
 | 2.2 | Programme Studio: list, programme page, inline editing of drafts, review → publish, version history with "what changed", audit | Every role in the workflow tested (author, reviewer, publisher; others refused); published versions cannot change |
-| 2.3 | Coverage map and readiness %, provider catalogue and "to confirm" checklist, reference pages | Provider sees only published content; checklist answers are tenant-isolated and audited |
+| 2.3 | Coverage map and readiness %, provider catalogue and "to confirm" checklist, reference pages, provider additions (HQ switch, off by default) | Provider sees only published content; checklist answers and additions are tenant-isolated and audited; additions refused while the switch is off |
 | 2.4 | Android release APK built in CI; download size budget; emulator cold-start measurement (C4) | APK < 25 MB enforced; cold-start number reported on every mobile PR |
 
 Each sub-sprint is its own PR, merged only when CI is fully green.
@@ -120,9 +122,10 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
 - **Changing a published programme mid-cohort:** solved by versioning; nothing in use is edited in place.
 - **Import accuracy:** structured JSON reviewed in the PR, plus count tests; a mismatch fails CI.
 
-## Questions for Srini (answers can come during the sprint)
-1. Should providers be able to **add their own extra outcomes or evidence** on top of HQ's (shown as
-   "provider addition"), or should the catalogue stay HQ-only? *Recommendation: allow additions in a later
-   sprint, HQ-only for now.*
-2. Does Muzi have the **official QCTO curriculum documents** for the 13 programmes, or only the guide?
-   With them we can link knowledge and practical modules too, not only the workplace component.
+## Decisions (Srini, 27 Nov 2026)
+1. **Provider additions:** HQ has a switch per provider, **off by default**. When on, that provider can add
+   its own outcomes and evidence requirements on top of HQ's, shown as "provider addition", visible only to
+   that provider (row-level security), audited, and never changing HQ's version. Delivered in 2.3.
+2. **Official QCTO curricula:** only the guide is available now; Muzi is collecting the curriculum documents.
+   The model already allows several qualification references per programme; knowledge and practical
+   modules from the curricula will be added when the documents arrive.
