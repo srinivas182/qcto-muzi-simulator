@@ -35,6 +35,9 @@ The API issues a 60-day device token (`client=mobile`), stored in the Android Ke
 - Target app download < 25 MB and cold start < 2 s on a budget Android phone — measured with EAS builds
   once store builds start.
 
+Since Sprint 2.4, CI also builds the release APK (no EAS: `expo prebuild` + Gradle). It fails if the arm64
+APK reaches 25 MB, and it measures cold start on an emulator on every mobile PR (see `docs/sprints/sprint-02.md`).
+
 ## Locked footer
 `<Screen>` renders the footer at the end of every screen's content (never under the tab bar); the full-screen
 camera shows it over the preview. `test/footer.test.tsx` discovers every route file and opens each one.
