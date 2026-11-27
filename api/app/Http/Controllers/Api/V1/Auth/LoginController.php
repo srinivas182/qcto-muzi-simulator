@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
+use App\Audit\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Identity\Authenticator;
 use App\Identity\OtpService;
@@ -83,6 +84,7 @@ final class LoginController extends Controller
 
         if ($user === null || $user->password === null || ! Hash::check($data['password'], $user->password)) {
             RateLimiter::hit($limiterKey, 60);
+            app(AuditLogger::class)->record('auth.login_failed', $user, null, ['email' => Str::lower($data['email'])]);
             throw ValidationException::withMessages(['email' => 'The email or password is incorrect.']);
         }
 

@@ -59,3 +59,25 @@ It is rendered by the platform (not tenant-editable content) and covered by auto
 - **POPIA:** terms + privacy notice accepted at join or first sign-in, versioned; a new version asks again. Records keep time, IP and device. The `consented` middleware guards learning routes from Sprint 1.5 onwards.
 - **Password reset:** email link valid 60 minutes, single use, signs out all devices; never reveals whether an email exists.
 - Web token storage approach is finalised in 1.5 together with the app shell (memory + secure refresh).
+
+## Sub-sprint 1.4 decisions (roles, audit, support login)
+- **12 system roles live in `config/roles.php`**, not the database, so improvements reach every provider at once.
+  Shared rows in `roles` (tenant_id NULL) are only labels; providers build **custom roles** from the plain-language
+  catalogue in `config/permissions.php`. `RoleMatrixTest` enforces the PRD §4 permission table.
+- **No privilege escalation:** nobody can create or assign a role holding admin permissions they lack. Functional
+  permissions (`learning.use`, `review_pack.view`, `attendance.confirm_workplace`) are exempt, so a centre manager can
+  enrol learners without being one. Built-in roles cannot be edited or deleted; roles in use cannot be deleted; a
+  provider always keeps one TP Administrator; HQ roles cannot be given inside a provider.
+- **RLS for shared rows:** `roles` has two policies — SELECT sees shared + own rows; INSERT/UPDATE/DELETE reach only own
+  rows, so a provider cannot delete a system role even with raw SQL.
+- **"Preview as this role":** `GET /roles/{id}/preview` returns the plain-language permissions and the menu from
+  `config/navigation.php`; Sprint 1.5 uses the same file for the role-aware home.
+- **Audit log is append-only at the database level** (trigger refuses UPDATE/DELETE, even for HQ) and has no foreign
+  keys so history outlives records. Recorded so far: sign-in, failed sign-in, sign-out, device revoked, 2FA on/off,
+  password reset, consent granted/withdrawn, invitation accepted, roles created/updated/deleted/assigned, support
+  started/ended. Data exports will be added with the reports module.
+- **Support login:** HQ staff with `support.login` **and 2FA** open a session with a written reason (≥10 chars) for
+  5–60 minutes. They get a separate token (ability `support`) that works only on that provider, only for GET requests,
+  and stops when the session ends or expires. The provider sees every session (who, why, until when) and can end it.
+  Mechanism: the database exposes the staff member's own user row inside the provider through `app.support_user_id`;
+  nothing else of HQ becomes visible.

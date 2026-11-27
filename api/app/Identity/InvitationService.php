@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Identity;
 
+use App\Audit\AuditLogger;
+use App\Authorization\RoleService;
 use App\Models\Invitation;
+use App\Models\Role;
 use App\Models\Tenant;
 use App\Models\TenantDomain;
 use App\Models\User;
@@ -23,6 +26,8 @@ final class InvitationService
     public function __construct(
         private readonly OtpService $otp,
         private readonly ConsentService $consents,
+        private readonly RoleService $roles,
+        private readonly AuditLogger $audit,
     ) {}
 
     /** @return array{invitation: Invitation, token: string, url: string} */
@@ -33,6 +38,12 @@ final class InvitationService
 
         if ($phone === null && ($email === null || $email === '')) {
             throw ValidationException::withMessages(['phone' => 'Enter a valid mobile number or an email address.']);
+        }
+
+        $assignable = Role::query()->where('key', $role)
+            ->whereIn('scope', [Role::SCOPE_TENANT, Role::SCOPE_EXTERNAL])->exists();
+        if (! $assignable) {
+            throw ValidationException::withMessages(['role' => 'Choose a valid role for this person.']);
         }
 
         $token = Str::random(40);
@@ -103,6 +114,8 @@ final class InvitationService
             }
 
             $invitation->forceFill(['accepted_at' => now(), 'accepted_user_id' => $user->id])->save();
+            $this->roles->assignKey($user, $invitation->role);
+            $this->audit->record('invitations.accepted', $user, null, ['role' => $invitation->role], $user);
 
             return $user;
         });

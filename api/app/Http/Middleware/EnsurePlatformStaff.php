@@ -16,7 +16,8 @@ final class EnsurePlatformStaff
     {
         $user = $request->user();
 
-        if (! $user instanceof User || ! $user->isPlatformStaff()) {
+        // Support tokens (ability "support") only work on the provider they were opened for.
+        if (! $user instanceof User || ! $user->isPlatformStaff() || ! $user->currentAccessToken()->can('*')) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 

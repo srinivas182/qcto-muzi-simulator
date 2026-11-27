@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Authorization\PermissionRegistry;
 use App\Identity\Messaging\CodeDelivery;
 use App\Identity\Messaging\CodeSender;
+use App\Models\User;
 use App\Tenancy\Dns\DnsResolver;
 use App\Tenancy\Dns\SystemDnsResolver;
 use App\Tenancy\TenantContext;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -28,5 +31,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // Sign-in endpoints: generous for real people, hostile to scripted guessing.
         RateLimiter::for('auth', fn (Request $request) => Limit::perMinute(30)->by((string) $request->ip()));
+
+        // Catalogue permissions work with Gate/@can/$user->can() everywhere: can('learners.view').
+        Gate::before(fn (User $user, string $ability) => PermissionRegistry::exists($ability) ? $user->hasPermission($ability) : null);
     }
 }

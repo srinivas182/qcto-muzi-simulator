@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity;
 
+use App\Audit\AuditLogger;
 use App\Models\PasswordReset;
 use App\Models\User;
 use App\Notifications\ResetPasswordLink;
@@ -55,5 +56,6 @@ final class PasswordResetService
         $user->forceFill(['password' => $password])->save();
         $user->tokens()->delete();
         $reset->forceFill(['used_at' => now()])->save();
+        app(AuditLogger::class)->record('auth.password_reset', $user, null, [], $user);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity;
 
+use App\Audit\AuditLogger;
 use App\Models\User;
 use App\Tenancy\TenantContext;
 use Illuminate\Support\Facades\Cache;
@@ -20,6 +21,7 @@ final class Authenticator
     public function __construct(
         private readonly ConsentService $consents,
         private readonly TenantContext $context,
+        private readonly AuditLogger $audit,
     ) {}
 
     /** @return array<string, mixed> */
@@ -88,6 +90,7 @@ final class Authenticator
     {
         $days = $client === 'mobile' ? (int) config('identity.tokens.mobile_days') : (int) config('identity.tokens.web_days');
         $token = $user->createToken(mb_substr($device, 0, 100), ['*'], now()->addDays($days));
+        $this->audit->record('auth.login', $user, null, ['device' => mb_substr($device, 0, 100), 'client' => $client], $user);
 
         $user->forceFill(['last_login_at' => now()])->save();
 

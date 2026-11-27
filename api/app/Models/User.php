@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Authorization\PermissionRegistry;
 use App\Tenancy\Concerns\BelongsToTenant;
+use App\Tenancy\TenantContext;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -70,6 +73,51 @@ class User extends Authenticatable
     public function consents(): HasMany
     {
         return $this->hasMany(UserConsent::class);
+    }
+
+    /** @return BelongsToMany<Role, $this, RoleAssignment> */
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class)->using(RoleAssignment::class)->withPivot(['id', 'centre_id', 'tenant_id'])->withTimestamps();
+    }
+
+    /** @var list<string>|null */
+    private ?array $permissionCache = null;
+
+    /** @return list<string> */
+    public function permissions(): array
+    {
+        if ($this->permissionCache !== null) {
+            return $this->permissionCache;
+        }
+
+        $permissions = [];
+        foreach ($this->roles()->get() as $role) {
+            $permissions = [...$permissions, ...$role->effectivePermissions()];
+        }
+
+        return $this->permissionCache = array_values(array_unique($permissions));
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        // HQ support session: read-only view of the provider (writes are blocked by middleware).
+        if ($this->isSupportViewer()) {
+            return PermissionRegistry::scopeOf($permission) === 'tenant';
+        }
+
+        return in_array($permission, $this->permissions(), true);
+    }
+
+    public function isSupportViewer(): bool
+    {
+        return $this->isPlatformStaff() && app(TenantContext::class)->supportUserId() === $this->id;
+    }
+
+    public function forgetPermissionCache(): void
+    {
+        $this->permissionCache = null;
+        $this->unsetRelation('roles');
     }
 
     public function isPlatformStaff(): bool

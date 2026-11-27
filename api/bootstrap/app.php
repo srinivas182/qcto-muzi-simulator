@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 use App\Http\Middleware\EnsureActiveUser;
 use App\Http\Middleware\EnsureConsented;
+use App\Http\Middleware\EnsurePermission;
 use App\Http\Middleware\EnsurePlatformStaff;
 use App\Http\Middleware\PlatformContext;
+use App\Http\Middleware\ResolveSupportSession;
 use App\Http\Middleware\ResolveTenant;
 use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Foundation\Application;
@@ -26,12 +28,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'platform.staff' => EnsurePlatformStaff::class,
             'active' => EnsureActiveUser::class,
             'consented' => EnsureConsented::class,
+            'permission' => EnsurePermission::class,
+            'support' => ResolveSupportSession::class,
         ]);
 
         // The tenant/platform context must be set before authentication, so row-level security
         // decides whether a token's user is visible at this address at all.
         $middleware->prependToPriorityList(before: AuthenticatesRequests::class, prepend: ResolveTenant::class);
         $middleware->prependToPriorityList(before: AuthenticatesRequests::class, prepend: PlatformContext::class);
+        // HQ support tokens are recognised after the tenant is known and before the user is loaded.
+        $middleware->prependToPriorityList(before: AuthenticatesRequests::class, prepend: ResolveSupportSession::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

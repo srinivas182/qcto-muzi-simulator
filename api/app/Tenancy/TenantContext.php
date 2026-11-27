@@ -20,6 +20,9 @@ final class TenantContext
 
     private bool $platform = false;
 
+    /** HQ staff member viewing this tenant in a read-only support session. */
+    private ?string $supportUserId = null;
+
     public function tenant(): ?Tenant
     {
         return $this->tenant;
@@ -61,7 +64,20 @@ final class TenantContext
     {
         $this->tenant = null;
         $this->platform = false;
+        $this->supportUserId = null;
         $this->apply();
+    }
+
+    /** Lets the database show this HQ staff member's own user row inside the current tenant. */
+    public function setSupportUser(?string $userId): void
+    {
+        $this->supportUserId = $userId;
+        $this->apply();
+    }
+
+    public function supportUserId(): ?string
+    {
+        return $this->supportUserId;
     }
 
     /**
@@ -94,8 +110,8 @@ final class TenantContext
         }
 
         DB::select(
-            "select set_config('app.tenant_id', ?, false), set_config('app.platform_access', ?, false)",
-            [$this->tenant->id ?? '', $this->platform ? 'on' : 'off'],
+            "select set_config('app.tenant_id', ?, false), set_config('app.platform_access', ?, false), set_config('app.support_user_id', ?, false)",
+            [$this->tenant->id ?? '', $this->platform ? 'on' : 'off', $this->supportUserId ?? ''],
         );
     }
 }

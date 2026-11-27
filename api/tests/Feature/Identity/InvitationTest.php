@@ -8,6 +8,7 @@ use App\Identity\InvitationService;
 use App\Models\User;
 use App\Models\UserConsent;
 use App\Tenancy\TenantContext;
+use Illuminate\Validation\ValidationException;
 
 final class InvitationTest extends IdentityTestCase
 {
@@ -45,7 +46,22 @@ final class InvitationTest extends IdentityTestCase
 
         $user = app(TenantContext::class)->runAs($this->ubuntu, fn () => User::query()->where('phone', '+27821234567')->firstOrFail());
         $this->assertNotNull($user->phone_verified_at);
+        $this->assertTrue(app(TenantContext::class)->runAs($this->ubuntu, fn () => $user->hasPermission('learning.use')));
         $this->assertSame(2, app(TenantContext::class)->runAs($this->ubuntu, fn () => UserConsent::query()->where('user_id', $user->id)->count()));
+    }
+
+    public function test_invitations_need_a_provider_role(): void
+    {
+        foreach (['super_admin', 'made_up_role'] as $role) {
+            app(TenantContext::class)->runAs($this->ubuntu, function () use ($role): void {
+                try {
+                    app(InvitationService::class)->create($this->ubuntu, 'Someone', $role, '0821234567', null);
+                    $this->fail("Inviting as {$role} should be refused.");
+                } catch (ValidationException $e) {
+                    $this->assertArrayHasKey('role', $e->errors());
+                }
+            });
+        }
     }
 
     public function test_consent_is_required_to_join(): void

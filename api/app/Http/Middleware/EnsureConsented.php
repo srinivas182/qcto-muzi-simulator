@@ -22,7 +22,7 @@ final class EnsureConsented
     {
         $user = $request->user();
 
-        if ($user instanceof User) {
+        if ($user instanceof User && ! $user->isSupportViewer()) {
             $outstanding = $this->consents->outstanding($user);
             if ($outstanding !== []) {
                 return response()->json([

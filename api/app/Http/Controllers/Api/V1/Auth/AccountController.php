@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
+use App\Audit\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Identity\Authenticator;
 use App\Identity\ConsentService;
@@ -19,6 +20,7 @@ final class AccountController extends Controller
     public function __construct(
         private readonly Authenticator $auth,
         private readonly ConsentService $consents,
+        private readonly AuditLogger $audit,
     ) {}
 
     public function me(Request $request): JsonResponse
@@ -28,6 +30,7 @@ final class AccountController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
+        $this->audit->record('auth.logout', $this->user($request));
         $this->user($request)->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Signed out.']);
@@ -55,6 +58,7 @@ final class AccountController extends Controller
     {
         $deleted = $this->user($request)->tokens()->whereKey($id)->delete();
         abort_if($deleted === 0, 404);
+        $this->audit->record('auth.session_revoked', $this->user($request), null, ['token_id' => $id]);
 
         return response()->json(['message' => 'Device signed out.']);
     }
