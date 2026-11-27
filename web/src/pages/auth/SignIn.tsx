@@ -6,7 +6,7 @@ import { api, ApiError } from '../../lib/api';
 import { AREA, areaPrefix } from '../../lib/area';
 import { useI18n } from '../../lib/i18n';
 import { homePath, useRefreshSession, useSession, usePublicTenant, type SignInResult } from '../../lib/session';
-import type { Session } from '../../lib/types';
+import type { Session } from '@simuwork/core';
 import { AuthLayout } from './AuthLayout';
 
 type Step = 'phone' | 'code' | 'email' | 'two-factor';

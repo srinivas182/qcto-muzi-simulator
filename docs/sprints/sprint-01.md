@@ -97,3 +97,17 @@ It is rendered by the platform (not tenant-editable content) and covered by auto
 - **Speed:** first-load JS ≈ 129 KB gzip (budget 170 KB); Lighthouse mobile 100 performance / 100
   accessibility locally; enforced at ≥ 95 in CI.
 - **Demo data:** `php artisan db:seed --class=DemoSeeder` (README) for local runs and prospect demos.
+
+## Sub-sprint 1.6 decisions (mobile app)
+- **One store app for all academies:** choose language → academy code or QR → sign in. Academy branding
+  applies everywhere after that. See ADR 0003.
+- **Shared foundations moved to `packages/core`** (types, translations, contrast rules, footer wording);
+  web and mobile each keep their own components and layouts.
+- **Mobile design system:** system fonts, large touch targets (54 pt buttons), bottom tabs with a brand pill,
+  bottom sheets instead of pop-ups, spring press animation, haptics, pull-to-refresh, readable width on
+  tablets, light/dark/system.
+- **Sign-in:** phone code with SMS auto-fill, or email + 2FA; token in the device keystore.
+- **Offline-first start** from a persisted cache; offline banner; **data saver on by default**.
+- **QR scanner** ready (academy join now; attendance check-in later). Camera frames never stored.
+- **POPIA consent** sheet before use. **Staff** see a pointer to the web portal until their mobile tools ship.
+- **Budgets in CI:** Android bundle ≤ 3.5 MB (now 2.9 MB); tests open every screen and check the locked footer.

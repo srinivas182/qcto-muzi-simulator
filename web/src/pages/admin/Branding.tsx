@@ -5,11 +5,11 @@ import { MCS_FOOTER } from '@simuwork/ui';
 import { useSignedIn } from '../../app/access';
 import { Button, Card, Field, inputClass, PageHeader, useToast, cx } from '../../components/ui';
 import { api, ApiError } from '../../lib/api';
-import { contrastWithWhite } from '../../lib/colour';
+import { contrastWithWhite } from '@simuwork/core';
 import { LOCALES, useI18n, type Locale } from '../../lib/i18n';
 import { sessionKey } from '../../lib/session';
 import { applyBranding } from '../../lib/theme';
-import type { Branding as BrandingT } from '../../lib/types';
+import type { Branding as BrandingT } from '@simuwork/core';
 
 type ColourKey = 'primary' | 'accent' | 'nav';
 const HEX = /^#[0-9a-f]{6}$/i;

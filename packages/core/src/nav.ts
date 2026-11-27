@@ -1,4 +1,4 @@
-import type { NavItem } from '../../lib/types';
+import type { NavItem } from './types';
 
 /** Group menu items by section, keeping their configured order. */
 export function sections(items: NavItem[]): [string, NavItem[]][] {

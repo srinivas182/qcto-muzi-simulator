@@ -2,7 +2,7 @@
   "name": "@simuwork/ui",
   "version": "0.1.0",
   "private": true,
-  "description": "Shared design tokens and platform-owned UI (locked MCS footer) for SimuWork web and mobile.",
+  "description": "Web-only platform UI: tokens.css and the locked MCS footer for the React DOM apps.",
   "type": "module",
   "main": "src/index.ts",
   "exports": {
@@ -11,5 +11,8 @@
   },
   "peerDependencies": {
     "react": ">=19"
+  },
+  "dependencies": {
+    "@simuwork/core": "0.1.0"
   }
 }

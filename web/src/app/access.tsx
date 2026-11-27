@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 import { Outlet, useLocation } from 'react-router';
-import { activeItem } from '../components/shell/nav';
+import { activeItem } from '@simuwork/core';
 import { useI18n } from '../lib/i18n';
 import { useSession } from '../lib/session';
-import type { Session } from '../lib/types';
-import en from '../locales/en';
+import type { Session } from '@simuwork/core';
+import en from '@simuwork/core/locales/en';
 import { ComingSoon, NoAccess, NotFound } from './states';
 
 /** Every menu path the platform knows, derived from nav.<id> (id "admin.roles" → "/admin/roles"). */
