@@ -185,3 +185,24 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
   `provider_evidence_requirements` (tenant-owned, RLS, additions soft-deleted to keep codes unique).
 - The HQ Training providers page is a first, minimal version (list + switch); full provider management
   (onboarding, approval, suspension) arrives with Sprint 3.
+
+## Sub-sprint 2.4 notes (Android release build, C4)
+- **No EAS needed:** the `Android release` workflow runs `expo prebuild` (the native `android/` folder is generated,
+  never committed) and builds a release APK with Gradle on every mobile PR and on `main`.
+- **Size settings** live in `mobile/plugins/withReleaseSize.js` (applied by prebuild): code and resource
+  shrinking, compressed native libraries (smaller download for learners paying for data or receiving the APK
+  over WhatsApp), and no GIF decoder.
+- **Download-size budget:** the arm64 phone APK must stay under 25 MB (`scripts/apk-size.mjs`, fails the
+  check). First build: **18.0 MB**: native libraries 9.5 MB, app code 3.3 MB, JavaScript 2.4 MB,
+  resources 1.7 MB. The job summary shows the breakdown on every PR.
+- **Cold start:** an x86_64 release APK runs on an Android 14 emulator (Pixel 4a profile, 2 GB RAM). Five cold
+  launches, plus the first launch after install (`scripts/cold-start.mjs`). Two numbers are recorded:
+  Android's "Displayed" time, and the time until the first SimuWork screen appears (a marker written by
+  `src/lib/startup.ts` in release builds only). First build: **1.18 s** Displayed and **1.82 s** to the first
+  screen (medians); the first launch after install took 3.55 s. The check fails if the first screen never
+  appears, which catches release-only crashes.
+- **Still open for C4:** a timing on a real budget phone (for example a 2 GB Android Go device) before launch.
+  Emulator numbers are for spotting regressions between PRs.
+- **Later savings, if needed:** the barcode scanner library from the camera module (2.0 MB) could be replaced
+  by a lighter QR reader, and the APK is signed with the debug key until the Play Store release sprint (an App
+  Bundle there lets Google Play trim the download further per device).

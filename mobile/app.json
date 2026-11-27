@@ -45,7 +45,8 @@
           "cameraPermission": "SimuWork uses the camera to scan your academy's QR codes and, when your academy requires it, for attendance check-in.",
           "recordAudioAndroid": false
         }
-      ]
+      ],
+      "./plugins/withReleaseSize"
     ],
     "experiments": {
       "typedRoutes": true

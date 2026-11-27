@@ -14,7 +14,7 @@ cannot be called complete while any item here is open.
 |    | • Centre manager / TP admin: today's dashboard (attendance, alerts, at-risk learners) | Srini, 27 Nov 2026 | Reports (M17) | Open |
 | C2 | Website builder for academies (own domain, branding), locked MCS footer | Srini, 27 Nov 2026 | M20 | Open |
 | C3 | First-language review of isiZulu, Afrikaans and isiXhosa texts (web + mobile) | Sprint 1.5 | Before launch | Open |
-| C4 | Real-device testing: app download < 25 MB, cold start < 2 s on a budget Android phone | Sprint 1.6 | Sprint 2 | Open |
+| C4 | Real-device testing: app download < 25 MB, cold start < 2 s on a budget Android phone | Sprint 1.6 | Sprint 2 | In CI since 2.4 (18.0 MB; 1.8 s median to first screen on the emulator). Real budget-phone check still open |
 
 Until C1 ships, staff opening the app see a card that points them to the web portal, which works in the
 phone's browser (responsive portal, Sprint 1.5).

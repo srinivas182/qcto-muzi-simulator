@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
+import { markFirstScreen } from '../lib/startup';
 import { PlatformFooter } from './PlatformFooter';
 import { T } from './Text';
 import { space, useTheme } from './theme';
@@ -24,6 +25,7 @@ export function Screen({
   bottom?: ReactNode;
 }) {
   const { c } = useTheme();
+  useEffect(markFirstScreen, []);
   return (
     <SafeAreaView edges={edges} style={[styles.root, { backgroundColor: c.bg }]}>
       <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
