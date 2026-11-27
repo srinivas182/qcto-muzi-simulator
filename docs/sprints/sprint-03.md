@@ -1,6 +1,6 @@
 # Sprint 3 — Providers, packages, licences and enrolments
 
-Status: **proposed, awaiting approval** · Date: 28 Nov 2026
+Status: **proposed** · decisions 1–4 made by Srini, 28 Nov 2026 · awaiting final approval
 
 ## Why this sprint
 Sprint 2 gave every module the same backbone: programmes, versions and workplace outcomes. Sprint 3 turns that
@@ -71,8 +71,10 @@ assessment) checks one thing: *does this learner have an active enrolment for th
   - Provider detail page with users, licences, invoices and audit.
 - **Packages and price list (HQ):**
   - A package is a programme plus what it includes: simulators, courses or both.
-  - Each package has a term in months, a price per seat in ZAR excluding VAT, volume price bands and a minimum
-    number of seats.
+  - HQ chooses how each package is billed (decision 1):
+    - **fixed term**: a price per seat for N months, invoiced once;
+    - **monthly**: a price per seat per month, invoiced every month while seats are held.
+  - Each package has a price per seat in ZAR excluding VAT, volume price bands and a minimum number of seats.
   - Packages are drafted, published or retired. Changing a package never changes existing licences.
 - **Provider shop and orders:** packages with a price calculator; order seats or top up an existing pool.
   - Orders are invoiced straight away.
@@ -81,12 +83,16 @@ assessment) checks one thing: *does this learner have an active enrolment for th
 - **Invoices and payments:**
   - Tax invoice PDF with VAT at 15%.
   - Payment by EFT: HQ records it against the invoice, using the invoice number as the reference.
-  - Online payment: depends on **decision 3**.
+  - Online payment through **Paystack** (card, Instant EFT, Capitec Pay); paid invoices activate pools
+    automatically from the signed payment notification.
   - Due dates and overdue reminders; credit notes; HQ billing dashboard.
 - **Licence pools:**
   - Seats bought, used and free; start and end dates.
-  - Top-ups are pro-rated to the pool's end date.
-  - Renewal reminders at 30 and 7 days; seats freeze at expiry.
+  - Fixed term: top-ups are pro-rated to the pool's end date; renewal reminders at 30 and 7 days; seats freeze
+    at expiry.
+  - Monthly: an invoice on the 1st of each month for the seats held, with the first month pro-rated. Providers
+    can lower seats for the next month, but never below the seats in use. Cancelling stops at the end of the
+    paid month.
 - **Learners (provider):**
   - List, add, import from CSV or Excel, edit, deactivate.
   - Invitations by SMS, WhatsApp link or email, plus a cohort QR code to join.
@@ -117,7 +123,8 @@ assessment) checks one thing: *does this learner have an active enrolment for th
   - `payment_terms`: pay before activation, or on account with N days.
 - `packages` (platform):
   - code, name, description, `programme_id`, includes simulators and/or courses.
-  - `term_months`, `min_seats`, status (draft · published · retired).
+  - `billing` (fixed term · monthly), `term_months` (fixed term only), `min_seats`, status (draft · published ·
+    retired).
   - `package_prices`: seat bands `from_seats` → price per seat in cents, excluding VAT.
 - `orders` (tenant, RLS):
   - package, seats, unit price locked at order time, new pool or top-up.
@@ -130,7 +137,8 @@ assessment) checks one thing: *does this learner have an active enrolment for th
 - `payments`: method (EFT · gateway), amount, reference, recorded by or gateway event id.
 - `licence_pools` (tenant, RLS):
   - package, programme, seats, start and end dates.
-  - status (pending payment · active · expired · suspended), source orders.
+  - billing (fixed term · monthly), seats for next month (monthly), status (pending payment · active · expired
+    · cancelled), source orders.
 - `learner_profiles` (tenant, RLS; 1:1 with the learner's user):
   - ID type (SA ID · passport).
   - ID number **encrypted**, plus a keyed hash so we can find duplicates without decrypting.
@@ -153,7 +161,7 @@ audited platform context.
 |---|---|---|
 | 3.1 | HQ provider management: list and detail, create provider + invite first admin, company and accreditation details, status changes with reasons and their effect on sign-in, audit. Provider "Academy details" page | Each status change is tested end to end (suspended provider staff see "account on hold"; archived cannot sign in); accreditation expiry warnings shown to both sides |
 | 3.2 | Packages and price list (HQ), provider shop with price calculator | Published packages are frozen like programme versions; price bands tested; provider sees only published packages for active programmes |
-| 3.3 | Orders, tax invoices (PDF), EFT payments recorded by HQ, online payment (per decision 3), licence pools, top-ups pro-rated, renewal and overdue reminders, credit notes, HQ billing dashboard | Invoice numbers never skip or repeat; VAT and pro-rating calculated in cents and tested; a pool goes live only when its terms are met; every money action audited |
+| 3.3 | Orders, tax invoices (PDF), EFT payments recorded by HQ, Paystack online payment (card, Instant EFT, Capitec Pay), licence pools, fixed-term top-ups pro-rated, monthly invoicing run, renewal and overdue reminders with the decision 4 block, credit notes, HQ billing dashboard | Invoice numbers never skip or repeat; VAT and pro-rating calculated in cents and tested; a pool goes live only when its terms are met; every money action audited |
 | 3.4 | Learners: list, add, CSV/Excel import with row checks, SA ID validation, invitations (SMS · WhatsApp link · email), cohort QR join, encrypted ID numbers with masked display | Import of 500 rows in under 10 s with a clear error report; ID numbers never stored or logged in plain text; revealing a full ID needs its own permission and is audited |
 | 3.5 | Cohorts and enrolments: pinned version, seat use, 14-day no-show return, withdrawal and transfer, licence health dashboard, QCTO deadline reminder and enrolment register export, learner home on web and mobile | A learner can never hold a seat they are not entitled to (concurrency tested); expired pools stop new enrolments; learner home shows programme and days left on both apps |
 
@@ -174,25 +182,28 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
   is a small update.
 - **Unpaid accounts:** handled by clear, visible rules (decision 4), with reminders before anything happens,
   never a silent lock-out of learners mid-cohort.
+- **Payment notifications:** Paystack notifications are verified by signature, processed once (stored by event
+  id) and checked against Paystack's API before an invoice is marked paid. EFT stays available if Paystack is
+  down.
 
-## Decisions needed from Srini
-1. **Pricing model.** Recommended: **price per seat per programme for a fixed term** (for example 12 months),
-   invoiced once when seats are bought, with volume bands. The alternative is a monthly price per seat billed
-   every month. The fixed term matches how cohorts run and how providers are funded, and is far simpler to
-   collect by EFT.
-2. **Seat rule.** Recommended:
-   - A seat is a named learner for the term.
+## Decisions (Srini, 28 Nov 2026)
+1. **Pricing model: offer both.** HQ chooses per package:
+   - **fixed term:** a price per seat for N months, invoiced once when seats are bought;
+   - **monthly:** a price per seat per month, invoiced on the 1st of each month for the seats held.
+   Both have volume price bands, and the price is locked at purchase.
+2. **Seat rule: no-show and early withdrawal.**
+   - A seat is a named learner.
    - It returns to the pool automatically if the learner does not start within 14 days.
-   - It returns on withdrawal only if the learner has done less than 10% of the programme. After that, the seat
-     stays used.
-3. **Payments.** Recommended: **EFT with HQ recording payments, plus Paystack for card, Instant EFT and Capitec
-   Pay** in 3.3. Paystack is owned by Stripe, has a clean API, includes free settlement, and covers card and
-   bank payments in one integration. The alternatives are PayFast (most payment methods, higher fees) or EFT
-   only for now.
-4. **Unpaid invoices.** Recommended:
+   - It returns on withdrawal before 10% of the programme is done. After that, it stays used for the term (or,
+     on monthly packages, until the provider lowers its seats).
+3. **Payments: EFT plus Paystack.** HQ records EFT payments against the invoice number. Paystack takes card,
+   Instant EFT and Capitec Pay online, and activates the licence pool automatically when payment is confirmed.
+4. **Unpaid invoices: block new, keep learners.**
    - Reminders at the due date, then after 7 and 14 days.
-   - After 30 days the provider cannot buy more or enrol new learners.
-   - Learners already enrolled keep learning until their term ends, because the learner is not at fault.
+   - After 30 days unpaid, the provider cannot buy more seats or enrol new learners.
+   - Learners already enrolled keep learning to the end of their term.
+
+## Still needed (information, before 3.3 goes live)
 5. **Who invoices.** Which company and VAT number appears on invoices as the seller (Muzi's South African
-   entity?), and its banking details for EFT. This is information, not a choice; it can come later, but is
-   needed before 3.3 goes live.
+   entity?), its address, and its banking details for EFT. A Paystack merchant account in that company's name is
+   also needed. Until then we build and test with placeholder details.
