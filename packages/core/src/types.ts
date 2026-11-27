@@ -182,3 +182,59 @@ export interface VersionChange {
   before?: string | null;
   after?: string | null;
 }
+
+export type CoverageChannel = 'simulator' | 'course';
+export type CoverageStatus = 'planned' | 'in_production' | 'linked';
+
+export interface CoverageScore {
+  outcomes: number;
+  ready: number;
+  planned: number;
+  readiness: number;
+}
+
+export interface ProgrammeCoverage {
+  version: number | null;
+  summary: CoverageScore;
+  outcomes: Record<string, Partial<Record<CoverageChannel, { status: CoverageStatus; title: string | null }>>>;
+}
+
+export interface ProviderCheck {
+  key: string;
+  text: string;
+  status: 'confirmed' | 'not_applicable' | null;
+  note: string | null;
+  answered_by: string | null;
+  answered_at: string | null;
+}
+
+export interface ProviderLayer {
+  checks: ProviderCheck[];
+  checks_done: number;
+  additions: {
+    enabled: boolean;
+    outcomes: { id: string; duty_area: number; code: string; statement: string; plain_words: string | null }[];
+    evidence: { id: string; duty_area: number; description: string; type: EvidenceType; min_count: number | null }[];
+  };
+}
+
+export interface ProviderRow {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
+  programme_additions: boolean;
+}
+
+export interface ReferencePageSummary {
+  slug: string;
+  title: string;
+  position: number;
+}
+
+export interface ReferencePageContent {
+  slug: string;
+  title: string;
+  markdown: string;
+  source: { document?: string; page?: number } | null;
+}

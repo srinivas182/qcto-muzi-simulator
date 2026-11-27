@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Identity\ConsentService;
+use App\Models\OutcomeCoverage;
+use App\Models\Programme;
 use App\Models\Role;
 use App\Models\Tenant;
 use App\Models\User;
@@ -70,7 +72,36 @@ final class DemoSeeder extends Seeder
         }, platform: true);
 
         app(GuideImporter::class)->import(null, publish: true);
+        $this->demoCoverage();
 
         $this->command?->info('Demo ready. Password for every account: '.self::PASSWORD);
+    }
+
+    /** A believable coverage map for the demo: Technical Support well under way, two others started. */
+    private function demoCoverage(): void
+    {
+        $rows = [
+            'technical-support' => [
+                'TS-1.1' => ['simulator' => 'linked', 'course' => 'linked'], 'TS-1.2' => ['simulator' => 'linked'],
+                'TS-1.3' => ['simulator' => 'in_production', 'course' => 'linked'], 'TS-1.4' => ['course' => 'planned'],
+                'TS-2.1' => ['simulator' => 'linked'], 'TS-2.2' => ['simulator' => 'in_production'], 'TS-3.1' => ['course' => 'planned'],
+            ],
+            'data-analytics' => ['DA-1.1' => ['course' => 'in_production'], 'DA-1.2' => ['course' => 'planned']],
+            'cybersecurity-defender' => ['CYD-1.1' => ['simulator' => 'planned']],
+        ];
+        foreach ($rows as $code => $outcomes) {
+            $programme = Programme::query()->where('code', $code)->first();
+            if ($programme === null) {
+                continue;
+            }
+            foreach ($outcomes as $outcome => $channels) {
+                foreach ($channels as $channel => $status) {
+                    OutcomeCoverage::query()->updateOrCreate(
+                        ['programme_id' => $programme->id, 'outcome_code' => $outcome, 'channel' => $channel],
+                        ['status' => $status],
+                    );
+                }
+            }
+        }
     }
 }

@@ -2,15 +2,17 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { GraduationCap, Search } from 'lucide-react';
-import type { ProgrammeSummary } from '@simuwork/core';
+import type { CoverageScore, ProgrammeSummary } from '@simuwork/core';
 import { Badge, Card, cx, EmptyState, inputClass, PageHeader, Skeleton } from '../../components/ui';
 import { api } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
+import { ReadinessRing } from './ReadinessRing';
 
 export default function Programmes() {
   const { t, locale } = useI18n();
   const [q, setQ] = useState('');
   const list = useQuery({ queryKey: ['hq-programmes'], queryFn: async () => (await api<{ data: ProgrammeSummary[] }>('/platform/programmes')).data });
+  const coverage = useQuery({ queryKey: ['hq-coverage-overview'], queryFn: async () => (await api<{ data: Record<string, CoverageScore> }>('/platform/coverage')).data });
   const shown = useMemo(() => (list.data ?? []).filter((p) => !q || `${p.title} ${p.prefix} ${p.summary}`.toLowerCase().includes(q.toLowerCase())), [list.data, q]);
 
   return (
@@ -38,11 +40,14 @@ export default function Programmes() {
                 </div>
                 <h3 className="mt-3 text-[16px] font-bold leading-snug text-ink">{p.title}</h3>
                 <p className="mt-1 line-clamp-2 text-[14px] text-muted">{p.summary}</p>
-                <div className="mt-auto pt-5">
+                <div className="mt-auto flex items-end gap-3 pt-5">
+                  <div className="min-w-0 flex-1">
                   {p.counts && <p className="text-[13px] font-medium text-ink">{t('prog.counts', { areas: p.counts.duty_areas, outcomes: p.counts.outcomes, evidence: p.counts.evidence })}</p>}
                   <p className="mt-1 text-[12px] text-muted">
                     {p.version ? `${t('prog.version', { n: p.version })} · ${t('prog.publishedOn', { date: new Date(p.published_at ?? '').toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' }) })}` : ''}
                   </p>
+                  </div>
+                  {coverage.data?.[p.code] && <ReadinessRing value={coverage.data[p.code]!.readiness} size={48} label={t('cov.readinessOf', { title: p.title })} />}
                 </div>
               </Card>
             </Link>

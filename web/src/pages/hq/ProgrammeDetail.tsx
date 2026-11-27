@@ -11,10 +11,11 @@ import { useI18n } from '../../lib/i18n';
 import { can } from '../../lib/session';
 import { relativeTime } from '../../lib/time';
 import type { MessageKey } from '@simuwork/core/locales/en';
+import { CoverageTab } from './CoverageTab';
 import { programmeKey, useStudioMutation } from './programmeApi';
 
 const EVIDENCE: EvidenceType[] = ['document', 'record', 'photo', 'observation', 'sign_off', 'feedback'];
-type Tab = 'outcomes' | 'overview' | 'history';
+type Tab = 'outcomes' | 'coverage' | 'overview' | 'history';
 
 export default function ProgrammeDetail() {
   const { code = '' } = useParams();
@@ -90,13 +91,13 @@ export default function ProgrammeDetail() {
 
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div role="tablist" className="inline-flex rounded-xl bg-surface-2 p-1">
-          {(['outcomes', 'overview', 'history'] as Tab[]).map((k) => (
+          {(['outcomes', 'coverage', 'overview', 'history'] as Tab[]).map((k) => (
             <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={cx('h-9 rounded-lg px-4 text-[13px] font-semibold transition', tab === k ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink')}>
               {t(`prog.tab.${k}` as MessageKey)}
             </button>
           ))}
         </div>
-        {isOpen && publishedNumber && tab !== 'history' && (
+        {isOpen && publishedNumber && tab !== 'history' && tab !== 'coverage' && (
           <div className="flex items-center gap-2 text-[13px] text-muted">
             {t('prog.viewing')}
             <div className="inline-flex rounded-lg border border-line p-0.5">
@@ -111,6 +112,7 @@ export default function ProgrammeDetail() {
       </div>
 
       {tab === 'outcomes' && <OutcomesTab content={shown} editable={editable} run={run} />}
+      {tab === 'coverage' && <CoverageTab code={code} content={current} editable={author} />}
       {tab === 'overview' && <OverviewTab content={shown} editable={editable} run={run} />}
       {tab === 'history' && <HistoryTab code={code} data={data.data} />}
 

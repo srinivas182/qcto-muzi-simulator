@@ -43,6 +43,7 @@ return [
             'reports.export' => ['scope' => 'tenant', 'label' => 'Export reports and evidence packs'],
             'audit.view_tenant' => ['scope' => 'tenant', 'label' => "See this provider's audit log"],
             'catalogue.view' => ['scope' => 'tenant', 'label' => 'See programmes, workplace outcomes and the mentor guide'],
+            'catalogue.manage' => ['scope' => 'tenant', 'label' => "Confirm a programme's set-up and add the provider's own outcomes"],
         ],
         'People' => [
             'learners.view' => ['scope' => 'tenant', 'label' => 'See learners'],

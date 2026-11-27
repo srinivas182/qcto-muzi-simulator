@@ -17,9 +17,12 @@ use App\Http\Controllers\Api\V1\CurrentTenantController;
 use App\Http\Controllers\Api\V1\DomainAllowedController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\Programmes\CatalogueController;
+use App\Http\Controllers\Api\V1\Programmes\CoverageController;
 use App\Http\Controllers\Api\V1\Programmes\PlatformProgrammeController;
 use App\Http\Controllers\Api\V1\Programmes\ProgrammeStudioController;
+use App\Http\Controllers\Api\V1\Programmes\ProviderProgrammeController;
 use App\Http\Controllers\Api\V1\Programmes\ReferencePageController;
+use App\Http\Controllers\Api\V1\Providers\ProviderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -101,6 +104,16 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::get('/reference-pages', [ReferencePageController::class, 'index'])->name('reference-pages.index');
                 Route::get('/reference-pages/{page}', [ReferencePageController::class, 'show'])->name('reference-pages.show');
             });
+            // The provider's "to confirm" answers and own additions (additions also need HQ's switch).
+            Route::prefix('/programmes/{programme}')->name('programmes.')->middleware('permission:catalogue.manage')->group(function (): void {
+                Route::put('/checks/{key}', [ProviderProgrammeController::class, 'answer'])->where('key', '[0-9a-f]{40}')->name('checks.answer');
+                Route::post('/additions/outcomes', [ProviderProgrammeController::class, 'addOutcome'])->name('additions.outcomes.store');
+                Route::patch('/additions/outcomes/{id}', [ProviderProgrammeController::class, 'updateOutcome'])->whereUuid('id')->name('additions.outcomes.update');
+                Route::delete('/additions/outcomes/{id}', [ProviderProgrammeController::class, 'removeOutcome'])->whereUuid('id')->name('additions.outcomes.destroy');
+                Route::post('/additions/evidence', [ProviderProgrammeController::class, 'addEvidence'])->name('additions.evidence.store');
+                Route::patch('/additions/evidence/{id}', [ProviderProgrammeController::class, 'updateEvidence'])->whereUuid('id')->name('additions.evidence.update');
+                Route::delete('/additions/evidence/{id}', [ProviderProgrammeController::class, 'removeEvidence'])->whereUuid('id')->name('additions.evidence.destroy');
+            });
             Route::get('/support-sessions', [SupportSessionController::class, 'index'])->middleware('permission:audit.view_tenant')->name('support-sessions.index');
             Route::delete('/support-sessions/{session}', [SupportSessionController::class, 'destroy'])->middleware('permission:audit.view_tenant')->name('support-sessions.destroy');
         });
@@ -119,9 +132,18 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::get('/programmes/{programme}', [PlatformProgrammeController::class, 'show'])->name('programmes.show');
                 Route::get('/programmes/{programme}/versions/{number}', [PlatformProgrammeController::class, 'version'])->whereNumber('number')->name('programmes.version');
                 Route::get('/programmes/{programme}/compare', [ProgrammeStudioController::class, 'compare'])->name('programmes.compare');
+                Route::get('/coverage', [CoverageController::class, 'index'])->name('coverage.index');
+                Route::get('/programmes/{programme}/coverage', [CoverageController::class, 'show'])->name('programmes.coverage');
                 Route::get('/reference-pages', [ReferencePageController::class, 'index'])->name('reference-pages.index');
                 Route::get('/reference-pages/{page}', [ReferencePageController::class, 'show'])->name('reference-pages.show');
             });
+            Route::put('/programmes/{programme}/coverage/{code}', [CoverageController::class, 'update'])
+                ->middleware('permission:programmes.manage|content.author')->name('programmes.coverage.update');
+
+            Route::get('/providers', [ProviderController::class, 'index'])->middleware('permission:providers.view')->name('providers.index');
+            Route::patch('/providers/{provider}/programme-additions', [ProviderController::class, 'programmeAdditions'])
+                ->whereUuid('provider')->middleware('permission:providers.manage')->name('providers.programme-additions');
+
             Route::get('/support-sessions', [SupportSessionController::class, 'index'])->middleware('permission:support.login')->name('support-sessions.index');
             Route::post('/support-sessions', [SupportSessionController::class, 'store'])->middleware('permission:support.login')->name('support-sessions.store');
             Route::delete('/support-sessions/{session}', [SupportSessionController::class, 'destroy'])->middleware('permission:support.login')->name('support-sessions.destroy');
