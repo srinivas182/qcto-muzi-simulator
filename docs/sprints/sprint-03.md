@@ -80,11 +80,19 @@ assessment) checks one thing: *does this learner have an active enrolment for th
   - Orders are invoiced straight away.
   - A licence pool goes live when the invoice is paid, or straight away if HQ allows that provider to pay later
     (on account).
+- **HQ billing settings (Super Admin):**
+  - Seller details printed on every invoice: company name, registration number, VAT number, address.
+  - EFT banking details shown on invoices and at checkout.
+  - VAT rate, invoice number prefix and payment terms.
+  - **Payment gateways:** Paystack, PayFast, Peach Payments, Ozow and Yoco. Each can be switched on or off, in
+    test or live mode, with its own keys.
+  - Keys are encrypted at rest, can be written but never read back (only the last 4 characters are shown), and
+    have a "Test connection" button. Every change is audited.
 - **Invoices and payments:**
   - Tax invoice PDF with VAT at 15%.
   - Payment by EFT: HQ records it against the invoice, using the invoice number as the reference.
-  - Online payment through **Paystack** (card, Instant EFT, Capitec Pay); paid invoices activate pools
-    automatically from the signed payment notification.
+  - Online payment through whichever gateways Super Admin has switched on. The provider picks one at checkout.
+  - A paid invoice activates its pool automatically from the gateway's signed payment notification.
   - Due dates and overdue reminders; credit notes; HQ billing dashboard.
 - **Licence pools:**
   - Seats bought, used and free; start and end dates.
@@ -121,6 +129,10 @@ assessment) checks one thing: *does this learner have an active enrolment for th
   - Legal name, trading name, company registration number, VAT number, physical address.
   - QCTO SDP accreditation number and expiry date, billing email and phone.
   - `payment_terms`: pay before activation, or on account with N days.
+- `billing_settings` (platform, one row): seller details, EFT banking details, VAT rate, invoice prefix.
+- `payment_gateways` (platform):
+  - driver (paystack · payfast · peach · ozow · yoco), enabled, mode (test · live).
+  - **encrypted** credentials, display order, last connection test result.
 - `packages` (platform):
   - code, name, description, `programme_id`, includes simulators and/or courses.
   - `billing` (fixed term · monthly), `term_months` (fixed term only), `min_seats`, status (draft · published ·
@@ -134,7 +146,8 @@ assessment) checks one thing: *does this learner have an active enrolment for th
   - Issue and due dates, provider details as they were on the day.
   - Lines, subtotal, VAT, total; status (issued · paid · overdue · credited); PDF.
 - `credit_notes` (linked to an invoice).
-- `payments`: method (EFT · gateway), amount, reference, recorded by or gateway event id.
+- `payments`: method (EFT · gateway), gateway, amount, reference, recorded by or gateway event id.
+- `payment_events`: every gateway notification, stored once by gateway and event id, and processed only once.
 - `licence_pools` (tenant, RLS):
   - package, programme, seats, start and end dates.
   - billing (fixed term · monthly), seats for next month (monthly), status (pending payment · active · expired
@@ -161,9 +174,10 @@ audited platform context.
 |---|---|---|
 | 3.1 | HQ provider management: list and detail, create provider + invite first admin, company and accreditation details, status changes with reasons and their effect on sign-in, audit. Provider "Academy details" page | Each status change is tested end to end (suspended provider staff see "account on hold"; archived cannot sign in); accreditation expiry warnings shown to both sides |
 | 3.2 | Packages and price list (HQ), provider shop with price calculator | Published packages are frozen like programme versions; price bands tested; provider sees only published packages for active programmes |
-| 3.3 | Orders, tax invoices (PDF), EFT payments recorded by HQ, Paystack online payment (card, Instant EFT, Capitec Pay), licence pools, fixed-term top-ups pro-rated, monthly invoicing run, renewal and overdue reminders with the decision 4 block, credit notes, HQ billing dashboard | Invoice numbers never skip or repeat; VAT and pro-rating calculated in cents and tested; a pool goes live only when its terms are met; every money action audited |
-| 3.4 | Learners: list, add, CSV/Excel import with row checks, SA ID validation, invitations (SMS · WhatsApp link · email), cohort QR join, encrypted ID numbers with masked display | Import of 500 rows in under 10 s with a clear error report; ID numbers never stored or logged in plain text; revealing a full ID needs its own permission and is audited |
-| 3.5 | Cohorts and enrolments: pinned version, seat use, 14-day no-show return, withdrawal and transfer, licence health dashboard, QCTO deadline reminder and enrolment register export, learner home on web and mobile | A learner can never hold a seat they are not entitled to (concurrency tested); expired pools stop new enrolments; learner home shows programme and days left on both apps |
+| 3.3 | HQ billing settings (seller details, EFT details, VAT, invoice prefix), orders, tax invoices (PDF), EFT payments recorded by HQ, licence pools, fixed-term top-ups pro-rated, monthly invoicing run, renewal and overdue reminders with the decision 4 block, credit notes, HQ billing dashboard | Invoice numbers never skip or repeat; VAT and pro-rating calculated in cents and tested; a pool goes live only when its terms are met; every money action audited |
+| 3.4 | Online payments: one gateway layer with Paystack, PayFast, Peach Payments, Ozow and Yoco; Super Admin switches each on or off, sets test or live keys, tests the connection; provider picks a gateway at checkout; signed notifications activate pools | Each gateway tested against recorded sandbox responses; a forged or repeated notification never marks an invoice paid; keys never returned by the API or written to logs |
+| 3.5 | Learners: list, add, CSV/Excel import with row checks, SA ID validation, invitations (SMS · WhatsApp link · email), cohort QR join, encrypted ID numbers with masked display | Import of 500 rows in under 10 s with a clear error report; ID numbers never stored or logged in plain text; revealing a full ID needs its own permission and is audited |
+| 3.6 | Cohorts and enrolments: pinned version, seat use, 14-day no-show return, withdrawal and transfer, licence health dashboard, QCTO deadline reminder and enrolment register export, learner home on web and mobile | A learner can never hold a seat they are not entitled to (concurrency tested); expired pools stop new enrolments; learner home shows programme and days left on both apps |
 
 Each sub-sprint is its own PR, merged only when CI is fully green.
 
@@ -182,9 +196,11 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
   is a small update.
 - **Unpaid accounts:** handled by clear, visible rules (decision 4), with reminders before anything happens,
   never a silent lock-out of learners mid-cohort.
-- **Payment notifications:** Paystack notifications are verified by signature, processed once (stored by event
-  id) and checked against Paystack's API before an invoice is marked paid. EFT stays available if Paystack is
-  down.
+- **Payment notifications:** each gateway's notifications are verified by its signature, processed once
+  (stored by event id) and checked against that gateway's API before an invoice is marked paid. If a gateway is
+  down, the provider can pick another one or pay by EFT.
+- **Gateway keys:** encrypted with the app key, never shown again after saving, never logged. Only Super Admin
+  can change them, and each change is audited.
 
 ## Decisions (Srini, 28 Nov 2026)
 1. **Pricing model: offer both.** HQ chooses per package:
@@ -196,14 +212,15 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
    - It returns to the pool automatically if the learner does not start within 14 days.
    - It returns on withdrawal before 10% of the programme is done. After that, it stays used for the term (or,
      on monthly packages, until the provider lowers its seats).
-3. **Payments: EFT plus Paystack.** HQ records EFT payments against the invoice number. Paystack takes card,
-   Instant EFT and Capitec Pay online, and activates the licence pool automatically when payment is confirmed.
+3. **Payments: EFT plus several gateways, chosen by Super Admin.** HQ records EFT payments against the invoice
+   number. Online gateways: **Paystack, PayFast, Peach Payments, Ozow and Yoco**. Super Admin switches on
+   whichever are needed and enters their keys; providers choose at checkout. A confirmed payment activates the
+   licence pool automatically.
 4. **Unpaid invoices: block new, keep learners.**
    - Reminders at the due date, then after 7 and 14 days.
    - After 30 days unpaid, the provider cannot buy more seats or enrol new learners.
    - Learners already enrolled keep learning to the end of their term.
 
-## Still needed (information, before 3.3 goes live)
-5. **Who invoices.** Which company and VAT number appears on invoices as the seller (Muzi's South African
-   entity?), its address, and its banking details for EFT. A Paystack merchant account in that company's name is
-   also needed. Until then we build and test with placeholder details.
+5. **Seller details are settings, not code.** Muzi's South African company is the seller. Super Admin enters
+   its company details, address, VAT number, EFT banking details and the gateway keys in HQ → Billing settings.
+   Nothing is hard-coded; development and tests use placeholder details.
