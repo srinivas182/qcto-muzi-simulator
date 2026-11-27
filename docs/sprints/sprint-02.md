@@ -147,3 +147,17 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
   TP Admin, Centre Manager, Facilitator, Assessor/Mentor, Moderator. Learners will see their own programme
   through enrolment (Sprint 3).
 - Published content is cached forever by version id (it cannot change); the list is cleared on publish.
+
+## Sub-sprint 2.2 notes (Programme Studio)
+- **Workflow:** start a draft (a copy of the published version) → edit → send for review with "what changed
+  and why" → reviewer approves or sends back with a comment → publisher publishes. Drafts in review are
+  locked. One open draft per programme; a draft can be discarded.
+- **Who does what:** edit = `programmes.manage` or `content.author`; review = `content.review`; publish =
+  `content.publish`. Nobody reviews their own submission, except a Super Admin (so a one-person HQ can work).
+- **Stable codes:** duty area numbers and outcome codes never change and are never reused, even after an
+  outcome is removed, so simulators, lessons and logbook entries can link to them safely across versions.
+- **What changed:** version comparison lists added, removed and reworded items (overview lists, duty areas,
+  outcomes by code, evidence) — shown in the History tab.
+- **Screens:** Programmes list (search, status per programme) and Programme page (Outcomes, Overview, History;
+  click-to-edit text, plain-language line per outcome, evidence type per item; draft/published switch).
+- Every step is in the audit log. Providers keep seeing the published version until the new one is published.

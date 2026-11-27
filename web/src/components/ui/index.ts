@@ -4,3 +4,4 @@ export { Card, Badge, Skeleton, Kbd, Avatar, PageHeader, EmptyState } from './Su
 export { Drawer } from './Drawer';
 export { ToastProvider, useToast } from './Toast';
 export { cx } from './cx';
+export { Editable } from './Editable';

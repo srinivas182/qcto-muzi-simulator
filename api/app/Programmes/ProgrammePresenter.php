@@ -10,6 +10,7 @@ use App\Models\Outcome;
 use App\Models\Programme;
 use App\Models\ProgrammeVersion;
 use App\Models\QualificationRef;
+use App\Models\User;
 
 /** JSON shapes for programmes and versions (shared by the HQ and provider APIs). */
 final class ProgrammePresenter
@@ -63,8 +64,29 @@ final class ProgrammePresenter
                 'number' => $d->number,
                 'title' => $d->title,
                 'outcomes' => $d->outcomes->map(fn (Outcome $o) => ['code' => $o->code, 'statement' => $o->statement, 'plain_words' => $o->plain_words])->all(),
-                'evidence' => $d->evidence->map(fn (EvidenceRequirement $e) => ['description' => $e->description, 'type' => $e->type, 'min_count' => $e->min_count])->all(),
+                'evidence' => $d->evidence->map(fn (EvidenceRequirement $e) => ['id' => $e->id, 'description' => $e->description, 'type' => $e->type, 'min_count' => $e->min_count])->all(),
             ])->all(),
         ];
+    }
+
+    /**
+     * HQ view of a version: content plus the review trail (names of HQ staff are never sent to providers).
+     *
+     * @return array<string, mixed>
+     */
+    public static function studio(ProgrammeVersion $version): array
+    {
+        $ids = array_filter([$version->getAttribute('submitted_by'), $version->getAttribute('reviewed_by'), $version->getAttribute('published_by')]);
+        $names = User::query()->whereIn('id', $ids)->pluck('name', 'id');
+        $name = fn (mixed $id) => is_string($id) ? ($names[$id] ?? null) : null;
+
+        return self::version($version) + ['review' => [
+            'submitted_at' => $version->getAttribute('submitted_at')?->toIso8601String(),
+            'submitted_by' => $name($version->getAttribute('submitted_by')),
+            'reviewed_at' => $version->getAttribute('reviewed_at')?->toIso8601String(),
+            'reviewed_by' => $name($version->getAttribute('reviewed_by')),
+            'comment' => $version->getAttribute('review_comment'),
+            'published_by' => $name($version->getAttribute('published_by')),
+        ]];
     }
 }
