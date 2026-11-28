@@ -37,4 +37,11 @@ return [
         ],
     ],
 
+    // Course Studio AI drafting (Sprint 4.2). Programme content only; never learner data.
+    'anthropic' => [
+        'key' => env('ANTHROPIC_API_KEY', ''),
+        'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-5-5'),
+        'url' => env('ANTHROPIC_URL', 'https://api.anthropic.com'),
+    ],
+
 ];

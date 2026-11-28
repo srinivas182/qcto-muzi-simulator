@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Programmes;
 
 use App\Audit\AuditLogger;
+use App\Learning\LessonStudio;
 use App\Models\Programme;
 use App\Models\ProgrammeVersion;
 use App\Models\User;
@@ -85,7 +86,10 @@ final class ProgrammeVersions
                 ->where('programme_id', $version->programme_id)
                 ->where('status', ProgrammeVersion::PUBLISHED)
                 ->get()
-                ->each(fn (ProgrammeVersion $old) => $old->update(['status' => ProgrammeVersion::RETIRED, 'retired_at' => now()]));
+                ->each(function (ProgrammeVersion $old) use ($version): void {
+                    $old->update(['status' => ProgrammeVersion::RETIRED, 'retired_at' => now()]);
+                    LessonStudio::carryForward($old, $version); // lessons and scenarios move to the new version
+                });
 
             $version->update(['status' => ProgrammeVersion::PUBLISHED, 'published_by' => $actor?->id, 'published_at' => now()]);
         });

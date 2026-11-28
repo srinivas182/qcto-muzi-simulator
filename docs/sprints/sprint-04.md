@@ -163,3 +163,37 @@ We fix what the pilot shows before producing content for the other 12 programmes
     rejects for good so they are not retried forever.
 - **Demo:** four published Technical Support activities (three lessons and the "A PC won't boot" scenario),
   with their content arriving in 4.2 and 4.5.
+
+## Sub-sprint 4.2 notes (Course Studio)
+
+- **Content tab** on each programme in HQ: its lessons and simulators, with a review chip per language
+  (EN, ZU, XH, AF) and a status of draft, published or "unpublished changes".
+- **Lesson editor** with a live preview on a phone-sized screen. Block types:
+  - narration, with optional audio;
+  - text and key points;
+  - picture, with a description that is read aloud;
+  - quick check, linked to an outcome;
+  - video, optional, with a low-data version and the text shown on data saver;
+  - "try it in the simulator".
+- **AI draft:** Claude drafts a lesson from the outcomes it links, written for South African learners on cheap
+  phones in plain words, with at least two quick checks. Only programme content is sent; never learner or
+  provider data. The model and key are settings (`ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`). Without a key the AI
+  buttons are hidden.
+- **AI translation:** isiZulu, isiXhosa and Afrikaans drafts in everyday language, with workplace terms kept in
+  English. Only text fields can be translated, so a translation can never change the right answer.
+- **Review and publish:**
+  - Authors (`content.author`), subject experts (`content.review`) and publishers (`content.publish`) are
+    separate roles.
+  - English must be reviewed before publishing.
+  - Changing the English text clears every review; changing a translation clears that language's review.
+  - **Learners see a translation only after a subject expert reviews it**; until then they get English (C3).
+  - Unreviewed translations are kept, so review can carry on after publishing.
+  - Republishing a changed lesson raises its content version.
+- **Uploads:** checked by the file's real type, not its name, with limits that suit learners' data:
+  pictures 400 KB, audio 1.5 MB, video 25 MB. Each file is stored once per content hash under a name that never
+  changes, so phones can cache it for good.
+- **New programme versions:** lessons and simulators carry forward automatically, keeping links only to outcomes
+  that still exist. Learners on the old version keep their copies.
+- **Demo:** three Technical Support lessons with real content, reviewed in English.
+- **Still to decide:** the narration voice provider and the avatar-video provider, with costs, before content
+  production. Until then narration is text, or an uploaded recording, and video is an uploaded MP4.

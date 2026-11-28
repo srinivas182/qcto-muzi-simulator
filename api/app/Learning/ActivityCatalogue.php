@@ -40,7 +40,7 @@ final class ActivityCatalogue
             DB::table('activity_outcomes')->insert(array_map(fn (string $c) => ['activity_id' => $activity->id, 'outcome_code' => $c], array_values(array_unique($outcomeCodes))));
             $this->audit->record('activities.created', $activity, null, ['code' => $activity->code, 'kind' => $activity->kind], $actor);
 
-            return $activity;
+            return $activity->refresh(); // database defaults (status, weight, content)
         });
     }
 
