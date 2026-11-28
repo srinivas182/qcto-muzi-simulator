@@ -664,6 +664,25 @@ const zu: Messages = {
   'bill.f.due_days': "Izinsuku zokukhokha (abahlinzeki abakhokha kuqala)",
   'bill.f.invoice_prefix': "Isiqalo senombolo ye-invoyisi",
   'bill.f.credit_note_prefix': "Isiqalo senothi lesikweletu",
+  // Payment gateways and paying online (Sprint 3.4)
+  'gw.title': "Amasango okukhokha",
+  'gw.lead': "Vula amasango abahlinzeki abangakhokha ngawo. Okhiye bagcinwa bebethelwe futhi abaphinde baboniswe; shiya ukhiye ungenalutho ukuze uwugcine.",
+  'gw.enable': "Vula u-{name}",
+  'gw.test': "Isivivinyo",
+  'gw.live': "Bukhoma",
+  'gw.mode': "Imodi",
+  'gw.notSet': "Akusethiwe",
+  'gw.keepHint': "Kugciniwe. Bhala inani elisha kuphela uma ufuna ukulishintsha.",
+  'gw.notify': "Ikheli lesaziso (i-webhook) okumele lifakwe esangweni",
+  'gw.save': "Gcina okhiye nemodi",
+  'gw.testConnection': "Hlola ukuxhumana",
+  'pay.online': "Khokha ku-inthanethi",
+  'pay.with': "Khokha nge-{name}",
+  'pay.secure': "Ukhokha ekhasini eliphephile lesango uqobo. I-invoyisi yakho imakwa njengekhokhiwe lapho isango liqinisekisa.",
+  'pay.checking': "Sihlola inkokhelo yakho nesango…",
+  'pay.received': "Inkokhelo itholiwe. Siyabonga: i-invoyisi yakho ikhokhiwe.",
+  'pay.failed': "Inkokhelo ayiqedwanga. Ungazama futhi noma ukhokhe nge-EFT.",
+  'pay.slow': "Asikazwa lutho kusango okwamanje. Uma ukhokhile, i-invoyisi yakho izobuyekezwa lapho iqinisekisa.",
 };
 
 export default zu;

@@ -664,6 +664,25 @@ const af: Messages = {
   'bill.f.due_days': "Dae om te betaal (betaal-eerste verskaffers)",
   'bill.f.invoice_prefix': "Faktuurnommer-voorvoegsel",
   'bill.f.credit_note_prefix': "Kredietnota-voorvoegsel",
+  // Payment gateways and paying online (Sprint 3.4)
+  'gw.title': "Betaalpoorte",
+  'gw.lead': "Skakel die poorte aan waarmee verskaffers kan betaal. Sleutels word geïnkripteer gestoor en nooit weer gewys nie; laat 'n sleutel leeg om dit te hou.",
+  'gw.enable': "Skakel {name} aan",
+  'gw.test': "Toets",
+  'gw.live': "Lewendig",
+  'gw.mode': "Modus",
+  'gw.notSet': "Nie gestel nie",
+  'gw.keepHint': "Gestoor. Tik net 'n nuwe waarde om dit te vervang.",
+  'gw.notify': "Kennisgewing- (webhook-) adres om by die poort in te voer",
+  'gw.save': "Stoor sleutels en modus",
+  'gw.testConnection': "Toets verbinding",
+  'pay.online': "Betaal aanlyn",
+  'pay.with': "Betaal met {name}",
+  'pay.secure': "Jy betaal op die poort se eie veilige bladsy. Jou faktuur word as betaal gemerk sodra die poort dit bevestig.",
+  'pay.checking': "Ons kontroleer jou betaling by die poort…",
+  'pay.received': "Betaling ontvang. Dankie: jou faktuur is betaal.",
+  'pay.failed': "Die betaling is nie voltooi nie. Jy kan weer probeer of per EFT betaal.",
+  'pay.slow': "Ons het nog nie van die poort gehoor nie. As jy betaal het, word jou faktuur bygewerk sodra dit bevestig.",
 };
 
 export default af;

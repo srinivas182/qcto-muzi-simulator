@@ -14,8 +14,10 @@ use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\SessionController;
 use App\Http\Controllers\Api\V1\Auth\TwoFactorController;
 use App\Http\Controllers\Api\V1\Billing\BillingSettingsController;
+use App\Http\Controllers\Api\V1\Billing\GatewaySettingsController;
 use App\Http\Controllers\Api\V1\Billing\InvoiceController;
 use App\Http\Controllers\Api\V1\Billing\LicenceController;
+use App\Http\Controllers\Api\V1\Billing\OnlinePaymentController;
 use App\Http\Controllers\Api\V1\Billing\PackageController;
 use App\Http\Controllers\Api\V1\Billing\PlatformBillingController;
 use App\Http\Controllers\Api\V1\Billing\ShopController;
@@ -88,6 +90,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
         ->middleware('throttle:120,1')
         ->name('internal.domain-allowed');
 
+    // Payment gateway notifications (public, signed by each gateway; see App\Billing\OnlinePayments).
+    Route::post('/payments/{driver}/notify', [OnlinePaymentController::class, 'notify'])->whereAlpha('driver')->middleware('throttle:120,1')->name('payments.notify');
+
     // Training provider context (provider sub-domain, custom domain, or X-Tenant on platform hosts).
     Route::middleware(['tenant', 'support'])->group(function () use ($authRoutes, $accessRoutes): void {
         Route::get('/tenant', CurrentTenantController::class)->name('tenant.current');
@@ -117,6 +122,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->whereUuid('invoice')->name('invoices.show');
                 Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->whereUuid('invoice')->name('invoices.pdf');
                 Route::get('/invoices/{invoice}/credit-note.pdf', [InvoiceController::class, 'creditNotePdf'])->whereUuid('invoice')->name('invoices.credit-note');
+                Route::get('/payment-options', [OnlinePaymentController::class, 'options'])->name('payment-options');
+                Route::post('/invoices/{invoice}/pay', [OnlinePaymentController::class, 'pay'])->whereUuid('invoice')->middleware('throttle:20,1')->name('invoices.pay');
+                Route::get('/payment-attempts/{attempt}', [OnlinePaymentController::class, 'attempt'])->whereUuid('attempt')->middleware('throttle:60,1')->name('payment-attempts.show');
             });
             Route::get('/academy', [AcademyController::class, 'show'])->middleware('permission:academy.manage')->name('academy.show');
             Route::patch('/academy', [AcademyController::class, 'update'])->middleware('permission:academy.manage')->name('academy.update');
@@ -175,6 +183,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::post('/invoices/{invoice}/credit', [PlatformBillingController::class, 'credit'])->whereUuid('invoice')->name('invoices.credit');
             });
             Route::middleware('permission:billing.settings')->group(function (): void {
+                Route::get('/billing/gateways', [GatewaySettingsController::class, 'index'])->name('billing.gateways');
+                Route::patch('/billing/gateways/{driver}', [GatewaySettingsController::class, 'update'])->whereAlpha('driver')->name('billing.gateways.update');
+                Route::post('/billing/gateways/{driver}/test', [GatewaySettingsController::class, 'test'])->whereAlpha('driver')->middleware('throttle:10,1')->name('billing.gateways.test');
                 Route::get('/billing/settings', [BillingSettingsController::class, 'show'])->name('billing.settings');
                 Route::patch('/billing/settings', [BillingSettingsController::class, 'update'])->name('billing.settings.update');
             });

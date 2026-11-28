@@ -662,6 +662,25 @@ const en = {
   'bill.f.due_days': "Days to pay (pay-first providers)",
   'bill.f.invoice_prefix': "Invoice number prefix",
   'bill.f.credit_note_prefix': "Credit note prefix",
+  // Payment gateways and paying online (Sprint 3.4)
+  'gw.title': "Payment gateways",
+  'gw.lead': "Switch on the gateways providers can pay with. Keys are stored encrypted and never shown again; leave a key empty to keep it.",
+  'gw.enable': "Switch {name} on",
+  'gw.test': "Test",
+  'gw.live': "Live",
+  'gw.mode': "Mode",
+  'gw.notSet': "Not set",
+  'gw.keepHint': "Saved. Type a new value only to replace it.",
+  'gw.notify': "Notification (webhook) address to enter at the gateway",
+  'gw.save': "Save keys and mode",
+  'gw.testConnection': "Test connection",
+  'pay.online': "Pay online",
+  'pay.with': "Pay with {name}",
+  'pay.secure': "You pay on the gateway’s own secure page. Your invoice is marked paid as soon as the gateway confirms it.",
+  'pay.checking': "Checking your payment with the gateway…",
+  'pay.received': "Payment received. Thank you: your invoice is paid.",
+  'pay.failed': "The payment was not completed. You can try again or pay by EFT.",
+  'pay.slow': "We have not heard from the gateway yet. If you paid, your invoice updates as soon as it confirms.",
 } as const;
 
 export type MessageKey = keyof typeof en;

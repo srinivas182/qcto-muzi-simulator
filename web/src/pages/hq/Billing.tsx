@@ -5,6 +5,7 @@ import { AlertTriangle, Search } from 'lucide-react';
 import { formatZar, type BillingSettingsData, type BillingSummary, type InvoiceRow } from '@simuwork/core';
 import type { MessageKey } from '@simuwork/core/locales/en';
 import { useSignedIn } from '../../app/access';
+import { Gateways } from '../../components/billing/Gateways';
 import { InvoiceDrawer } from '../../components/billing/InvoiceDrawer';
 import { InvoiceTable } from '../../components/billing/InvoiceTable';
 import { Button, Card, cx, Field, inputClass, PageHeader, Skeleton, useToast } from '../../components/ui';
@@ -29,7 +30,7 @@ export default function Billing() {
       </div>
       {tab === 'overview' && <Overview onInvoices={() => setTab('invoices')} />}
       {tab === 'invoices' && <Invoices manage={can(session, 'billing.manage')} />}
-      {tab === 'settings' && <Settings />}
+      {tab === 'settings' && <div className="space-y-10"><Settings /><Gateways /></div>}
     </div>
   );
 }
