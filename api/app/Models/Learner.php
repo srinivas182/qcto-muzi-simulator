@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property string $first_names
  * @property string $surname
  * @property string|null $phone
+ * @property Carbon|null $reminders_off_at
  * @property string|null $email
  * @property string $id_type
  * @property string $id_number_encrypted
@@ -65,7 +66,7 @@ class Learner extends Model
     /** The 11 official languages of South Africa (plus "other"), as ISO 639 codes. */
     public const LANGUAGES = ['en', 'af', 'zu', 'xh', 'st', 'tn', 'nso', 'ts', 'ss', 've', 'nr', 'sasl', 'other'];
 
-    protected $fillable = ['user_id', 'first_names', 'surname', 'phone', 'email', 'id_type', 'id_number_encrypted', 'id_number_hash', 'id_last4', 'date_of_birth', 'gender', 'citizenship', 'home_language', 'qcto_learner_number', 'status', 'created_by', 'joined_at',
+    protected $fillable = ['user_id', 'first_names', 'surname', 'phone', 'email', 'id_type', 'id_number_encrypted', 'id_number_hash', 'id_last4', 'date_of_birth', 'gender', 'citizenship', 'home_language', 'qcto_learner_number', 'status', 'created_by', 'joined_at', 'reminders_off_at',
         'title', 'middle_name', 'alt_id_type', 'equity_encrypted', 'disability_encrypted', 'nationality_code', 'citizen_status', 'immigrant_status',
         'socioeconomic_code', 'home_address', 'postal_address', 'province_code', 'stats_area_code', 'popi_agreed_at', 'flc_code', 'flc_sor_number'];
 
@@ -74,7 +75,7 @@ class Learner extends Model
     protected function casts(): array
     {
         return [
-            'date_of_birth' => 'date', 'joined_at' => 'datetime', 'popi_agreed_at' => 'datetime',
+            'date_of_birth' => 'date', 'joined_at' => 'datetime', 'popi_agreed_at' => 'datetime', 'reminders_off_at' => 'datetime',
             'equity_encrypted' => 'encrypted', 'disability_encrypted' => 'encrypted:array',
             'home_address' => 'array', 'postal_address' => 'array',
         ];

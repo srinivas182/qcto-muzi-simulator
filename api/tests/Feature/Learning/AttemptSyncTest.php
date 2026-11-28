@@ -6,6 +6,7 @@ namespace Tests\Feature\Learning;
 
 use App\Learners\IdNumbers;
 use App\Learning\ActivityCatalogue;
+use App\Learning\LearnerNudges;
 use App\Learning\ScenarioContent;
 use App\Models\Activity;
 use App\Models\Attempt;
@@ -297,5 +298,65 @@ final class AttemptSyncTest extends AccessTestCase
         $this->fresh()->getJson($this->url("/enrolments/{$this->enrolment->id}/checklist"), $this->bearer($staff))->assertOk()->assertJsonPath('data.learner', 'Sipho Ndlovu');
         [$other] = $this->enrolled($this->ubuntu, Package::query()->firstOrFail());
         $this->fresh()->getJson($this->url("/learn/enrolments/{$this->enrolment->id}/checklist"), $this->bearer($other))->assertNotFound();
+    }
+
+    public function test_quiet_learners_get_a_gentle_reminder_in_their_language_at_most_weekly_and_three_times(): void
+    {
+        config(['identity.messaging.driver_override' => 'log']);
+        $this->sync([$this->item('L1')]);
+        app(TenantContext::class)->runAs($this->ubuntu, function (): void {
+            $this->enrolment->refresh()->learner->user->update(['locale' => 'zu']);
+        });
+        $run = fn () => app(TenantContext::class)->runAs($this->ubuntu, fn () => app(LearnerNudges::class)->run($this->ubuntu));
+        $this->assertSame(0, $run()); // active today: nothing
+
+        Carbon::setTestNow('2027-02-18 09:12:00'); // 8 days quiet
+        $this->assertSame(1, $run());
+        $this->assertSame(0, $run()); // not twice in a week
+        $this->assertAudited('learning.reminder_sent');
+        Carbon::setTestNow('2027-02-26 09:12:00');
+        $this->assertSame(1, $run());
+        Carbon::setTestNow('2027-03-06 09:12:00');
+        $this->assertSame(1, $run());
+        Carbon::setTestNow('2027-03-14 09:12:00');
+        $this->assertSame(0, $run()); // three in a row: the facilitator follows up in person
+
+        // Turning reminders off is respected; the facilitator's nudge too.
+        $this->fresh()->patchJson($this->url('/learn/me/reminders'), ['on' => false], $this->bearer($this->token))->assertOk()->assertJsonPath('data.on', false);
+        $this->fresh()->getJson($this->url('/learn/home'), $this->bearer($this->token))->assertJsonPath('data.learner.reminders', false);
+        [, $staff] = $this->person($this->ubuntu, 'tp_admin');
+        $this->fresh()->postJson($this->url("/enrolments/{$this->enrolment->id}/nudge"), [], $this->bearer($staff))->assertUnprocessable()->assertJsonPath('data.sent', false);
+    }
+
+    public function test_the_reminder_text_is_short_and_in_each_language(): void
+    {
+        foreach (LearnerNudges::TEXT as $text) {
+            $this->assertStringContainsString('{url}', $text);
+            $this->assertLessThan(200, mb_strlen(strtr($text, ['{academy}' => 'Ubuntu Skills Academy', '{name}' => 'Sipho', '{programme}' => 'Technical Support', '{url}' => ''])));
+        }
+    }
+
+    public function test_a_learner_shares_a_read_only_checklist_link_and_can_stop_it(): void
+    {
+        $this->sync([$this->item('S1', ['mode' => 'job'])]);
+        $made = $this->fresh()->postJson($this->url("/learn/enrolments/{$this->enrolment->id}/shares"), ['label' => 'For my mentor'], $this->bearer($this->token))->assertCreated();
+        $token = (string) str($made->json('data.url'))->afterLast('/c/');
+        $this->assertSame(40, strlen($token));
+        $this->assertAudited('checklist.shared');
+
+        $view = $this->fresh()->getJson($this->url("/checklists/{$token}"))->assertOk()->assertHeader('X-Robots-Tag', 'noindex');
+        $view->assertJsonPath('data.learner', 'Sipho N.')->assertJsonPath('data.academy', $this->ubuntu->name);
+        $this->assertStringNotContainsString('Ndlovu', (string) $view->getContent()); // no full surname, no ID, no phone
+        $this->assertStringNotContainsString('+2782', (string) $view->getContent());
+        $this->fresh()->getJson($this->url("/learn/enrolments/{$this->enrolment->id}/shares"), $this->bearer($this->token))->assertJsonPath('data.0.views', 1)->assertJsonPath('data.0.label', 'For my mentor');
+
+        // Another provider's host cannot open it, and once stopped it is gone.
+        $this->fresh()->getJson($this->url("/checklists/{$token}", 'lebone.simuwork.test'))->assertNotFound();
+        [$other] = $this->enrolled($this->ubuntu, Package::query()->firstOrFail());
+        $this->fresh()->deleteJson($this->url('/learn/shares/'.$made->json('data.id')), [], $this->bearer($other))->assertNotFound();
+        $this->fresh()->deleteJson($this->url('/learn/shares/'.$made->json('data.id')), [], $this->bearer($this->token))->assertNoContent();
+        $this->fresh()->getJson($this->url("/checklists/{$token}"))->assertNotFound();
+        Carbon::setTestNow('2027-04-10 09:00:00');
+        $this->fresh()->getJson($this->url('/checklists/'.str_repeat('a', 40)))->assertNotFound();
     }
 }

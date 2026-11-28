@@ -1207,6 +1207,27 @@ const af: Messages = {
   'pg.cellDone': "Klaar · beste {best}% · {tries} pogings",
   'pg.cellStarted': "Begin · {tries} pogings",
   'pg.legend': "Vol sirkel: klaar (nommer = beste punt). Groen regmerk: geslaag as regte werk. Stippelsirkel: begin. Leerders wat stil geword het, kom eerste.",
+  // Sprint 4.6b: reminders and shared checklists
+  'jr.share.title': "Deel met ’n mentor of werkgewer",
+  'jr.share.lead': "Maak ’n leesalleen-skakel na hierdie lys. Dit wys net jou voornaam en vaardighede, en werk nie meer ná 30 dae of wanneer jy dit stop nie.",
+  'jr.share.label': "Vir wie is dit?",
+  'jr.share.labelPh': "Byvoorbeeld: my mentor by Acme IT",
+  'jr.share.make': "Maak ’n skakel",
+  'jr.share.send': "Kopieer of stuur",
+  'jr.share.copied': "Skakel gekopieer.",
+  'jr.share.stopped': "Daardie skakel werk nie meer nie.",
+  'jr.share.noLabel': "Gedeelde skakel",
+  'jr.share.meta': "{views} keer oopgemaak · werk tot {date}",
+  'jr.share.stop': "Stop",
+  'jr.public.title': "Werksgereedheid-kontrolelys: {name}",
+  'jr.public.asOf': "op {date}",
+  'jr.public.gone': "Hierdie skakel het verval of die leerder het opgehou om dit te deel.",
+  'jr.public.note': "\"Gewys in ’n regte werk\" beteken die leerder het hierdie taak in ’n werkplek-simulator met ’n tydsbeperking sonder wenke geslaag. Deur die leerder gedeel; geen ander persoonlike besonderhede is ingesluit nie.",
+  'jr.reminders': "Herinneringe",
+  'jr.remindersLead': "As jy ’n week lank nie geoefen het nie, stuur ons een kort boodskap in jou taal. Hoogstens drie na mekaar.",
+  'pg.nudge': "Herinner",
+  'pg.nudged': "Herinnering gestuur.",
+  'pg.nudgeFailed': "Nie gestuur nie: die leerder het geen foonnommer nie, het herinneringe afgeskakel, of is hierdie week herinner.",
 };
 
 export default af;

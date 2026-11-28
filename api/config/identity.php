@@ -51,6 +51,7 @@ return [
             'token' => env('WHATSAPP_TOKEN'),
             'phone_number_id' => env('WHATSAPP_PHONE_NUMBER_ID'),
             'otp_template' => env('WHATSAPP_OTP_TEMPLATE', 'login_code'),
+            'reminder_template' => env('WHATSAPP_REMINDER_TEMPLATE'), // approved utility template with one body parameter
             'api_version' => env('WHATSAPP_API_VERSION', 'v21.0'),
         ],
         'sms' => [

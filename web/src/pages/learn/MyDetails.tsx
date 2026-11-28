@@ -1,9 +1,9 @@
 import { Link, useNavigate } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft } from 'lucide-react';
-import type { QctoDetails } from '@simuwork/core';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, BellRing } from 'lucide-react';
+import type { LearnHomeData, QctoDetails } from '@simuwork/core';
 import { QctoForm } from '../../components/qcto/QctoDetailsDrawer';
-import { Card, Skeleton } from '../../components/ui';
+import { Card, Skeleton, Switch } from '../../components/ui';
 import { api } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
 
@@ -22,6 +22,24 @@ export default function MyDetails() {
           <QctoForm self endpoint="/learn/me/qcto" queryKey={['my-qcto']} details={details.data.data} hasSaId={details.data.data.alt_id_type === null} onDone={() => void navigate('/learn')} />
         )}
       </Card>
+      <Reminders />
     </div>
+  );
+}
+
+/** Gentle reminders after a quiet week: on by default, the learner can turn them off. */
+function Reminders() {
+  const { t } = useI18n();
+  const qc = useQueryClient();
+  const home = useQuery({ queryKey: ['learn-home'], queryFn: () => api<{ data: LearnHomeData }>('/learn/home') });
+  const set = useMutation({ mutationFn: (on: boolean) => api('/learn/me/reminders', { method: 'PATCH', body: { on } }), onSuccess: () => void qc.invalidateQueries({ queryKey: ['learn-home'] }) });
+  const on = set.isPending ? set.variables : home.data?.data.learner?.reminders ?? true;
+  if (!home.data?.data.learner) return null;
+  return (
+    <Card className="mt-4 flex items-center gap-4 p-5">
+      <BellRing className="size-5 shrink-0 text-brand" />
+      <div className="flex-1"><p className="font-semibold text-ink">{t('jr.reminders')}</p><p className="text-[13px] text-muted">{t('jr.remindersLead')}</p></div>
+      <Switch checked={on} onChange={(v) => set.mutate(v)} label={t('jr.reminders')} />
+    </Card>
   );
 }

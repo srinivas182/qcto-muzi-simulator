@@ -1,4 +1,4 @@
-import { fireEvent, screen, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import type { ChecklistArea, CohortBoard } from '@simuwork/core';
 import { mockApi, nav, renderAt, session } from './harness';
@@ -37,5 +37,34 @@ describe('Progress', () => {
     expect(await screen.findByText('Find why a PC will not start')).toBeInTheDocument();
     expect(screen.getByText('2. Diagnose faults')).toBeInTheDocument();
     expect(screen.getByLabelText('Not yet')).toBeInTheDocument();
+  });
+
+  it('a shared checklist opens without signing in, shows no personal details and keeps the locked footer', async () => {
+    mockApi({ '/checklists/abc': { data: { learner: 'Sipho N.', academy: 'Ubuntu Skills Academy', programme: 'Technical Support', as_of: '2027-02-10', expires_at: '2027-03-12T00:00:00Z', areas } } });
+    renderAt('/c/abc');
+    expect(await screen.findByRole('heading', { name: 'Job-ready checklist: Sipho N.' })).toBeInTheDocument();
+    expect(screen.getByText('Find why a PC will not start')).toBeInTheDocument();
+    const footer = screen.getByRole('contentinfo');
+    expect(within(footer).getByRole('link', { name: 'Mayura Consultancy Services' })).toHaveAttribute('href', 'https://www.mayuraconsultancy.com');
+    expect(document.head.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe('noindex');
+  });
+
+  it('the learner makes a link, sees it opened, and stops it', async () => {
+    let live = true;
+    const calls = mockApi({
+      '/learn/enrolments/e1/checklist': { data: { areas } },
+      '/learn/enrolments/e1/shares': (init?: RequestInit) => (init?.method === 'POST'
+        ? { data: { id: 'sh1', label: 'My mentor', created_at: '2027-02-10', expires_at: '2027-03-12', views: 0, live: true, url: 'https://ubuntu.simuwork.co.za/c/TOKEN' } }
+        : { data: live ? [{ id: 'sh1', label: 'My mentor', created_at: '2027-02-10', expires_at: '2027-03-12', views: 2, live: true }] : [] }),
+      '/learn/shares/sh1': () => { live = false; return null; },
+    }, session({ permissions: ['learning.use'], navigation: nav('learn') }));
+    renderAt('/learn/enrolments/e1/checklist');
+    fireEvent.change(await screen.findByLabelText('Who is it for?'), { target: { value: 'My mentor' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Make a link' }));
+    expect(await screen.findByText('https://ubuntu.simuwork.co.za/c/TOKEN')).toBeInTheDocument();
+    expect(await screen.findByText(/Opened 2 times/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
+    await waitFor(() => expect(calls.mock.calls.some(([u, i]) => String(u).endsWith('/learn/shares/sh1') && (i as RequestInit).method === 'DELETE')).toBe(true));
+    await waitFor(() => expect(screen.queryByText(/Opened 2 times/)).not.toBeInTheDocument());
   });
 });

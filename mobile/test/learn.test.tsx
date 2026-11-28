@@ -122,4 +122,19 @@ describe('job-ready checklist', () => {
     expect(await screen.findByText('1 of 2 skills shown')).toBeOnTheScreen();
     expect(screen.getByLabelText('Find why a PC will not start: Shown on a real job')).toBeOnTheScreen();
   });
+
+  it('shares a read-only link through the phone’s share sheet', async () => {
+    const { Share } = jest.requireActual<typeof import('react-native')>('react-native');
+    const spy = jest.spyOn(Share, 'share').mockResolvedValue({ action: 'sharedAction' } as never);
+    await seed({ signedIn: true });
+    mockApi({
+      '/session': { data: session() },
+      '/learn/enrolments/e1/checklist': { data: { areas: [] } },
+      '/learn/enrolments/e1/shares': { data: { id: 'sh1', label: null, created_at: '', expires_at: '', views: 0, live: true, url: 'https://ubuntu.simuwork.co.za/c/TOKEN' } },
+    });
+    await renderRouter('./app', { initialUrl: '/learn/e1/checklist' });
+    await act(async () => fireEvent.press(await screen.findByText('Share with a mentor or employer')));
+    await settle();
+    expect(spy).toHaveBeenCalledWith({ message: 'Job-ready checklist: https://ubuntu.simuwork.co.za/c/TOKEN' });
+  });
 });

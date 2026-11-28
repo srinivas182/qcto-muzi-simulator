@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, BookOpen, Box, Check, Clock, ListChecks } from 'lucide-react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { ArrowLeft, BellRing, BookOpen, Box, Check, Clock, ListChecks } from 'lucide-react';
 import type { ChecklistArea, CohortBoard } from '@simuwork/core';
 import { Checklist } from '../../components/progress/Checklist';
-import { Badge, Card, cx, Drawer, Skeleton } from '../../components/ui';
+import { Badge, Card, cx, Drawer, Skeleton, useToast } from '../../components/ui';
+import { can, useSession } from '../../lib/session';
 import { api } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
 
@@ -19,6 +20,13 @@ export default function CohortProgress() {
   const q = useQuery({ queryKey: ['cohort-progress', id], queryFn: () => api<{ data: CohortBoard }>(`/cohorts/${id}/progress`) });
   const [open, setOpen] = useState<{ id: string; name: string } | null>(null);
   const [now] = useState(loadedAt);
+  const toast = useToast();
+  const { data: session } = useSession();
+  const nudge = useMutation({
+    mutationFn: (eid: string) => api(`/enrolments/${eid}/nudge`, { method: 'POST' }),
+    onSuccess: () => toast(t('pg.nudged')),
+    onError: () => toast(t('pg.nudgeFailed'), 'error'),
+  });
   const b = q.data?.data;
 
   return (
@@ -53,6 +61,7 @@ export default function CohortProgress() {
                       <p className="font-semibold text-ink">{l.name}</p>
                       <p className="flex items-center gap-1 text-[12px] text-muted">
                         {l.at_risk && <Badge tone="warning"><Clock className="size-3" />{t('pg.quiet')}</Badge>}
+                        {l.at_risk && can(session, 'classes.manage') && <button type="button" onClick={() => nudge.mutate(l.id)} className="inline-flex items-center gap-1 rounded-md px-1.5 font-semibold text-brand hover:bg-surface-2"><BellRing className="size-3" />{t('pg.nudge')}</button>}
                         {l.last_activity_at ? t('pg.lastActive', { n: daysSince(l.last_activity_at, now) }) : t('pg.neverActive')}
                       </p>
                     </td>

@@ -1207,6 +1207,27 @@ const xh: Messages = {
   'pg.cellDone': "Kugqityiwe · okona kulungileyo {best}% · iinzame ezi-{tries}",
   'pg.cellStarted': "Kuqalisiwe · iinzame ezi-{tries}",
   'pg.legend': "Isangqa esizeleyo: kugqityiwe (inani = amanqaku aphezulu). Uphawu oluhlaza: kuphumelele njengomsebenzi wokwenene. Isangqa esinamachaphaza: kuqalisiwe. Abafundi abathe cwaka baqala.",
+  // Sprint 4.6b: reminders and shared checklists
+  'jr.share.title': "Yabelana nomcebisi okanye umqeshi",
+  'jr.share.lead': "Yenza ikhonkco lokufunda kuphela lolu luhlu. Libonisa igama lakho lokuqala nezakhono kuphela, kwaye liyayeka ukusebenza emva kweentsuku ezingama-30 okanye xa ulimisa.",
+  'jr.share.label': "Lelikabani?",
+  'jr.share.labelPh': "Umzekelo: umcebisi wam e-Acme IT",
+  'jr.share.make': "Yenza ikhonkco",
+  'jr.share.send': "Kopa okanye thumela",
+  'jr.share.copied': "Ikhonkco likopiwe.",
+  'jr.share.stopped': "Elo khonkco alisasebenzi.",
+  'jr.share.noLabel': "Ikhonkco ekwabelwana ngalo",
+  'jr.share.meta': "Livulwe amaxesha angama-{views} · lisebenza de kube ngu-{date}",
+  'jr.share.stop': "Misa",
+  'jr.public.title': "Uluhlu lokulungela umsebenzi: {name}",
+  'jr.public.asOf': "ukusukela nge-{date}",
+  'jr.public.gone': "Eli khonkco liphelelwe lixesha okanye umfundi uyekile ukwabelana ngalo.",
+  'jr.public.note': "\"Kubonisiwe emsebenzini wokwenene\" kuthetha ukuba umfundi uphumelele lo msebenzi kwi-simulator yendawo yokusebenza enexesha ngaphandle kwamacebo. Kwabelwe ngumfundi; akukho zinye iinkcukacha zobuqu.",
+  'jr.reminders': "Izikhumbuzo",
+  'jr.remindersLead': "Ukuba khange uziqeqeshe iveki yonke, sikuthumelela umyalezo omnye omfutshane ngolwimi lwakho. Kathathu kuphela ngokulandelelana.",
+  'pg.nudge': "Khumbuza",
+  'pg.nudged': "Isikhumbuzo sithunyelwe.",
+  'pg.nudgeFailed': "Asithunyelwanga: umfundi akanayo inombolo yefowuni, ucime izikhumbuzo, okanye ukhunjuziwe kule veki.",
 };
 
 export default xh;

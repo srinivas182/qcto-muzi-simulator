@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\V1\CurrentTenantController;
 use App\Http\Controllers\Api\V1\DomainAllowedController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\Learn\LearnController;
+use App\Http\Controllers\Api\V1\Learn\ShareController;
 use App\Http\Controllers\Api\V1\Learners\LearnerController;
 use App\Http\Controllers\Api\V1\Programmes\CatalogueController;
 use App\Http\Controllers\Api\V1\Programmes\CoverageController;
@@ -104,6 +105,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
 
         Route::middleware('throttle:auth')->group(function (): void {
             Route::get('/invitations/{token}', [InvitationController::class, 'show'])->name('invitations.show');
+            Route::get('/checklists/{token}', [ShareController::class, 'show'])->name('checklists.show'); // read-only link a learner shared
             Route::post('/invitations/{token}/code', [InvitationController::class, 'sendCode'])->name('invitations.code');
             Route::post('/invitations/{token}/accept', [InvitationController::class, 'accept'])->name('invitations.accept');
         });
@@ -157,6 +159,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
             });
             Route::middleware('permission:learners.manage')->group(function (): void {
                 Route::post('/cohorts/{cohort}/enrolments', [CohortController::class, 'enrol'])->whereUuid('cohort')->name('cohorts.enrol');
+                Route::post('/enrolments/{enrolment}/nudge', [ShareController::class, 'nudge'])->whereUuid('enrolment')->middleware('throttle:30,1')->name('enrolments.nudge');
                 Route::post('/enrolments/{enrolment}/withdraw', [CohortController::class, 'withdraw'])->whereUuid('enrolment')->name('enrolments.withdraw');
                 Route::post('/enrolments/{enrolment}/transfer', [CohortController::class, 'transfer'])->whereUuid('enrolment')->name('enrolments.transfer');
             });
@@ -171,6 +174,10 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::get('/learn/enrolments/{enrolment}/activities', [LearnController::class, 'activities'])->whereUuid('enrolment')->name('learn.activities');
                 Route::get('/learn/enrolments/{enrolment}/lessons/{activity}', [LearnController::class, 'lesson'])->whereUuid(['enrolment', 'activity'])->name('learn.lesson');
                 Route::get('/learn/enrolments/{enrolment}/checklist', [LearnController::class, 'checklist'])->whereUuid('enrolment')->name('learn.checklist');
+                Route::get('/learn/enrolments/{enrolment}/shares', [ShareController::class, 'index'])->whereUuid('enrolment')->name('learn.shares');
+                Route::post('/learn/enrolments/{enrolment}/shares', [ShareController::class, 'store'])->whereUuid('enrolment')->middleware('throttle:10,1')->name('learn.shares.store');
+                Route::delete('/learn/shares/{share}', [ShareController::class, 'destroy'])->whereUuid('share')->name('learn.shares.destroy');
+                Route::patch('/learn/me/reminders', [ShareController::class, 'reminders'])->name('learn.reminders');
                 Route::get('/learn/enrolments/{enrolment}/scenarios/{activity}', [LearnController::class, 'scenario'])->whereUuid(['enrolment', 'activity'])->name('learn.scenario');
                 Route::post('/learn/attempts/sync', [LearnController::class, 'sync'])->middleware('throttle:60,1')->name('learn.sync');
                 Route::get('/learn/me/qcto', [LearnController::class, 'qcto'])->name('learn.qcto');
