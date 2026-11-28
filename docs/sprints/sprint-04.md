@@ -30,6 +30,52 @@ progress that drives the seat rules, the QCTO file and, later, assessment.
   outcomes; people review it and publish it.
 - **Progress is real:** it drives the 10% withdrawal rule, at-risk alerts, and the learner's own home screen.
 
+## Gaps we fill and best recommendations (approved by Srini, 28 Nov 2026)
+
+**Gaps against the leaders:**
+1. **Access:** the learner's own phone, with no headset and no laptop; offline downloads; scenes ≤ 3 MB and
+   lessons of about 150 KB.
+2. **Language:** English, isiZulu, isiXhosa and Afrikaans, with narration. Switch language in the middle of a
+   lesson and keep your place.
+3. **Feedback on hands-on tasks:** coaching like the AI role-play tools give for conversations, but for
+   technical tasks.
+4. **Never losing work:** every step is saved on the device first and synced later.
+5. **Price:** per learner seat; unused seats come back automatically.
+
+**Interactive (in this sprint):**
+- **Mistakes have consequences:** the scene reacts realistically (the RAM fails, the PC won't boot, a customer
+  gets impatient). *(4.4)*
+- **Practice mode and "real job" mode:**
+  - Practice gives hints that get more specific each time the learner asks.
+  - Real job mode has no hints, a clock and a customer waiting, and counts towards EISA readiness. *(4.4)*
+- **Replay and debrief:** a short replay of each attempt with mistakes marked, a "why it matters" note, and a
+  link to the lesson block that covers it. *(4.4 and 4.5)*
+- **Branching:** the same fault can have different causes, so learners diagnose instead of memorising. *(4.5)*
+- **Lesson → try it → fix it:** lessons of 3–5 minutes end with "try it in the simulator", and mistakes link
+  back to the exact lesson block. *(4.2 and 4.3)*
+- **AI coach in the simulator:** "Why?" and "Help" answer in the learner's language, limited to that scenario
+  and its QCTO outcomes. *(4.7)*
+
+**Easy to use (in this sprint):**
+- **Audio first, for low-literacy learners:** every instruction can be heard; icons back up text; large touch
+  targets; captions. *(4.3 and 4.4)*
+- **One clear next step:** a "Continue" card on the home screen. *(4.3)*
+- **Job-ready checklist:** built from the QCTO outcomes, ticked as skills are shown, shareable with a mentor
+  or employer. *(4.6)*
+- **Class mode:** the facilitator runs a scenario with the whole class and sees live who is stuck and where.
+  *(4.7)*
+- **Gentle encouragement:** no public leaderboard by default; reminders by SMS or WhatsApp in the learner's
+  own language. *(4.6)*
+
+**Proving it:** a pilot with one of Muzi's provider cohorts at the end of Sprint 4, measuring:
+- completion of the first simulator;
+- time taken and number of tries;
+- data used per learner;
+- how often learners ask for help;
+- a 3-question learner rating.
+
+We fix what the pilot shows before producing content for the other 12 programmes.
+
 ## Decisions (Srini, 28 Nov 2026)
 
 1. **Simulators are real-time 3D.** Learners handle tools and parts in a 3D workplace on their own phone or in
@@ -54,7 +100,8 @@ progress that drives the seat rules, the QCTO file and, later, assessment.
 | **4.3** | Course player | Web and mobile; narration with a data-saver setting (text only); resume where you left off; checks feed progress; works offline from a downloaded pack. |
 | **4.4** | Simulator runtime | Scenario format: scene, steps (instruction, tap or inspect an object, choose, drag to place), hints, scoring linked to outcomes, attempts saved. Touch-first 3D on web; on mobile, the same runtime in a WebView, downloaded with the pack (the app size stays under 25 MB). A step-by-step 2D fallback for phones without WebGL. |
 | **4.5** | Scenario Studio (HQ) and the first simulator | A form-based step editor on ready-made scenes, with preview. First scenario for Technical Support: "A PC won't boot — diagnose it and replace the faulty RAM safely" (antistatic strap, power off, reseat, test). |
-| **4.6** | Offline packs and progress views | Download a programme on Wi-Fi; attempts are queued offline and synced later. Facilitators see progress per learner in a cohort, and learners who haven't been active for 7 days are flagged (feeds C1). |
+| **4.6** | Offline packs and progress views | Download a programme on Wi-Fi; attempts are queued offline and synced later. Facilitators see progress per learner in a cohort, and learners who haven't been active for 7 days are flagged (feeds C1). Job-ready checklist; gentle SMS/WhatsApp reminders. |
+| **4.7** | AI coach and class mode | An AI coach in the simulator ("Why?" and "Help"), answering in the learner's language and limited to the scenario and its outcomes; no learner personal data is sent. Class mode: the facilitator starts a scenario for the cohort and sees each learner's step live. Pilot measures in place. |
 
 ## Data model (outline)
 

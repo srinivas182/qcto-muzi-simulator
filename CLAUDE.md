@@ -8,6 +8,9 @@ Requirements: PRD v1.2 and UI/UX mock-ups v1.2 (Mayura Consultancy Services, 26 
 ## Sprint process
 1. Before each sprint: detailed spec in `docs/sprints/`, including what market leaders do, their weaknesses,
    and our additions. Get approval before building.
+   Every sprint spec and every sprint report must also include a **"Gaps we fill and best recommendations"**
+   section (Srini, 28 Nov 2026): the gaps against the leaders for our learners and providers, and the
+   recommended improvements for interactivity and ease of use, each marked as in this sprint or proposed for later.
 2. Small sub-sprints. Check locally first (Pint, PHPStan, tests, lint, types, build).
 3. Open a PR per sub-sprint; merge only when CI is fully green. Draft PRs run quick checks only.
 4. After merging, report status and propose the next sub-sprint.
