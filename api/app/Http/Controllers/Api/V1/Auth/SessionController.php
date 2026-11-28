@@ -8,6 +8,7 @@ use App\Authorization\Navigation;
 use App\Authorization\PermissionRegistry;
 use App\Branding\BrandingService;
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\EnsureProviderOpen;
 use App\Identity\Authenticator;
 use App\Models\SupportSession;
 use App\Models\User;
@@ -50,7 +51,12 @@ final class SessionController extends Controller
             'user' => $this->auth->present($user),
             'permissions' => $permissions,
             'navigation' => Navigation::for($area, $permissions),
-            'tenant' => $tenant === null ? null : ['id' => $tenant->id, 'name' => $tenant->name, 'slug' => $tenant->slug, 'branding' => $this->branding->present($tenant)],
+            'tenant' => $tenant === null ? null : [
+                'id' => $tenant->id, 'name' => $tenant->name, 'slug' => $tenant->slug, 'status' => $tenant->status,
+                // Staff of a suspended provider see "account on hold" instead of the app.
+                'on_hold' => $tenant->isSuspended() && ! ($support instanceof SupportSession) && EnsureProviderOpen::isStaff($user),
+                'branding' => $this->branding->present($tenant),
+            ],
             'support' => $support instanceof SupportSession ? [
                 'id' => $support->id,
                 'staff_name' => $support->staff_name,

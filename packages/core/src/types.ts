@@ -48,7 +48,7 @@ export interface Session {
   user: User;
   permissions: string[];
   navigation: NavItem[];
-  tenant: { id: string; name: string; slug: string; branding: Branding } | null;
+  tenant: { id: string; name: string; slug: string; status?: ProviderStatus; on_hold?: boolean; branding: Branding } | null;
   support: SupportInfo | null;
   locales: Record<string, string>;
 }
@@ -218,12 +218,51 @@ export interface ProviderLayer {
   };
 }
 
+export type ProviderStatus = 'trial' | 'active' | 'suspended' | 'archived';
+
+export interface AccreditationState {
+  state: 'missing' | 'ok' | 'expiring' | 'expired';
+  days_left: number | null;
+}
+
 export interface ProviderRow {
   id: string;
   name: string;
   slug: string;
-  status: string;
+  status: ProviderStatus;
   programme_additions: boolean;
+  accreditation?: AccreditationState;
+  created_at?: string | null;
+}
+
+export interface ProviderAddress {
+  line1?: string | null;
+  line2?: string | null;
+  city?: string | null;
+  province?: string | null;
+  postal_code?: string | null;
+}
+
+export interface ProviderDetails extends ProviderRow {
+  accreditation: AccreditationState;
+  legal_name: string | null;
+  registration_number: string | null;
+  vat_number: string | null;
+  accreditation_number: string | null;
+  accreditation_expires_at: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  billing_email: string | null;
+  address: ProviderAddress;
+  payment_terms: { mode: 'pay_first' | 'on_account'; days: number };
+  status_reason: string | null;
+  status_changed_at: string | null;
+}
+
+export interface ProviderForHq extends ProviderDetails {
+  centres: number;
+  people: { id: string; name: string; email: string | null; phone: string | null; status: string; roles: string[]; last_login_at: string | null }[];
+  domains: { host: string; type: string; primary: boolean; verified: boolean }[];
 }
 
 export interface ReferencePageSummary {

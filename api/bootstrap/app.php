@@ -6,6 +6,7 @@ use App\Http\Middleware\EnsureActiveUser;
 use App\Http\Middleware\EnsureConsented;
 use App\Http\Middleware\EnsurePermission;
 use App\Http\Middleware\EnsurePlatformStaff;
+use App\Http\Middleware\EnsureProviderOpen;
 use App\Http\Middleware\PlatformContext;
 use App\Http\Middleware\ResolveSupportSession;
 use App\Http\Middleware\ResolveTenant;
@@ -31,6 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'consented' => EnsureConsented::class,
             'permission' => EnsurePermission::class,
             'support' => ResolveSupportSession::class,
+            'provider.open' => EnsureProviderOpen::class,
         ]);
 
         // The tenant/platform context must be set before authentication, so row-level security

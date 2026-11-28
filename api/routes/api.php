@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\V1\Programmes\PlatformProgrammeController;
 use App\Http\Controllers\Api\V1\Programmes\ProgrammeStudioController;
 use App\Http\Controllers\Api\V1\Programmes\ProviderProgrammeController;
 use App\Http\Controllers\Api\V1\Programmes\ReferencePageController;
+use App\Http\Controllers\Api\V1\Providers\AcademyController;
 use App\Http\Controllers\Api\V1\Providers\ProviderController;
 use Illuminate\Support\Facades\Route;
 
@@ -93,10 +94,12 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
 
         $authRoutes(false);
 
-        Route::middleware(['auth:sanctum', 'active', 'consented'])->group(function () use ($accessRoutes): void {
+        Route::middleware(['auth:sanctum', 'active', 'consented', 'provider.open'])->group(function () use ($accessRoutes): void {
             $accessRoutes(false);
             Route::get('/audit', [AuditController::class, 'index'])->middleware('permission:audit.view_tenant')->name('audit.index');
             Route::patch('/branding', [BrandingController::class, 'update'])->middleware('permission:branding.manage')->name('branding.update');
+            Route::get('/academy', [AcademyController::class, 'show'])->middleware('permission:academy.manage')->name('academy.show');
+            Route::patch('/academy', [AcademyController::class, 'update'])->middleware('permission:academy.manage')->name('academy.update');
 
             Route::middleware('permission:catalogue.view')->group(function (): void {
                 Route::get('/programmes', [CatalogueController::class, 'index'])->name('programmes.index');
@@ -141,6 +144,13 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 ->middleware('permission:programmes.manage|content.author')->name('programmes.coverage.update');
 
             Route::get('/providers', [ProviderController::class, 'index'])->middleware('permission:providers.view')->name('providers.index');
+            Route::get('/providers/{provider}', [ProviderController::class, 'show'])->whereUuid('provider')->middleware('permission:providers.view')->name('providers.show');
+            Route::middleware('permission:providers.manage')->group(function (): void {
+                Route::post('/providers', [ProviderController::class, 'store'])->name('providers.store');
+                Route::patch('/providers/{provider}', [ProviderController::class, 'update'])->whereUuid('provider')->name('providers.update');
+                Route::post('/providers/{provider}/status', [ProviderController::class, 'status'])->whereUuid('provider')->name('providers.status');
+                Route::post('/providers/{provider}/invitations', [ProviderController::class, 'invite'])->whereUuid('provider')->name('providers.invite');
+            });
             Route::patch('/providers/{provider}/programme-additions', [ProviderController::class, 'programmeAdditions'])
                 ->whereUuid('provider')->middleware('permission:providers.manage')->name('providers.programme-additions');
 

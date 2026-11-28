@@ -34,6 +34,12 @@ final class DemoSeeder extends Seeder
 
         $context->runAs(null, function () use ($context, $domains, $consents): void {
             $tenant = Tenant::query()->firstOrCreate(['slug' => 'ubuntu'], ['name' => 'Ubuntu Skills Academy', 'status' => 'active']);
+            $tenant->forceFill([
+                'legal_name' => 'Ubuntu Skills Academy (Pty) Ltd', 'registration_number' => '2019/482113/07', 'vat_number' => '4710283456',
+                'accreditation_number' => 'SDP0712/24-00321', 'accreditation_expires_at' => now()->addDays(45)->toDateString(),
+                'contact_email' => 'hello@ubuntu.demo', 'contact_phone' => '+27 31 555 0142', 'billing_email' => 'accounts@ubuntu.demo',
+                'address' => ['line1' => '14 Anton Lembede St', 'city' => 'Durban', 'province' => 'KwaZulu-Natal', 'postal_code' => '4001'],
+            ])->save();
             if (! $tenant->domains()->exists()) {
                 $domains->createSubdomain($tenant);
             }

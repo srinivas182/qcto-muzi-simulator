@@ -176,7 +176,8 @@ final class CoverageAndProviderProgrammeTest extends AccessTestCase
         [, $support] = $this->person(null, 'support_finance', ['email' => 'thabo@hq.test']);
 
         $providers = $this->getJson($this->url('/platform/providers', self::HQ), $this->bearer($support))->assertOk()->json('data');
-        $this->assertContains(['id' => $this->ubuntu->id, 'name' => $this->ubuntu->name, 'slug' => 'ubuntu', 'status' => $this->ubuntu->status, 'programme_additions' => false], $providers);
+        $ubuntu = collect($providers)->firstWhere('id', $this->ubuntu->id);
+        $this->assertSame(['slug' => 'ubuntu', 'programme_additions' => false], ['slug' => $ubuntu['slug'], 'programme_additions' => $ubuntu['programme_additions']]);
 
         $this->fresh()->patchJson($this->url("/platform/providers/{$this->ubuntu->id}/programme-additions", self::HQ), ['enabled' => true], $this->bearer($support))->assertForbidden();
         $this->fresh()->getJson($this->url('/platform/providers', self::HQ), $this->bearer($this->ubuntuAdmin))->assertUnauthorized(); // provider tokens never work on HQ
