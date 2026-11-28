@@ -36,4 +36,16 @@ final class SmsChannel implements MessageChannel
             throw new RuntimeException('SMS delivery failed: HTTP '.$response->status());
         }
     }
+
+    /** Send a plain text message (for example an invitation link). */
+    public function sendText(string $phoneE164, string $text): void
+    {
+        $response = Http::withHeaders(['Authorization' => (string) config('identity.messaging.sms.api_key')])
+            ->timeout(8)
+            ->post('https://platform.clickatell.com/messages', ['messages' => [['channel' => 'sms', 'to' => ltrim($phoneE164, '+'), 'content' => $text]]]);
+
+        if ($response->failed()) {
+            throw new RuntimeException('SMS delivery failed: HTTP '.$response->status());
+        }
+    }
 }

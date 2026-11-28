@@ -28,6 +28,7 @@ export const routes: RouteObject[] = [
           { path: 'admin/audit', lazy: page(() => import('../pages/shared/Audit')) },
           { path: 'admin/branding', lazy: page(() => import('../pages/admin/Branding')) },
           { path: 'admin/academy', lazy: page(() => import('../pages/admin/Academy')) },
+          { path: 'admin/learners', lazy: page(() => import('../pages/admin/Learners')) },
           { path: 'admin/licences', lazy: page(() => import('../pages/admin/Licences')) },
           { path: 'admin/billing', lazy: page(() => import('../pages/admin/Billing')) },
           { path: 'admin/programmes', lazy: page(() => import('../pages/provider/Programmes')) },

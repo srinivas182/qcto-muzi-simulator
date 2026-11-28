@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\V1\Billing\ShopController;
 use App\Http\Controllers\Api\V1\CurrentTenantController;
 use App\Http\Controllers\Api\V1\DomainAllowedController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\Learners\LearnerController;
 use App\Http\Controllers\Api\V1\Programmes\CatalogueController;
 use App\Http\Controllers\Api\V1\Programmes\CoverageController;
 use App\Http\Controllers\Api\V1\Programmes\PlatformProgrammeController;
@@ -126,6 +127,19 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::post('/invoices/{invoice}/pay', [OnlinePaymentController::class, 'pay'])->whereUuid('invoice')->middleware('throttle:20,1')->name('invoices.pay');
                 Route::get('/payment-attempts/{attempt}', [OnlinePaymentController::class, 'attempt'])->whereUuid('attempt')->middleware('throttle:60,1')->name('payment-attempts.show');
             });
+            Route::middleware('permission:learners.view')->group(function (): void {
+                Route::get('/learners', [LearnerController::class, 'index'])->name('learners.index');
+                Route::get('/learners/{learner}', [LearnerController::class, 'show'])->whereUuid('learner')->name('learners.show');
+            });
+            Route::middleware('permission:learners.manage')->group(function (): void {
+                Route::post('/learners', [LearnerController::class, 'store'])->name('learners.store');
+                Route::post('/learners/import', [LearnerController::class, 'import'])->middleware('throttle:20,1')->name('learners.import');
+                Route::patch('/learners/{learner}', [LearnerController::class, 'update'])->whereUuid('learner')->name('learners.update');
+                Route::post('/learners/{learner}/invite', [LearnerController::class, 'invite'])->whereUuid('learner')->middleware('throttle:30,1')->name('learners.invite');
+                Route::post('/learners/{learner}/status', [LearnerController::class, 'status'])->whereUuid('learner')->name('learners.status');
+            });
+            Route::post('/learners/{learner}/reveal-id', [LearnerController::class, 'revealId'])->whereUuid('learner')
+                ->middleware(['permission:learners.reveal_id', 'throttle:30,1'])->name('learners.reveal-id');
             Route::get('/academy', [AcademyController::class, 'show'])->middleware('permission:academy.manage')->name('academy.show');
             Route::patch('/academy', [AcademyController::class, 'update'])->middleware('permission:academy.manage')->name('academy.update');
 
