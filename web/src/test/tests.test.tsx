@@ -53,4 +53,22 @@ describe('Knowledge tests', () => {
     expect(JSON.parse(String((put[1] as RequestInit).body))).toEqual({ answers: { q1: 1, q2: [0, 2], q3: 'So it works for the user.' }, submit: true });
     await waitFor(() => expect(localStorage.getItem('sw.test.s1')).toBeNull());
   });
+
+  it('a camera-checked test needs my agreement first, and says how to opt out', async () => {
+    const item: LearnAssessmentItem = { id: 't1', code: 'TS-A01', title: 'Knowledge test', component: 'knowledge', kind: 'test', outcomes: [], minutes: 20, questions: 3, pass_mark: 70, attempts_allowed: 2, attempts_used: 0, open_sitting: null, waiting_for_marking: false, result: null, best_score: null, camera: true };
+    const calls = mockApi({
+      '/learn/enrolments/e1/assessments': { data: [item] },
+      '/learn/enrolments/e1/tests/t1/start': { data: { ...paper, camera: true, photos_max: 6 } },
+    }, learner());
+    renderAt('/learn/enrolments/e1/tests/t1');
+    expect(await screen.findByText('This test uses a camera check')).toBeInTheDocument();
+    expect(screen.getByText(/ask your provider for a supervised sitting/i)).toBeInTheDocument();
+    const begin = screen.getByRole('button', { name: 'Start the test' });
+    expect(begin).toBeDisabled();
+    fireEvent.click(screen.getByLabelText('I agree to the camera check for this test.'));
+    fireEvent.click(begin);
+    expect(await screen.findByText('Camera check on')).toBeInTheDocument();
+    const start = calls.mock.calls.find(([u]) => String(u).endsWith('/start'))!;
+    expect(JSON.parse(String((start[1] as RequestInit).body))).toMatchObject({ camera_consent: true });
+  });
 });

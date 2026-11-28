@@ -43,13 +43,15 @@ export interface AssessmentPlan {
 export interface LearnAssessmentItem {
   id: string; code: string; title: string; component: AssessmentComponent; kind: AssessmentKind; outcomes: string[];
   minutes: number | null; questions: number | null; pass_mark: number | null; attempts_allowed: number | null; attempts_used: number;
-  open_sitting: string | null; waiting_for_marking: boolean; result: 'competent' | 'not_yet' | null; best_score: number | null;
+  open_sitting: string | null; waiting_for_marking: boolean; camera?: boolean; result: 'competent' | 'not_yet' | null; best_score: number | null;
 }
 
 /** The paper a learner's device gets: questions and shuffled options, never answers. */
 export interface TestPaper {
   id: string; task: { id: string; code: string; title: string; pass_mark: number }; attempt: number; locale: string; status: 'open';
   started_at: string; deadline_at: string; seconds_left: number; answers: Record<string, number | number[] | string>;
+  /** Camera check: send up to photos_max small photos during the sitting. */
+  camera?: boolean; photos_max?: number;
   questions: { id: string; type: 'single' | 'multi' | 'short'; prompt: string; marks: number; options: string[] }[];
 }
 

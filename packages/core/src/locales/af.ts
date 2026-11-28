@@ -1373,6 +1373,22 @@ const af: Messages = {
   'as.notYetLong': "Nog nie bevoeg nie. Hersien en probeer weer.",
   'as.revise': "Hersien hierdie voor jou volgende poging:",
   'as.lateNote': "Sommige antwoorde het ná die tyd aangekom omdat die foon vanlyn was. Jou assessor kan dit sien.",
+  // Sprint 5.1c: optional camera check
+  'acad.cam.title': "Kamerakontrole by toetse",
+  'acad.cam.lead': "Laat toetse wat as \"kamerakontrole\" gemerk is vier klein foto's van die leerder neem terwyl hulle skryf. By verstek af.",
+  'acad.cam.onBy': "Aangeskakel deur {name} op {date}.",
+  'acad.cam.saved': "Gestoor",
+  'acad.cam.p1': "Leerders moet voor elke toets instem. Enigiemand wat nee sê, kry eerder 'n toesig-sitting.",
+  'acad.cam.p2': "Vier klein foto's per toets (sowat 60 KB altesaam), geen video en geen klank nie.",
+  'acad.cam.p3': "Net jou assessors en moderators kan dit sien.",
+  'acad.cam.p4': "Foto's word outomaties 90 dae nadat die uitslag finaal is, uitgevee.",
+  'acad.cam.accept': "Ek het die POPIA-impakbepaling (DPIA) sjabloon vir kamerakontroles gelees en aanvaar dit namens ons organisasie.",
+  'acad.cam.switchOn': "Skakel aan",
+  'as.cam.title': "Hierdie toets gebruik 'n kamerakontrole",
+  'as.cam.body': "Jou kamera neem vier klein foto's terwyl jy skryf, om te wys dit was jy. Net jou assessor en moderator sien dit, en dit word 90 dae na jou uitslag uitgevee.",
+  'as.cam.agree': "Ek stem in tot die kamerakontrole vir hierdie toets.",
+  'as.cam.decline': "Wil jy nie die kamera hê nie? Vra jou verskaffer eerder vir 'n toesig-sitting. Dit tel dieselfde.",
+  'as.cam.on': "Kamerakontrole aan",
 };
 
 export default af;

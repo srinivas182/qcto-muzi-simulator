@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Access\BrandingController;
 use App\Http\Controllers\Api\V1\Access\RoleController;
 use App\Http\Controllers\Api\V1\Access\SupportSessionController;
 use App\Http\Controllers\Api\V1\Access\UserRoleController;
+use App\Http\Controllers\Api\V1\Assessment\AssessmentSettingsController;
 use App\Http\Controllers\Api\V1\Assessment\TestController;
 use App\Http\Controllers\Api\V1\Auth\AccountController;
 use App\Http\Controllers\Api\V1\Auth\InvitationController;
@@ -154,6 +155,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::get('/cohorts/{cohort}/pilot', [CohortController::class, 'pilot'])->whereUuid('cohort')->name('cohorts.pilot');
                 Route::get('/cohorts/{cohort}/class', [CohortController::class, 'liveClass'])->whereUuid('cohort')->middleware('throttle:120,1')->name('cohorts.class');
                 Route::get('/sittings/{sitting}', [TestController::class, 'review'])->whereUuid('sitting')->middleware('permission:assessments.review')->name('sittings.review');
+                Route::get('/sittings/{sitting}/photos/{photo}', [TestController::class, 'showPhoto'])->whereUuid(['sitting', 'photo'])->middleware('permission:assessments.review')->name('sittings.photos.show');
                 Route::post('/sittings/{sitting}/mark', [TestController::class, 'mark'])->whereUuid('sitting')->middleware('permission:assessments.review')->name('sittings.mark');
                 Route::get('/enrolments/{enrolment}/checklist', [CohortController::class, 'checklist'])->whereUuid('enrolment')->name('enrolments.checklist');
             });
@@ -186,6 +188,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::get('/learn/enrolments/{enrolment}/assessments', [TestController::class, 'index'])->whereUuid('enrolment')->name('learn.assessments');
                 Route::post('/learn/enrolments/{enrolment}/tests/{task}/start', [TestController::class, 'start'])->whereUuid(['enrolment', 'task'])->middleware('throttle:10,1')->name('learn.tests.start');
                 Route::get('/learn/sittings/{sitting}', [TestController::class, 'show'])->whereUuid('sitting')->name('learn.sittings.show');
+                Route::post('/learn/sittings/{sitting}/photos', [TestController::class, 'photo'])->whereUuid('sitting')->middleware('throttle:20,1')->name('learn.sittings.photos');
                 Route::put('/learn/sittings/{sitting}', [TestController::class, 'save'])->whereUuid('sitting')->middleware('throttle:120,1')->name('learn.sittings.save');
                 Route::get('/learn/enrolments/{enrolment}/pack', [LearnController::class, 'pack'])->whereUuid('enrolment')->middleware('throttle:20,1')->name('learn.pack');
                 Route::get('/learn/enrolments/{enrolment}/checklist', [LearnController::class, 'checklist'])->whereUuid('enrolment')->name('learn.checklist');
@@ -205,6 +208,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 ->middleware(['permission:learners.reveal_id', 'throttle:30,1'])->name('learners.reveal-id');
             Route::get('/academy', [AcademyController::class, 'show'])->middleware('permission:academy.manage')->name('academy.show');
             Route::patch('/academy', [AcademyController::class, 'update'])->middleware('permission:academy.manage')->name('academy.update');
+            Route::get('/academy/assessment', [AssessmentSettingsController::class, 'show'])->middleware('permission:academy.manage')->name('academy.assessment');
+            Route::patch('/academy/assessment', [AssessmentSettingsController::class, 'update'])->middleware('permission:academy.manage')->name('academy.assessment.update');
 
             Route::middleware('permission:catalogue.view')->group(function (): void {
                 Route::get('/programmes', [CatalogueController::class, 'index'])->name('programmes.index');

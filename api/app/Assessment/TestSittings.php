@@ -7,6 +7,7 @@ namespace App\Assessment;
 use App\Audit\AuditLogger;
 use App\Models\AssessmentTask;
 use App\Models\Enrolment;
+use App\Models\Tenant;
 use App\Models\TestSitting;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -28,9 +29,10 @@ final class TestSittings
     public function __construct(private readonly AuditLogger $audit) {}
 
     /** Start (or resume) a sitting and return the learner's paper. */
-    public function start(Enrolment $e, AssessmentTask $task, string $locale, ?string $device, User $actor): TestSitting
+    public function start(Tenant $tenant, Enrolment $e, AssessmentTask $task, string $locale, ?string $device, bool $cameraConsent, User $actor): TestSitting
     {
         $this->assertAvailable($e, $task);
+        $camera = CameraChecks::required($tenant, $task);
         $open = TestSitting::query()->where('enrolment_id', $e->id)->where('assessment_task_id', $task->id)->where('status', 'open')->latest('started_at')->first();
         if ($open !== null) {
             if ($this->closeIfExpired($open)->status === 'open') {
@@ -45,14 +47,18 @@ final class TestSittings
         if ($used >= (int) ($task->settings['attempts'] ?? 1)) {
             throw ValidationException::withMessages(['test' => 'You have used all your attempts. Your assessor will contact you.']);
         }
+        if ($camera && ! $cameraConsent) {
+            throw ValidationException::withMessages(['camera' => 'This test uses a camera check. Agree to it to start, or ask your provider for a supervised sitting.']);
+        }
         $questions = collect((array) ($task->content['questions'] ?? []))->shuffle()->take((int) ($task->settings['pick'] ?? 10));
         $paper = $questions->map(fn (array $q) => ['id' => $q['id'], 'options' => isset($q['options']) ? collect(array_keys($q['options']))->shuffle()->values()->all() : []])->values()->all();
         $sitting = TestSitting::query()->create([
             'enrolment_id' => $e->id, 'assessment_task_id' => $task->id, 'content_version' => $task->content_version, 'attempt' => $used + 1,
             'locale' => in_array($locale, QuestionBank::LOCALES, true) && isset($task->content['review'][$locale]['by']) ? $locale : 'en',
             'started_at' => now(), 'deadline_at' => now()->addMinutes((int) ($task->settings['minutes'] ?? 30)), 'paper' => $paper, 'device' => $device === null ? null : mb_substr($device, 0, 40),
+            'camera' => $camera, 'camera_consent_at' => $camera ? now() : null,
         ]);
-        $this->audit->record('tests.started', $sitting, null, ['task' => $task->code, 'attempt' => $sitting->attempt], $actor);
+        $this->audit->record('tests.started', $sitting, null, ['task' => $task->code, 'attempt' => $sitting->attempt, 'camera' => $camera], $actor);
 
         return $sitting;
     }
@@ -72,7 +78,7 @@ final class TestSittings
             'id' => $s->id, 'task' => ['id' => $task->id, 'code' => $task->code, 'title' => $task->title, 'pass_mark' => (int) ($task->settings['pass_mark'] ?? 70)],
             'attempt' => $s->attempt, 'locale' => $s->locale, 'status' => $s->status, 'started_at' => $s->started_at->toIso8601String(),
             'deadline_at' => $s->deadline_at->toIso8601String(), 'seconds_left' => max(0, (int) now()->diffInSeconds($s->deadline_at, false)),
-            'answers' => $s->answers,
+            'answers' => $s->answers, 'camera' => $s->camera, 'photos_max' => $s->camera ? CameraChecks::MAX_PHOTOS : 0,
             'questions' => array_map(function (array $p) use ($bank, $tr): array {
                 $q = (array) $bank->get($p['id']);
                 $t = (array) ($tr[$p['id']] ?? []);
@@ -188,6 +194,7 @@ final class TestSittings
         $total = array_sum(array_map(fn (array $p) => (int) ($bank->get($p['id'])['marks'] ?? 0), $s->paper));
         $score = $total > 0 ? (int) round(100 * array_sum($s->marks) / $total) : 0;
         $s->fill(['status' => 'marked', 'score' => $score, 'result' => $score >= (int) ($s->task->settings['pass_mark'] ?? 70) ? 'competent' : 'not_yet'])->save();
+        CameraChecks::scheduleDeletion($s); // photos (if any) are kept 90 days after the result is final
     }
 
     /**

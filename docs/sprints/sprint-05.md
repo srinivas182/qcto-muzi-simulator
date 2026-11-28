@@ -208,3 +208,25 @@ None of them produces evidence of practical competence by itself.
 | Marking written answers on paper | Assessor screen with the answer, the model answer and marks (full workspace in 5.2) | This sprint (API), 5.2 (screens) |
 | Learners who need more time | Accommodations per learner (extra time, read-aloud), set by the provider | Proposed for 5.2 |
 | Read-aloud of test questions | Questions read aloud, as in the simulator | Proposed for 5.2 |
+
+## 5.1c notes: optional camera check (done)
+
+**Built**
+- **Provider switch** on the Academy page: *Camera check on tests*, off by default. Switching it on shows the four promises (consent each time, four small photos and no video or sound, assessors and moderators only, deleted after 90 days) and needs the DPIA tick. Who switched it on, and when, is stored and audited (`academy.camera_checks_on/off`).
+- **Per test**: HQ marks a test `integrity: camera`. It only runs with the camera when the provider has switched it on. Otherwise it runs at the light level.
+- **Learner consent**: the start screen explains the check. *Start* stays disabled until the learner ticks *I agree*. The opt-out line points to a supervised sitting, which counts the same. The server refuses a camera test that is started without consent.
+- **Photos**: on web, 160×120 JPEG at quality 0.5. On the phone, the camera's smallest picture size at quality 0.2. One photo is taken at the start and three at random times, with at most 6 per sitting and at most 60 KB each (JPEG/WebP only). Uploads are throttled. Photos are stored on private storage, never public, and nothing is kept on the device. If the camera can't start, the test carries on.
+- **Access**: photos are listed only on the assessor's sitting view, and streamed only to `assessments.review` with `no-store`. Learners get 403, and other learners get 404.
+- **Deletion**: `learning:daily` deletes photos 90 days after the result is final, for every provider whatever its status.
+
+**Tests**: API 274, web 111, mobile 42. First load 149.0 KB.
+
+### Gaps we fill and best recommendations (5.1c)
+| Gap against leaders | What we did / recommend | When |
+|---|---|---|
+| Proctoring tools (Proctorio, Honorlock, ExamSoft) record full video, need a desktop extension and break on low-end phones and weak data | Four 60 KB photos, phone-first, works with patchy signal; total per test ≈ 0.06 MB | In this sprint |
+| Leaders make proctoring all-or-nothing, so learners without a camera or who refuse are locked out | Opt-out to a supervised sitting is shown on the consent screen and counts the same | In this sprint |
+| POPIA: biometric-like data kept indefinitely, no DPIA | Provider-level DPIA acceptance, 90-day automatic deletion, assessor/moderator-only access, audit | In this sprint |
+| Assessor must eyeball every photo | Show photos as a small strip in the 5.2 replay, beside the answers | 5.2 |
+| Photo of the wrong person is not detected | Optional on-device face-present check (no face matching, no biometrics stored) to flag empty or multiple-face photos | Proposed for later |
+| Phone photo size depends on the camera's smallest size | Add on-device resize (expo-image-manipulator), reused by the 5.3 logbook photos (≤150 KB) | 5.3 |

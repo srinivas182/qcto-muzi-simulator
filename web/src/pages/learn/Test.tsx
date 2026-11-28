@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, CircleCheck, Clock, Hourglass, WifiOff } from 'lucide-react';
-import type { TestPaper, TestResult } from '@simuwork/core';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, Camera, CircleCheck, Clock, Hourglass, WifiOff } from 'lucide-react';
+import type { LearnAssessmentItem, TestPaper, TestResult } from '@simuwork/core';
+import { startCameraCheck } from '../../lib/cameraCheck';
 import { Button, Card, cx, inputClass } from '../../components/ui';
 import { api } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
@@ -27,8 +28,11 @@ export default function Test() {
   const { t, locale } = useI18n();
   const [paper, setPaper] = useState<TestPaper | null>(null);
   const [result, setResult] = useState<TestResult | null>(null);
+  const [consent, setConsent] = useState(false);
+  const list = useQuery({ queryKey: ['learn-assessments', eid], queryFn: () => api<{ data: LearnAssessmentItem[] }>(`/learn/enrolments/${eid}/assessments`) });
+  const camera = list.data?.data.find((x) => x.id === tid)?.camera ?? false;
   const start = useMutation({
-    mutationFn: () => api<{ data: TestPaper }>(`/learn/enrolments/${eid}/tests/${tid}/start`, { method: 'POST', body: { locale, device: 'web' } }),
+    mutationFn: () => api<{ data: TestPaper }>(`/learn/enrolments/${eid}/tests/${tid}/start`, { method: 'POST', body: { locale, device: 'web', camera_consent: consent } }),
     onSuccess: (r) => setPaper(r.data),
   });
   const back = <Link to={`/learn/enrolments/${eid}/assessments`} className="inline-flex items-center gap-1 text-[14px] font-semibold text-brand hover:underline"><ArrowLeft className="size-4" />{t('as.title')}</Link>;
@@ -43,8 +47,16 @@ export default function Test() {
         <ul className="mt-3 space-y-1.5 text-left text-[14px] text-ink">
           <li>• {t('as.rule.time')}</li><li>• {t('as.rule.offline')}</li><li>• {t('as.rule.once')}</li>
         </ul>
+        {camera && (
+          <div className="mt-4 rounded-xl border border-line p-3 text-left">
+            <p className="flex items-center gap-2 text-[14px] font-semibold text-ink"><Camera className="size-4 text-brand" />{t('as.cam.title')}</p>
+            <p className="mt-1 text-[13px] text-muted">{t('as.cam.body')}</p>
+            <label className="mt-2 flex items-start gap-2 text-[14px] text-ink"><input type="checkbox" className="mt-1 size-4 accent-[var(--brand)]" checked={consent} onChange={(e) => setConsent(e.target.checked)} />{t('as.cam.agree')}</label>
+            <p className="mt-2 text-[12px] text-muted">{t('as.cam.decline')}</p>
+          </div>
+        )}
         {start.isError && <p role="alert" className="mt-3 text-[14px] font-medium text-[#C92A2F]">{start.error instanceof Error ? start.error.message : t('common.error')}</p>}
-        <Button className="mt-5 w-full" size="lg" loading={start.isPending} onClick={() => start.mutate()}>{t('as.begin')}</Button>
+        <Button className="mt-5 w-full" size="lg" disabled={camera && !consent} loading={start.isPending} onClick={() => start.mutate()}>{t('as.begin')}</Button>
       </Card>
     </div>
   );
@@ -84,6 +96,15 @@ function Sitting({ p, onDone }: { p: TestPaper; onDone: (r: TestResult) => void 
   };
 
   useEffect(() => {
+    if (!p.camera) return;
+    return startCameraCheck(Math.ceil(p.seconds_left / 60), (photo) => {
+      const form = new FormData();
+      form.append('photo', photo, 'photo.jpg');
+      void api(`/learn/sittings/${p.id}/photos`, { method: 'POST', body: form }).catch(() => undefined);
+    });
+  }, [p.camera, p.id, p.seconds_left]);
+
+  useEffect(() => {
     const tick = setInterval(() => {
       const s = Math.max(0, Math.round((ends.current - now()) / 1000));
       setLeft(s);
@@ -103,6 +124,7 @@ function Sitting({ p, onDone }: { p: TestPaper; onDone: (r: TestResult) => void 
         <span className="text-[13px] text-muted">{t('as.answered', { done, n: p.questions.length })}</span>
         <span className={cx('flex items-center gap-1 font-semibold tabular-nums', left < 120 ? 'text-[#C92A2F]' : 'text-ink')} aria-live="polite"><Clock className="size-4" />{clock(left)}</span>
       </div>
+      {p.camera && <p className="flex items-center gap-2 text-[12px] text-muted"><Camera className="size-3.5" />{t('as.cam.on')}</p>}
       {offline && <p role="status" className="flex items-center gap-2 rounded-xl bg-[#FFF4E5] px-3 py-2 text-[14px] text-[#7A4B00]"><WifiOff className="size-4" />{t('as.offline')}</p>}
       {p.questions.map((q, i) => (
         <Card key={q.id} className="p-5">

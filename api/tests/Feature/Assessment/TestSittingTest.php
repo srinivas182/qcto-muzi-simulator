@@ -14,11 +14,14 @@ use App\Models\Learner;
 use App\Models\LicencePool;
 use App\Models\Package;
 use App\Models\ProgrammeVersion;
+use App\Models\SittingPhoto;
 use App\Models\TestSitting;
 use App\Programmes\GuideImporter;
 use App\Tenancy\TenantContext;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Tests\Feature\Access\AccessTestCase;
@@ -152,5 +155,44 @@ final class TestSittingTest extends AccessTestCase
         $this->fresh()->getJson($this->url("/learn/sittings/{$id}"), $this->bearer($other))->assertNotFound();
         $this->fresh()->putJson($this->url("/learn/sittings/{$id}"), ['answers' => []], $this->bearer($other))->assertNotFound();
         $this->fresh()->postJson($this->url("/learn/enrolments/{$this->enrolment->id}/tests/{$this->task->id}/start"), [], $this->bearer($other))->assertNotFound();
+    }
+
+    public function test_the_camera_check_needs_the_provider_and_the_learner_to_agree_and_photos_are_private_and_deleted(): void
+    {
+        Storage::fake('local');
+        $settings = $this->task->settings;
+        $settings['integrity'] = 'camera';
+        $this->task->update(['settings' => $settings]);
+
+        // The provider has not switched camera checks on: the test runs at the light level.
+        $this->fresh()->getJson($this->url("/learn/enrolments/{$this->enrolment->id}/assessments"), $this->bearer($this->token))->assertJsonPath('data.0.camera', false);
+
+        [, $admin] = $this->person($this->ubuntu, 'tp_admin');
+        $this->fresh()->patchJson($this->url('/academy/assessment'), ['camera_checks' => true], $this->bearer($admin))->assertUnprocessable()->assertJsonValidationErrors('accept_dpia');
+        $this->fresh()->patchJson($this->url('/academy/assessment'), ['camera_checks' => true, 'accept_dpia' => true], $this->bearer($admin))->assertOk()->assertJsonPath('data.camera_checks.on', true);
+        $this->assertAudited('academy.camera_checks_on');
+
+        $this->start()->assertUnprocessable()->assertJsonValidationErrors('camera'); // no consent, no online sitting
+        $paper = $this->fresh()->postJson($this->url("/learn/enrolments/{$this->enrolment->id}/tests/{$this->task->id}/start"), ['camera_consent' => true], $this->bearer($this->token))
+            ->assertCreated()->assertJsonPath('data.camera', true)->assertJsonPath('data.photos_max', 6);
+        $id = (string) $paper->json('data.id');
+        $send = fn ($file, ?string $token = null) => $this->fresh()->post($this->url("/learn/sittings/{$id}/photos"), ['photo' => $file], $this->bearer($token ?? $this->token) + ['Accept' => 'application/json']);
+        $send(UploadedFile::fake()->image('p.jpg', 160, 120)->size(20))->assertCreated();
+        $send(UploadedFile::fake()->create('big.jpg', 200, 'image/jpeg'))->assertUnprocessable(); // too big
+        [$other] = $this->enrolled();
+        $send(UploadedFile::fake()->image('p.jpg', 160, 120)->size(20), $other)->assertNotFound();
+
+        // Assessors see the photos; learners cannot.
+        $this->fresh()->putJson($this->url("/learn/sittings/{$id}"), ['answers' => [], 'submit' => true], $this->bearer($this->token))->assertOk();
+        [, $assessor] = $this->person($this->ubuntu, 'assessor');
+        $photo = (string) $this->fresh()->getJson($this->url("/sittings/{$id}"), $this->bearer($assessor))->assertJsonPath('data.camera', true)->assertJsonCount(1, 'data.photos')->json('data.photos.0.id');
+        $this->fresh()->get($this->url("/sittings/{$id}/photos/{$photo}"), $this->bearer($assessor))->assertOk();
+        $this->fresh()->get($this->url("/sittings/{$id}/photos/{$photo}"), $this->bearer($this->token) + ['Accept' => 'application/json'])->assertForbidden();
+
+        // Deleted 90 days after the result is final.
+        Carbon::setTestNow('2027-05-12 09:00:00');
+        $this->artisan('learning:daily')->assertSuccessful();
+        $this->assertSame(0, app(TenantContext::class)->runAs($this->ubuntu, fn () => SittingPhoto::query()->count()));
+        Storage::disk('local')->assertDirectoryEmpty("sittings/{$this->ubuntu->id}/{$id}");
     }
 }

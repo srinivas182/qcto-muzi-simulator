@@ -235,4 +235,24 @@ describe('knowledge tests', () => {
     const put = calls.filter((c) => c.path === '/learn/sittings/s1').pop()!;
     expect(JSON.parse(String(put.init.body))).toEqual({ answers: { q1: 1 }, submit: true });
   });
+
+  it('a camera-checked test waits for my agreement and sends it with the start', async () => {
+    await seed({ signedIn: true });
+    const paper = { id: 's2', task: { id: 't1', code: 'TS-A01', title: 'Knowledge test', pass_mark: 70 }, attempt: 1, locale: 'en', status: 'open', started_at: '', deadline_at: '', seconds_left: 1200, answers: {}, camera: true, photos_max: 6,
+      questions: [{ id: 'q1', type: 'single', prompt: 'What do you do first?', marks: 1, options: ['Call the user', 'Switch off and unplug'] }] };
+    const calls = mockApi({
+      '/session': { data: session() },
+      '/learn/enrolments/e1/assessments': { data: [{ id: 't1', code: 'TS-A01', title: 'Knowledge test', component: 'knowledge', kind: 'test', outcomes: [], minutes: 20, questions: 1, pass_mark: 70, attempts_allowed: 2, attempts_used: 0, open_sitting: null, waiting_for_marking: false, result: null, best_score: null, camera: true }] },
+      '/learn/enrolments/e1/tests/t1/start': { data: paper },
+    });
+    await renderRouter('./app', { initialUrl: '/learn/e1/test/t1' });
+    expect(await screen.findByText('This test uses a camera check')).toBeOnTheScreen();
+    await act(async () => fireEvent.press(screen.getByText('Start the test')));
+    expect(calls.some((c) => c.path.endsWith('/start'))).toBe(false); // not until I agree
+    await act(async () => fireEvent.press(screen.getByLabelText('I agree to the camera check for this test.')));
+    await act(async () => fireEvent.press(screen.getByText('Start the test')));
+    await settle();
+    const start = calls.find((c) => c.path.endsWith('/start'))!;
+    expect(JSON.parse(String(start.init.body))).toMatchObject({ camera_consent: true });
+  });
 });

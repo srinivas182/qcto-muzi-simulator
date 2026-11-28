@@ -1371,6 +1371,22 @@ const en = {
   'as.notYetLong': "Not yet competent. Revise and try again.",
   'as.revise': "Revise these before your next try:",
   'as.lateNote': "Some answers arrived after the time was up, because the phone was offline. Your assessor can see this.",
+  // Sprint 5.1c: optional camera check
+  'acad.cam.title': "Camera check on tests",
+  'acad.cam.lead': "Lets tests marked \"camera check\" take four small photos of the learner while they write. Off by default.",
+  'acad.cam.onBy': "Switched on by {name} on {date}.",
+  'acad.cam.saved': "Saved",
+  'acad.cam.p1': "Learners must agree before each test. Anyone who says no is offered a supervised sitting instead.",
+  'acad.cam.p2': "Four small photos per test (about 60 KB in total), no video and no sound.",
+  'acad.cam.p3': "Only your assessors and moderators can see them.",
+  'acad.cam.p4': "Photos are deleted automatically 90 days after the result is final.",
+  'acad.cam.accept': "I have read and accept the POPIA impact assessment (DPIA) template for camera checks on behalf of our organisation.",
+  'acad.cam.switchOn': "Switch on",
+  'as.cam.title': "This test uses a camera check",
+  'as.cam.body': "Your camera takes four small photos while you write, to show it was you. Only your assessor and moderator see them, and they are deleted 90 days after your result.",
+  'as.cam.agree': "I agree to the camera check for this test.",
+  'as.cam.decline': "Do not want the camera? Ask your provider for a supervised sitting instead. It counts the same.",
+  'as.cam.on': "Camera check on",
 } as const;
 
 export type MessageKey = keyof typeof en;

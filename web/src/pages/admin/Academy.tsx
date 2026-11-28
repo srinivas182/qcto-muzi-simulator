@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
 import type { ProviderDetails } from '@simuwork/core';
 import { ProviderDetailsForm } from '../../components/ProviderDetailsForm';
+import { CameraChecksCard } from '../../components/assessment/CameraChecksCard';
 import { PageHeader, Skeleton, useToast } from '../../components/ui';
 import { api, ApiError } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
@@ -41,6 +42,7 @@ export default function Academy() {
         </p>
       )}
       {p ? <ProviderDetailsForm key={p.id} provider={p} scope="provider" editable onSave={save} errors={errors} /> : <Skeleton className="h-96" />}
+      <CameraChecksCard />
     </div>
   );
 }

@@ -30,6 +30,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $marked_by
  * @property Carbon|null $marked_at
  * @property string|null $device
+ * @property bool $camera
+ * @property Carbon|null $camera_consent_at
  * @property-read AssessmentTask $task
  * @property-read Enrolment $enrolment
  */
@@ -40,11 +42,11 @@ class TestSitting extends Model
     /** Answers saved on a phone that lost signal may arrive this long after the deadline. */
     public const GRACE_MINUTES = 15;
 
-    protected $fillable = ['enrolment_id', 'assessment_task_id', 'content_version', 'attempt', 'locale', 'status', 'started_at', 'deadline_at', 'submitted_at', 'late', 'paper', 'answers', 'marks', 'score', 'result', 'marked_by', 'marked_at', 'device'];
+    protected $fillable = ['enrolment_id', 'assessment_task_id', 'content_version', 'attempt', 'locale', 'status', 'started_at', 'deadline_at', 'submitted_at', 'late', 'paper', 'answers', 'marks', 'score', 'result', 'marked_by', 'marked_at', 'device', 'camera', 'camera_consent_at'];
 
     protected function casts(): array
     {
-        return ['started_at' => 'datetime', 'deadline_at' => 'datetime', 'submitted_at' => 'datetime', 'marked_at' => 'datetime', 'late' => 'boolean', 'paper' => 'array', 'answers' => 'array', 'marks' => 'array'];
+        return ['started_at' => 'datetime', 'deadline_at' => 'datetime', 'submitted_at' => 'datetime', 'marked_at' => 'datetime', 'late' => 'boolean', 'camera' => 'boolean', 'camera_consent_at' => 'datetime', 'paper' => 'array', 'answers' => 'array', 'marks' => 'array'];
     }
 
     /** @return BelongsTo<AssessmentTask, $this> */
