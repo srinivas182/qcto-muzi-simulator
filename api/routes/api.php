@@ -13,6 +13,8 @@ use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\SessionController;
 use App\Http\Controllers\Api\V1\Auth\TwoFactorController;
+use App\Http\Controllers\Api\V1\Billing\PackageController;
+use App\Http\Controllers\Api\V1\Billing\ShopController;
 use App\Http\Controllers\Api\V1\CurrentTenantController;
 use App\Http\Controllers\Api\V1\DomainAllowedController;
 use App\Http\Controllers\Api\V1\HealthController;
@@ -98,6 +100,10 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
             $accessRoutes(false);
             Route::get('/audit', [AuditController::class, 'index'])->middleware('permission:audit.view_tenant')->name('audit.index');
             Route::patch('/branding', [BrandingController::class, 'update'])->middleware('permission:branding.manage')->name('branding.update');
+            Route::middleware('permission:licences.manage')->group(function (): void {
+                Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+                Route::get('/shop/{package}/quote', [ShopController::class, 'quote'])->name('shop.quote');
+            });
             Route::get('/academy', [AcademyController::class, 'show'])->middleware('permission:academy.manage')->name('academy.show');
             Route::patch('/academy', [AcademyController::class, 'update'])->middleware('permission:academy.manage')->name('academy.update');
 
@@ -142,6 +148,20 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
             });
             Route::put('/programmes/{programme}/coverage/{code}', [CoverageController::class, 'update'])
                 ->middleware('permission:programmes.manage|content.author')->name('programmes.coverage.update');
+
+            Route::middleware('permission:packages.manage|billing.view')->group(function (): void {
+                Route::get('/packages', [PackageController::class, 'index'])->name('packages.index');
+                Route::get('/packages/{package}', [PackageController::class, 'show'])->name('packages.show');
+            });
+            Route::middleware('permission:packages.manage')->group(function (): void {
+                Route::post('/packages', [PackageController::class, 'store'])->name('packages.store');
+                Route::patch('/packages/{package}', [PackageController::class, 'update'])->name('packages.update');
+                Route::delete('/packages/{package}', [PackageController::class, 'destroy'])->name('packages.destroy');
+                Route::put('/packages/{package}/prices', [PackageController::class, 'prices'])->name('packages.prices');
+                Route::post('/packages/{package}/publish', [PackageController::class, 'publish'])->name('packages.publish');
+                Route::post('/packages/{package}/retire', [PackageController::class, 'retire'])->name('packages.retire');
+                Route::post('/packages/{package}/duplicate', [PackageController::class, 'duplicate'])->name('packages.duplicate');
+            });
 
             Route::get('/providers', [ProviderController::class, 'index'])->middleware('permission:providers.view')->name('providers.index');
             Route::get('/providers/{provider}', [ProviderController::class, 'show'])->whereUuid('provider')->middleware('permission:providers.view')->name('providers.show');
