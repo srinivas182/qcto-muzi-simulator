@@ -8,6 +8,7 @@ use App\Cohorts\CohortPresenter;
 use App\Cohorts\Cohorts;
 use App\Cohorts\Enrolments;
 use App\Http\Controllers\Controller;
+use App\Learning\CohortProgress;
 use App\Models\Centre;
 use App\Models\Cohort;
 use App\Models\Enrolment;
@@ -68,6 +69,18 @@ final class CohortController extends Controller
             'free_seats' => $this->freeSeats($cohort->programme_id),
             'enrolments' => $enrolments->map(fn (Enrolment $e) => CohortPresenter::enrolment($e, $cohort))->all(),
         ]]);
+    }
+
+    /** Facilitator board: every learner × every activity, at-risk first. */
+    public function progress(Cohort $cohort, CohortProgress $progress): JsonResponse
+    {
+        return response()->json(['data' => $progress->board($cohort)])->header('Cache-Control', 'private, no-cache');
+    }
+
+    /** A learner's job-ready checklist, as their facilitator sees it. */
+    public function checklist(Enrolment $enrolment, CohortProgress $progress): JsonResponse
+    {
+        return response()->json(['data' => ['learner' => $enrolment->learner->fullName(), 'areas' => $progress->checklist($enrolment)]]);
     }
 
     public function store(Request $request): JsonResponse

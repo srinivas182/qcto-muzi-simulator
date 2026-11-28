@@ -330,3 +330,43 @@ now checked in CI. The learner language part is at most 5.9 KB.
 | One scene | More ready-made scenes for the other 12 programmes (a call-centre desk, a retail till, a reception counter) | Proposed with content production |
 | "Fix it" retry after a wrong answer in lessons | A retry with a hint before the answer is shown | Proposed for 4.6 |
 | Staff language files are nearing 15 KB (12.5 KB) | Split the staff part into HQ and provider parts | Proposed for 4.6 |
+
+## Sub-sprint 4.6 plan (split into small parts)
+
+| Part | Scope |
+|---|---|
+| **4.6a** | Facilitator progress board, at-risk flag (7 days), job-ready checklist (web and mobile) |
+| **4.6b** | Gentle reminders by SMS or WhatsApp in the learner's language; sharing the checklist with a mentor or employer |
+| **4.6c** | Offline packs: download a programme on Wi-Fi; 3D simulator in the app from the pack |
+| **4.6d** | "Fix it" retry in lessons; split the staff language file into HQ and provider parts |
+
+## Sub-sprint 4.6a notes (progress board and job-ready checklist)
+
+**Built**
+- **Progress board** (`GET /cohorts/{id}/progress`, page `/admin/cohorts/:id/progress`): every learner by every
+  published activity.
+  - Each cell shows done with the best score, passed as a real job, or started.
+  - Summary tiles show learners, average progress, how many have been quiet for 7+ days, and how many are
+    job-ready.
+  - Quiet learners are listed first.
+  - It is computed with a single grouped query over attempts.
+- **At risk:** a learner who started and has done nothing for 7 days. They are flagged on the board and in
+  the class list (`at_risk`, `last_activity_at`). This also feeds C1 and the reminders in 4.6b.
+- **Job-ready checklist** (`GET /learn/enrolments/{e}/checklist` for learners, `GET /enrolments/{e}/checklist`
+  for facilitators): every QCTO outcome, grouped by duty area and written in plain words, marked as:
+  - **Shown**, when a real-job simulator covering it was passed;
+  - **Practised**, when a practice run was passed or a lesson was finished with 70% or more;
+  - **Not yet**.
+  - On web and mobile. Facilitators open it from the board.
+
+**Checks:** API 255 tests, web 98, mobile 34.
+
+### Gaps we fill and best recommendations (4.6a)
+| Gap against the leaders | What we did | When |
+|---|---|---|
+| Labster and Transfr report scores, not job readiness against the qualification | A checklist against the QCTO outcomes; only real-job passes count as "shown" | This sprint |
+| Facilitators find out about drop-outs too late | Quiet learners (7+ days) are flagged and come first | This sprint |
+| Dashboards are for admins, not learners | Learners see the same checklist in plain words | This sprint |
+| Reminders | SMS or WhatsApp nudges in the learner's language for quiet learners | Proposed for 4.6b |
+| Share with employer | A read-only checklist link the learner controls | Proposed for 4.6b |
+| Step-level evidence | Show which step of which run proved each outcome, for assessors | Proposed for Sprint 5 (assessment) |

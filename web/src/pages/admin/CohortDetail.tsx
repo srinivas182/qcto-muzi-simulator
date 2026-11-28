@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRightLeft, Printer, RefreshCw, Search, UserPlus } from 'lucide-react';
+import { ArrowLeft, ArrowRightLeft, Clock, LayoutGrid, Printer, RefreshCw, Search, UserPlus } from 'lucide-react';
 import type { CohortDetail as Detail, CohortItem, EnrolmentItem, EnrolmentStatus, LearnerItem } from '@simuwork/core';
 import type { MessageKey } from '@simuwork/core/locales/en';
 import { QrCode } from '../../components/cohorts/QrCode';
@@ -60,7 +60,10 @@ export default function CohortDetail() {
           <h1 className="mt-1 text-[28px] font-bold tracking-tight text-ink">{c.name}</h1>
           <p className="mt-1 text-[14px] text-muted">{c.centre.name} · {date(c.starts_on)}{c.ends_on ? ` – ${date(c.ends_on)}` : ''}{c.facilitators.length > 0 && ` · ${c.facilitators.map((f) => f.name).join(', ')}`}</p>
         </div>
-        {enrolRight && !c.archived && <Button icon={<UserPlus className="size-4" />} onClick={() => setAdding(true)}>{t('coh.addLearners')}</Button>}
+        <div className="flex flex-wrap gap-2">
+          <Link to={`/admin/cohorts/${c.id}/progress`} className="inline-flex h-10 items-center gap-2 rounded-xl border border-line bg-surface px-4 text-sm font-semibold text-ink hover:bg-surface-2"><LayoutGrid className="size-4" />{t('pg.open')}</Link>
+          {enrolRight && !c.archived && <Button icon={<UserPlus className="size-4" />} onClick={() => setAdding(true)}>{t('coh.addLearners')}</Button>}
+        </div>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
@@ -77,6 +80,7 @@ export default function CohortDetail() {
                     <p className="font-semibold text-ink">{e.learner.name}</p>
                     <p className="text-[12px] text-muted">{e.seat_returns_on ? t('coh.notStarted', { date: date(e.seat_returns_on) }) : t('coh.progress', { n: e.progress })}</p>
                   </div>
+                  {e.at_risk && <Badge tone="warning"><Clock className="size-3" />{t('pg.quiet')}</Badge>}
                   <Badge tone={TONE[e.status]}>{t(`coh.status.${e.status}` as MessageKey)}</Badge>
                   {enrolRight && (
                     <div className="flex gap-1">

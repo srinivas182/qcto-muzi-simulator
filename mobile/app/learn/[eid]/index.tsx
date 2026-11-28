@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { LearnActivity } from '@simuwork/core';
 import { api } from '../../../src/lib/api';
 import { useI18n } from '../../../src/lib/i18n';
-import { Box, Check, ChevronRight, PlayCircle } from '../../../src/ui/icons';
+import { Box, Check, ChevronRight, ListChecks, PlayCircle } from '../../../src/ui/icons';
 import { Card, radius, Screen, space, T, useTheme } from '../../../src/ui';
 
 /** Learner: everything in my programme, in order, with what I have done. */
@@ -20,6 +20,11 @@ export default function ProgrammeScreen() {
         <>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}><T style={{ fontWeight: '700' }}>{t('lh.progress')}</T><T tone="muted">{`${d.progress}%`}</T></View>
           <View style={[styles.bar, { backgroundColor: c.line }]}><View style={{ width: `${d.progress}%`, height: '100%', backgroundColor: c.brand }} /></View>
+          <Pressable accessibilityRole="link" onPress={() => router.push(`/learn/${eid}/checklist`)} style={[styles.row, { marginTop: space.lg, borderRadius: radius.lg, borderWidth: 1, borderColor: c.line, backgroundColor: c.surface }]}>
+            <ListChecks size={22} color={c.brand} />
+            <View style={{ flex: 1 }}><T style={{ fontWeight: '700' }}>{t('jr.title')}</T><T variant="caption" tone="muted">{t('jr.cardLead')}</T></View>
+            <ChevronRight size={18} color={c.muted} />
+          </Pressable>
           <Card style={{ padding: 0, marginTop: space.lg }}>
             {d.activities.map((a, i) => (
               <Pressable key={a.id} accessibilityRole="button" onPress={() => router.push(`/learn/${eid}/${a.kind === 'lesson' ? 'lesson' : 'simulator'}/${a.id}`)}

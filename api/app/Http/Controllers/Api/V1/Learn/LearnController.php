@@ -8,6 +8,7 @@ use App\Cohorts\Enrolments;
 use App\Http\Controllers\Api\V1\Qcto\QctoController;
 use App\Http\Controllers\Controller;
 use App\Learning\AttemptSync;
+use App\Learning\CohortProgress;
 use App\Learning\LessonContent;
 use App\Learning\Progress;
 use App\Learning\ScenarioContent;
@@ -126,6 +127,16 @@ final class LearnController extends Controller
             'lessons' => Activity::query()->where('programme_version_id', $activity->programme_version_id)->where('kind', Activity::LESSON)->where('status', Activity::PUBLISHED)->pluck('id', 'code'),
             'results' => ['practice' => $best->get('practice'), 'job' => $best->get('job')],
         ]])->header('Cache-Control', 'private, no-cache');
+    }
+
+    /** My job-ready checklist: each QCTO outcome, shown / practised / not yet. */
+    public function checklist(Request $request, Enrolment $enrolment, CohortProgress $progress): JsonResponse
+    {
+        if ($enrolment->learner_id !== $this->learner($request)->id) {
+            throw new NotFoundHttpException;
+        }
+
+        return response()->json(['data' => ['areas' => $progress->checklist($enrolment)]])->header('Cache-Control', 'private, no-cache');
     }
 
     /** Attempts from the device, online or queued offline. Safe to send again; see AttemptSync. */
