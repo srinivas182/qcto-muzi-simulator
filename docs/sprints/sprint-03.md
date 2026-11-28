@@ -1,6 +1,6 @@
 # Sprint 3 — Providers, packages, licences and enrolments
 
-Status: **proposed** · decisions 1–4 made by Srini, 28 Nov 2026 · awaiting final approval
+Status: **approved** (Srini, 28 Nov 2026)
 
 ## Why this sprint
 Sprint 2 gave every module the same backbone: programmes, versions and workplace outcomes. Sprint 3 turns that
