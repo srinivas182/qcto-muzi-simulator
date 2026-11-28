@@ -14,6 +14,8 @@ type Filter = 'all' | LearnerStatus;
 const FILTERS: Filter[] = ['all', 'invited', 'active', 'inactive'];
 const TONE = { invited: 'warning', active: 'success', inactive: 'neutral' } as const;
 
+/** +27825550101 → 082 555 0101 (how South Africans write mobile numbers). */
+const localPhone = (p: string | null) => (p && /^\+27\d{9}$/.test(p) ? `0${p.slice(3, 5)} ${p.slice(5, 8)} ${p.slice(8)}` : p);
 const firstError = (e: unknown, fallback: string) => (e instanceof ApiError ? Object.values(e.errors)[0]?.[0] ?? e.message : fallback);
 
 /** Provider: the learner register — add one, import many, invite, and manage. */
@@ -80,7 +82,7 @@ export default function Learners() {
                 <tr key={l.id} onClick={() => setOpenId(l.id)} className="cursor-pointer hover:bg-surface-2">
                   <td className="px-4 py-3"><button className="text-left font-semibold text-ink hover:underline">{l.name}</button></td>
                   <td className="hidden px-4 py-3 font-mono text-[13px] text-muted md:table-cell">{l.id_masked}</td>
-                  <td className="hidden px-4 py-3 text-muted sm:table-cell">{l.phone ?? l.email}</td>
+                  <td className="hidden px-4 py-3 text-muted sm:table-cell">{localPhone(l.phone) ?? l.email}</td>
                   <td className="px-4 py-3"><Badge tone={TONE[l.status]}>{t(`lrn.status.${l.status}` as MessageKey)}</Badge></td>
                 </tr>
               ))}
@@ -151,7 +153,7 @@ function AddLearner({ open, onClose }: { open: boolean; onClose: () => void }) {
             {HOME_LANGUAGES.map((l) => <option key={l} value={l}>{t(`lrn.lang.${l}` as MessageKey)}</option>)}
           </select>
         </div>
-        <Switch checked={invite} onChange={setInvite} label={t('lrn.inviteNow')} />
+        <label className="flex items-center gap-3 text-[14px] font-medium text-ink"><Switch checked={invite} onChange={setInvite} label={t('lrn.inviteNow')} />{t('lrn.inviteNow')}</label>
         <p className="text-[12px] text-muted">{t('lrn.popia')}</p>
       </form>
     </Drawer>
@@ -198,7 +200,7 @@ function LearnerDrawer({ learner, manage, reveal, onClose }: { learner: LearnerI
         ))}
         {row(t('lrn.f.dob'), learner.date_of_birth)}
         {row(t('lrn.f.gender'), learner.gender && t(`lrn.gender.${learner.gender}` as MessageKey))}
-        {row(t('lrn.f.phone'), learner.phone)}
+        {row(t('lrn.f.phone'), localPhone(learner.phone))}
         {row(t('lrn.f.email'), learner.email)}
         {row(t('lrn.f.lang'), learner.home_language && t(`lrn.lang.${learner.home_language}` as MessageKey))}
         {row(t('lrn.f.joined'), learner.joined_at && new Date(learner.joined_at).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' }))}
@@ -270,7 +272,7 @@ function ImportLearners({ open, onClose }: { open: boolean; onClose: () => void 
     <Drawer open={open} onClose={close} width="max-w-2xl" title={t('lrn.import')} subtitle={t('lrn.importLead')}
       footer={report && (
         <div className="flex items-center justify-between gap-3">
-          <Switch checked={invite} onChange={setInvite} label={t('lrn.inviteNow')} />
+          <label className="flex items-center gap-3 text-[14px] font-medium text-ink"><Switch checked={invite} onChange={setInvite} label={t('lrn.inviteNow')} />{t('lrn.inviteNow')}</label>
           <Button disabled={report.ready === 0} loading={run.isPending} onClick={() => rows && run.mutate({ dry: false, list: rows })}>{t('lrn.importN', { n: report.ready })}</Button>
         </div>
       )}>
