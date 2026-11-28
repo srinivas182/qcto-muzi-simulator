@@ -5,6 +5,7 @@ import { formatZar, type InvoiceDetail, type InvoiceRow } from '@simuwork/core';
 import { Badge, Button, Card, cx, Drawer, Field, inputClass, Skeleton, useToast } from '../ui';
 import { api, ApiError, downloadFile } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
+import { PayOnline } from './PayOnline';
 
 export function InvoiceStatusBadge({ invoice }: { invoice: Pick<InvoiceRow, 'status' | 'overdue_days' | 'paid_cents'> }) {
   const { t } = useI18n();
@@ -65,6 +66,8 @@ export function InvoiceDrawer({ id, prefix, manage = false, onClose }: { id: str
               {inv.status === 'issued' && <Row label={t('inv.owed', { date: date(inv.due_date) })} value={formatZar(inv.balance_cents)} strong />}
             </div>
           </Card>
+
+          {inv.status === 'issued' && prefix === '' && <PayOnline invoiceId={inv.id} />}
 
           {inv.status === 'issued' && inv.seller.bank.account_number && (
             <Card className="bg-surface-2/50 p-4 text-[14px]">

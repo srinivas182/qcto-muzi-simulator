@@ -360,3 +360,21 @@ export interface BillingSummary {
   seats_by_programme: { title: string; prefix: string; seats: number }[];
   blocked_providers: { id: string; name: string }[];
 }
+
+export interface GatewaySetting {
+  driver: string;
+  label: string;
+  enabled: boolean;
+  mode: 'test' | 'live';
+  display_order: number;
+  complete: boolean;
+  fields: { key: string; label: string; secret: boolean; set: boolean; hint: string | null }[];
+  last_test: { at: string; ok: boolean | null; message: string | null } | null;
+  notify_url: string;
+}
+
+export interface PaymentOption {
+  driver: string;
+  label: string;
+  test_mode: boolean;
+}

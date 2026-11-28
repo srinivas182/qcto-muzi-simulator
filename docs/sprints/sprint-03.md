@@ -297,3 +297,29 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
   credit; settings).
 - Demo: placeholder seller details, a paid 60-seat Technical Support licence and an unpaid Data Analytics
   monthly order for Ubuntu.
+
+## Sub-sprint 3.4 notes (online payments)
+- **Five gateways, one layer** (`App\Billing\Gateways`): **Paystack** and **Yoco** (hosted checkout, redirect),
+  **PayFast**, **Peach Payments** (Hosted Checkout) and **Ozow** (signed form post to the gateway's page).
+- **Super Admin → Billing settings → Payment gateways:** switch each on or off, choose test or live, enter its
+  keys, copy the notification (webhook) address to give the gateway, and run **Test connection**. Keys are
+  encrypted with the app key, never returned by the API (only "set" and the last 4 characters), never logged,
+  and only the names of changed keys are audited. A gateway cannot be switched on until all its keys are set.
+- **Paying:** on an unpaid invoice the provider picks a switched-on gateway; SimuWork records an attempt (its
+  reference goes to the gateway) for the amount still owed and sends the browser to the gateway. The return
+  address must be one of the academy's own addresses.
+- **Safety rules (every gateway):**
+  1. a notification must pass the gateway's own signature check (Paystack HMAC-SHA512; PayFast MD5 with
+     passphrase; Peach HMAC-SHA256; Ozow SHA512 hash; Yoco Standard Webhooks HMAC-SHA256 with a 3-minute
+     replay window), otherwise it is refused (400) and audited;
+  2. each notification is stored once per gateway and event id, so repeats do nothing;
+  3. the payment is then **confirmed by asking the gateway's API** (PayFast: posted back to its validate
+     endpoint), never by trusting the notification body;
+  4. the confirmed amount must equal the attempt amount in rand, otherwise nothing is paid and HQ is alerted
+     in the audit log;
+  5. the same confirmation runs when the provider returns from the gateway, so a missed notification never
+     leaves a paid invoice unpaid; a payment that arrives after the invoice was already settled is flagged
+     for HQ to refund.
+- **Before going live:** each gateway's signature and status checks are covered by tests built from the
+  gateways' published formats; each must still be run once end to end in the gateway's own sandbox with
+  Muzi's test keys (test mode) before switching to live.

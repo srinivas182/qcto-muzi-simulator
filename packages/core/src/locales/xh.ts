@@ -664,6 +664,25 @@ const xh: Messages = {
   'bill.f.due_days': "Iintsuku zokuhlawula (ababoneleli abahlawula kuqala)",
   'bill.f.invoice_prefix': "Isimaphambili senombolo ye-invoyisi",
   'bill.f.credit_note_prefix': "Isimaphambili senqaku lekhredithi",
+  // Payment gateways and paying online (Sprint 3.4)
+  'gw.title': "Amasango okuhlawula",
+  'gw.lead': "Vula amasango ababoneleli abanokuhlawula ngawo. Izitshixo zigcinwa zifihliwe kwaye azibonakali kwakhona; shiya isitshixo singenanto ukuze usigcine.",
+  'gw.enable': "Vula u-{name}",
+  'gw.test': "Uvavanyo",
+  'gw.live': "Ngokuphilayo",
+  'gw.mode': "Imo",
+  'gw.notSet': "Ayisetwanga",
+  'gw.keepHint': "Igciniwe. Bhala ixabiso elitsha kuphela ukuba ufuna ukuyitshintsha.",
+  'gw.notify': "Idilesi yesaziso (i-webhook) ekufuneka ifakwe esangweni",
+  'gw.save': "Gcina izitshixo nemo",
+  'gw.testConnection': "Vavanya uqhagamshelo",
+  'pay.online': "Hlawula kwi-intanethi",
+  'pay.with': "Hlawula nge-{name}",
+  'pay.secure': "Uhlawula kwiphepha elikhuselekileyo lesango ngokwalo. I-invoyisi yakho iphawulwa njengehlawulweyo xa isango liqinisekisa.",
+  'pay.checking': "Sijonga intlawulo yakho nesango…",
+  'pay.received': "Intlawulo ifunyenwe. Enkosi: i-invoyisi yakho ihlawulwe.",
+  'pay.failed': "Intlawulo ayigqitywanga. Ungazama kwakhona okanye uhlawule nge-EFT.",
+  'pay.slow': "Asikeva nto esangweni okwangoku. Ukuba uhlawule, i-invoyisi yakho iya kuhlaziywa xa iqinisekisa.",
 };
 
 export default xh;
