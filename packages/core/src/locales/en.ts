@@ -1205,6 +1205,27 @@ const en = {
   'pg.cellDone': "Done · best {best}% · {tries} tries",
   'pg.cellStarted': "Started · {tries} tries",
   'pg.legend': "Filled circle: done (number = best score). Green tick: passed as a real job. Dashed circle: started. Learners who went quiet come first.",
+  // Sprint 4.6b: reminders and shared checklists
+  'jr.share.title': "Share with a mentor or employer",
+  'jr.share.lead': "Make a read-only link to this checklist. It shows your first name and skills only, and stops working after 30 days or when you stop it.",
+  'jr.share.label': "Who is it for?",
+  'jr.share.labelPh': "For example: my mentor at Acme IT",
+  'jr.share.make': "Make a link",
+  'jr.share.send': "Copy or send",
+  'jr.share.copied': "Link copied.",
+  'jr.share.stopped': "That link no longer works.",
+  'jr.share.noLabel': "Shared link",
+  'jr.share.meta': "Opened {views} times · works until {date}",
+  'jr.share.stop': "Stop",
+  'jr.public.title': "Job-ready checklist: {name}",
+  'jr.public.asOf': "as of {date}",
+  'jr.public.gone': "This link has expired or the learner stopped sharing it.",
+  'jr.public.note': "\"Shown on a real job\" means the learner passed this task in a timed workplace simulator with no hints. Shared by the learner; no other personal details are included.",
+  'jr.reminders': "Reminders",
+  'jr.remindersLead': "If you have not trained for a week, we send you one short message in your language. At most three in a row.",
+  'pg.nudge': "Nudge",
+  'pg.nudged': "Reminder sent.",
+  'pg.nudgeFailed': "Not sent: the learner has no phone number, turned reminders off, or was reminded this week.",
 } as const;
 
 export type MessageKey = keyof typeof en;

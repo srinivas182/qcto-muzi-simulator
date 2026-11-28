@@ -34,6 +34,9 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon|null $sor_issued_on
  * @property Carbon|null $last_activity_at
+ * @property Carbon|null $reminded_at
+ * @property int $reminders_sent
+ * @property-read Programme $programme
  * @property-read Learner $learner
  * @property-read Cohort $cohort
  * @property-read LicencePool $pool
@@ -58,11 +61,17 @@ class Enrolment extends Model
 
     public const FREE_WITHDRAWAL_BELOW = 10;
 
-    protected $fillable = ['learner_id', 'cohort_id', 'programme_id', 'programme_version_id', 'licence_pool_id', 'holds_seat', 'status', 'progress', 'seat_taken_at', 'started_at', 'ended_at', 'reason', 'created_by', 'sor_issued_on', 'last_activity_at'];
+    protected $fillable = ['learner_id', 'cohort_id', 'programme_id', 'programme_version_id', 'licence_pool_id', 'holds_seat', 'status', 'progress', 'seat_taken_at', 'started_at', 'ended_at', 'reason', 'created_by', 'sor_issued_on', 'last_activity_at', 'reminded_at', 'reminders_sent'];
 
     protected function casts(): array
     {
-        return ['holds_seat' => 'boolean', 'progress' => 'integer', 'seat_taken_at' => 'datetime', 'started_at' => 'datetime', 'ended_at' => 'datetime', 'sor_issued_on' => 'date', 'last_activity_at' => 'datetime'];
+        return ['holds_seat' => 'boolean', 'progress' => 'integer', 'seat_taken_at' => 'datetime', 'started_at' => 'datetime', 'ended_at' => 'datetime', 'sor_issued_on' => 'date', 'last_activity_at' => 'datetime', 'reminded_at' => 'datetime', 'reminders_sent' => 'integer'];
+    }
+
+    /** @return BelongsTo<Programme, $this> */
+    public function programme(): BelongsTo
+    {
+        return $this->belongsTo(Programme::class);
     }
 
     /** @return BelongsTo<Learner, $this> */

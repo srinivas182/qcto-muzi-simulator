@@ -48,6 +48,12 @@ export interface ChecklistArea {
   outcomes: { code: string; statement: string; plain_words: string | null; status: OutcomeStatus }[];
 }
 
+/** A read-only checklist link the learner shared. */
+export interface ChecklistShareItem { id: string; label: string | null; created_at: string; expires_at: string; views: number; live: boolean; url?: string }
+
+/** What a mentor or employer sees through a shared link. */
+export interface SharedChecklist { learner: string; academy: string; programme: string; as_of: string; expires_at: string; areas: ChecklistArea[] }
+
 /** Facilitator board: every learner × every published activity. */
 export interface CohortBoard {
   activities: { id: string; kind: 'lesson' | 'scenario'; code: string; title: string; required: boolean }[];
@@ -89,6 +95,6 @@ export interface LearnEnrolment {
 }
 
 export interface LearnHomeData {
-  learner: { name: string; qcto_missing: number } | null;
+  learner: { name: string; qcto_missing: number; reminders?: boolean } | null;
   enrolments: LearnEnrolment[];
 }

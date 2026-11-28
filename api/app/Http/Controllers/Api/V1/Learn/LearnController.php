@@ -36,7 +36,7 @@ final class LearnController extends Controller
             ->orderByDesc('seat_taken_at')->get();
 
         return response()->json(['data' => [
-            'learner' => $learner === null ? null : ['name' => $learner->fullName(), 'qcto_missing' => count(QctoDetails::missing($learner))],
+            'learner' => $learner === null ? null : ['name' => $learner->fullName(), 'qcto_missing' => count(QctoDetails::missing($learner)), 'reminders' => $learner->reminders_off_at === null],
             'enrolments' => $enrolments->map(function (Enrolment $e): array {
                 $c = $e->cohort;
                 $end = $c->ends_on;

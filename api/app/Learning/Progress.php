@@ -38,7 +38,7 @@ final class Progress
     public static function refresh(Enrolment $e): int
     {
         $p = self::percent($e);
-        $e->update(['progress' => $p, 'last_activity_at' => now()]);
+        $e->update(['progress' => $p, 'last_activity_at' => now(), 'reminders_sent' => 0]); // active again: reminders start over
 
         return $p;
     }

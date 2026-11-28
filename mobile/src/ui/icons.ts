@@ -42,3 +42,5 @@ export { default as CircleAlert } from 'lucide-react-native/icons/circle-alert';
 export { default as CircleCheck } from 'lucide-react-native/icons/circle-check';
 export { default as Circle } from 'lucide-react-native/icons/circle';
 export { default as ListChecks } from 'lucide-react-native/icons/list-checks';
+export { default as BellRing } from 'lucide-react-native/icons/bell-ring';
+export { default as Share2 } from 'lucide-react-native/icons/share-2';

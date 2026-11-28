@@ -19,6 +19,7 @@ export const routes: RouteObject[] = [
     children: [
       { path: 'sign-in', lazy: page(() => import('../pages/auth/SignIn')) },
       { path: 'forgot-password', lazy: page(() => import('../pages/auth/ForgotPassword')) },
+      { path: 'c/:token', lazy: page(() => import('../pages/public/SharedChecklist')) },
       {
         element: <RequireSession />,
         children: [

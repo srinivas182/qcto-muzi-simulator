@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { router } from 'expo-router';
 import * as Application from 'expo-application';
-import { Check, Languages, LogOut, Moon, WifiOff } from '../../src/ui/icons';
-import { LOCALES, type Locale } from '@simuwork/core';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { BellRing, Check, Languages, LogOut, Moon, WifiOff } from '../../src/ui/icons';
+import { LOCALES, type LearnHomeData, type Locale } from '@simuwork/core';
+import { api } from '../../src/lib/api';
 import { useAcademy } from '../../src/lib/academy';
 import { useAuth } from '../../src/lib/auth';
 import { useI18n } from '../../src/lib/i18n';
@@ -57,6 +59,7 @@ export default function Me() {
           last
         />
       </Card>
+      <Reminders />
 
       <View style={{ marginTop: space.xxl }}>
         <Button variant="secondary" title={t('common.signOut')} icon={<LogOut size={18} color={c.danger} />} onPress={() => setSheet('signout')} />
@@ -106,3 +109,21 @@ const styles = StyleSheet.create({
   initials: { color: '#fff', fontWeight: '800', fontSize: 20 },
   choice: { flexDirection: 'row', alignItems: 'center', minHeight: 56, borderBottomWidth: StyleSheet.hairlineWidth },
 });
+
+/** Gentle reminders after a quiet week (learners only): on by default, can be turned off. */
+function Reminders() {
+  const { t } = useI18n();
+  const { c } = useTheme();
+  const qc = useQueryClient();
+  const home = useQuery({ queryKey: ['learn-home'], queryFn: () => api<{ data: LearnHomeData }>('/learn/home'), retry: false });
+  const set = useMutation({ mutationFn: (on: boolean) => api('/learn/me/reminders', { method: 'PATCH', body: { on } }), onSuccess: () => void qc.invalidateQueries({ queryKey: ['learn-home'] }) });
+  const learner = home.data?.data.learner;
+  if (!learner) return null;
+  const on = set.isPending ? !!set.variables : learner.reminders ?? true;
+  return (
+    <Card style={{ paddingVertical: 0, marginTop: space.md }}>
+      <Row icon={<BellRing size={20} color={c.brand} />} label={t('jr.reminders')} detail={t('jr.remindersLead')}
+        right={<Switch value={on} onValueChange={(v) => { haptics.select(); set.mutate(v); }} trackColor={{ true: c.brand, false: c.line }} thumbColor="#FFFFFF" ios_backgroundColor={c.line} accessibilityLabel={t('jr.reminders')} />} last />
+    </Card>
+  );
+}

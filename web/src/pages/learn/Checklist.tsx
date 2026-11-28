@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import type { ChecklistArea } from '@simuwork/core';
 import { Checklist } from '../../components/progress/Checklist';
+import { ShareCard } from '../../components/progress/ShareCard';
 import { Card, Skeleton } from '../../components/ui';
 import { api } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
@@ -20,6 +21,7 @@ export default function MyChecklist() {
         <p className="mt-1 text-[15px] text-muted">{t('jr.lead')}</p>
       </div>
       <Card className="p-5">{q.data ? <Checklist areas={q.data.data.areas} /> : <Skeleton className="h-64" />}</Card>
+      <ShareCard eid={eid} />
     </div>
   );
 }

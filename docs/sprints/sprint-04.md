@@ -370,3 +370,48 @@ now checked in CI. The learner language part is at most 5.9 KB.
 | Reminders | SMS or WhatsApp nudges in the learner's language for quiet learners | Proposed for 4.6b |
 | Share with employer | A read-only checklist link the learner controls | Proposed for 4.6b |
 | Step-level evidence | Show which step of which run proved each outcome, for assessors | Proposed for Sprint 5 (assessment) |
+
+## Sub-sprint 4.6b notes (gentle reminders and shared checklists)
+
+**Built**
+- **Gentle reminders** (`learning:daily`, every day at 09:12 SAST; `LearnerNudges`):
+  - Who gets one: a learner who started and has then been quiet for 7 days.
+  - What they get: one short message in their own language (English, isiZulu, isiXhosa or Afrikaans), with a
+    link back to where they left off.
+  - **Limits:** at most one a week and three in a row. Any activity resets the count; after three, the
+    facilitator follows up in person.
+  - **Channel:** WhatsApp (an approved template, `WHATSAPP_REMINDER_TEMPLATE`) when configured, then SMS
+    (Clickatell), then the log in development.
+  - Only the first name, the academy, the programme and the link are sent.
+  - Each reminder is written to the audit log.
+  - **Learners can turn reminders off:** in My details on web, and in Me on mobile
+    (`PATCH /learn/me/reminders`).
+  - **Facilitator "Nudge"** on the progress board for quiet learners (`POST /enrolments/{e}/nudge`). It follows
+    the same rules.
+- **Shared checklists** (`checklist_shares`, with RLS):
+  - **Making a link:** the learner makes a read-only link (`/c/<token>`), with a label such as "For my mentor
+    at Acme". It can be copied or sent through the phone's share sheet.
+  - **What the link shows:** first name and surname initial, the academy, the programme and the checklist.
+    It never shows the ID number, contact details or scores.
+  - **Safeguards:**
+    - Links expire after 30 days, and there are at most 5 live links at a time.
+    - The token is stored only as a hash.
+    - Views are counted.
+    - Pages are marked noindex.
+    - Each link is tied to its provider's host.
+    - The learner can stop a link at any time.
+    - Creating and stopping links are audited.
+  - The public page keeps the locked MCS footer (tested).
+
+**Checks:** API 258 tests, web 100, mobile 36.
+
+### Gaps we fill and best recommendations (4.6b)
+| Gap against the leaders | What we did | When |
+|---|---|---|
+| Labster and Transfr send English e-mail nudges, if any | WhatsApp or SMS in the learner's own language, weekly at most, three at most | This sprint |
+| Reminders feel like spam | The learner can turn them off; any activity resets the count; after three the facilitator takes over | This sprint |
+| Employers cannot see what a learner can do | A checklist link the learner controls: plain words, and "shown on a real job" explained | This sprint |
+| POPIA risk when sharing records | Minimal data, expiry, revocation, hashed tokens, audit log | This sprint |
+| A reply to a WhatsApp reminder goes nowhere | Route replies to the facilitator's inbox | Proposed for later (needs a WhatsApp webhook) |
+| Employers want a printed record | A print or PDF view of the shared checklist with a verification QR code | Proposed for later |
+| Templates need Meta approval | Submit the reminder template in four languages; until then SMS is used | For Srini (operations) |

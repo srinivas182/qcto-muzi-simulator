@@ -1,11 +1,11 @@
-import { StyleSheet, View } from 'react-native';
+import { Share, StyleSheet, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
-import type { ChecklistArea, OutcomeStatus } from '@simuwork/core';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import type { ChecklistArea, ChecklistShareItem, OutcomeStatus } from '@simuwork/core';
 import { api } from '../../../src/lib/api';
 import { useI18n } from '../../../src/lib/i18n';
-import { CircleAlert, CircleCheck, Circle } from '../../../src/ui/icons';
-import { Card, radius, Screen, space, T, useTheme } from '../../../src/ui';
+import { CircleAlert, CircleCheck, Circle, Share2 } from '../../../src/ui/icons';
+import { Button, Card, radius, Screen, space, T, useTheme } from '../../../src/ui';
 
 /** Learner: my job-ready checklist (each QCTO outcome: shown on a real job / practised / not yet). */
 export default function ChecklistScreen() {
@@ -16,6 +16,11 @@ export default function ChecklistScreen() {
   const areas = q.data?.data.areas ?? [];
   const all = areas.flatMap((a) => a.outcomes);
   const shown = all.filter((o) => o.status === 'shown').length;
+  // Make a read-only link (first name and skills only, 30 days) and hand it to the phone's share sheet.
+  const share = useMutation({
+    mutationFn: () => api<{ data: ChecklistShareItem }>(`/learn/enrolments/${eid}/shares`, { method: 'POST', body: { label: null } }),
+    onSuccess: (r) => { if (r.data.url) void Share.share({ message: `${t('jr.title')}: ${r.data.url}` }); },
+  });
   const icon = (s: OutcomeStatus) => (s === 'shown' ? <CircleCheck size={20} color={c.success} /> : s === 'practised' ? <CircleAlert size={20} color="#B45309" /> : <Circle size={20} color={c.muted} />);
   return (
     <Screen title={t('jr.title')} subtitle={t('jr.lead')} refreshing={q.isRefetching} onRefresh={() => void q.refetch()}>
@@ -36,6 +41,10 @@ export default function ChecklistScreen() {
               </Card>
             </View>
           ))}
+          <View style={{ marginTop: space.xl, gap: space.sm }}>
+            <T variant="caption" tone="muted">{t('jr.share.lead')}</T>
+            <Button variant="secondary" title={t('jr.share.title')} icon={<Share2 size={18} color={c.text} />} loading={share.isPending} onPress={() => share.mutate()} />
+          </View>
         </>
       ) : null}
     </Screen>
