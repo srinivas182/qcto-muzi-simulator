@@ -1243,6 +1243,10 @@ const af: Messages = {
   'off.dataBody': "Hierdie aflaai gebruik ongeveer {size} data. Wi-Fi is beter as jy kan.",
   'off.sizeUnknown': "’n paar MB",
   'off.downloadAnyway': "Laai tog af",
+  // Sprint 4.6d: "Fix it" retry in lessons
+  'lv.tryOnce': "Kyk weer en probeer nog een keer.",
+  'lv.fixedIt': "Reggemaak!",
+  'ls.f.hint': "Wenk ná ’n verkeerde eerste antwoord (opsioneel)",
 };
 
 export default af;

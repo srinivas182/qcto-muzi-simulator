@@ -456,3 +456,28 @@ now checked in CI. The learner language part is at most 5.9 KB.
 | Packs go stale | Check for updates on Wi-Fi automatically, in the background | Proposed for later |
 | Web learners offline | A service worker that caches the same pack in the browser | Proposed for later |
 | Phone storage is tight | Show the space used per programme, with a "free up space" list | Proposed for later |
+
+## Sub-sprint 4.6d notes ("Fix it" and the HQ language part)
+
+**Built**
+- **"Fix it" in lessons** (web and mobile):
+  - A wrong first answer to a quick check now shows a hint and allows **one more try**.
+  - The wrong choice is crossed out. After the second try, the answer and its explanation are shown, as
+    "Fixed it!" when the second try was right.
+  - **Only the first answer counts** towards the score, so learners can't fish for the answer.
+  - Authors can write the hint per check in Course Studio (optional, translatable). Without one, learners see
+    "Have another look and try once more."
+- **Language files split into three parts:** learner, staff, and a new **HQ** part (Course, Lesson and
+  Scenario Studio strings).
+  - The HQ part is only downloaded by HQ staff, so providers no longer pay for it.
+  - Tests check that the three parts together are the whole file with no overlap, and that no provider screen
+    uses an HQ string.
+
+**Checks:** API 260 tests, web 102, mobile 37.
+
+### Gaps we fill and best recommendations (4.6d)
+| Gap against the leaders | What we did | When |
+|---|---|---|
+| Quizzes just reveal the answer after a mistake | A hint and a second try ("Fix it"), with the first answer still counting | This sprint |
+| Admin strings slow down every user's language download | Separate HQ part; providers and learners download less | This sprint |
+| Same help for every learner | AI coach "Why?" and "Help" in the learner's language | Proposed for 4.7 |

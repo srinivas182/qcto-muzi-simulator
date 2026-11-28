@@ -30,7 +30,7 @@ export function localeParts(): Plugin {
     load(id) {
       if (!id.startsWith(`\0${PREFIX}`)) return undefined;
       const [lang, part] = id.slice(PREFIX.length + 1).split('/') as [string, LocalePart];
-      if (!/^[a-z]{2}$/.test(lang) || (part !== 'learner' && part !== 'staff')) return undefined;
+      if (!/^[a-z]{2}$/.test(lang) || !['learner', 'staff', 'hq'].includes(part)) return undefined;
       const file = `${dir}${lang}.ts`;
       this.addWatchFile(file);
       return `export default ${JSON.stringify(splitLocale(readFileSync(file, 'utf8'), part))};`;

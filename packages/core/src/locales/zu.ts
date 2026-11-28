@@ -1243,6 +1243,10 @@ const zu: Messages = {
   'off.dataBody': "Lokhu kulanda kusebenzisa cishe idatha engu-{size}. I-Wi-Fi ingcono uma ungakwazi.",
   'off.sizeUnknown': "ama-MB ambalwa",
   'off.downloadAnyway': "Landa noma kunjalo",
+  // Sprint 4.6d: "Fix it" retry in lessons
+  'lv.tryOnce': "Buka futhi bese uzama kanye futhi.",
+  'lv.fixedIt': "Ulungisile!",
+  'ls.f.hint': "Icebo ngemuva kwempendulo yokuqala engalungile (akuphoqelekile)",
 };
 
 export default zu;

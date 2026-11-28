@@ -1241,6 +1241,10 @@ const en = {
   'off.dataBody': "This download uses about {size} of data. Wi-Fi is better if you can.",
   'off.sizeUnknown': "a few MB",
   'off.downloadAnyway': "Download anyway",
+  // Sprint 4.6d: "Fix it" retry in lessons
+  'lv.tryOnce': "Have another look and try once more.",
+  'lv.fixedIt': "Fixed it!",
+  'ls.f.hint': "Hint after a wrong first answer (optional)",
 } as const;
 
 export type MessageKey = keyof typeof en;
