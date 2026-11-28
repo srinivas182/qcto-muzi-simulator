@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\V1\Billing\OnlinePaymentController;
 use App\Http\Controllers\Api\V1\Billing\PackageController;
 use App\Http\Controllers\Api\V1\Billing\PlatformBillingController;
 use App\Http\Controllers\Api\V1\Billing\ShopController;
+use App\Http\Controllers\Api\V1\Cohorts\CohortController;
 use App\Http\Controllers\Api\V1\CurrentTenantController;
 use App\Http\Controllers\Api\V1\DomainAllowedController;
 use App\Http\Controllers\Api\V1\HealthController;
@@ -138,6 +139,23 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::post('/learners/{learner}/invite', [LearnerController::class, 'invite'])->whereUuid('learner')->middleware('throttle:30,1')->name('learners.invite');
                 Route::post('/learners/{learner}/status', [LearnerController::class, 'status'])->whereUuid('learner')->name('learners.status');
             });
+            Route::middleware('permission:classes.view')->group(function (): void {
+                Route::get('/cohorts', [CohortController::class, 'index'])->name('cohorts.index');
+                Route::get('/cohorts/options', [CohortController::class, 'options'])->name('cohorts.options');
+                Route::get('/cohorts/{cohort}', [CohortController::class, 'show'])->whereUuid('cohort')->name('cohorts.show');
+            });
+            Route::middleware('permission:classes.manage')->group(function (): void {
+                Route::post('/cohorts', [CohortController::class, 'store'])->name('cohorts.store');
+                Route::patch('/cohorts/{cohort}', [CohortController::class, 'update'])->whereUuid('cohort')->name('cohorts.update');
+                Route::post('/cohorts/{cohort}/join-code', [CohortController::class, 'newCode'])->whereUuid('cohort')->name('cohorts.join-code');
+                Route::post('/cohorts/{cohort}/archive', [CohortController::class, 'archive'])->whereUuid('cohort')->name('cohorts.archive');
+            });
+            Route::middleware('permission:learners.manage')->group(function (): void {
+                Route::post('/cohorts/{cohort}/enrolments', [CohortController::class, 'enrol'])->whereUuid('cohort')->name('cohorts.enrol');
+                Route::post('/enrolments/{enrolment}/withdraw', [CohortController::class, 'withdraw'])->whereUuid('enrolment')->name('enrolments.withdraw');
+                Route::post('/enrolments/{enrolment}/transfer', [CohortController::class, 'transfer'])->whereUuid('enrolment')->name('enrolments.transfer');
+            });
+            Route::post('/cohorts/join', [CohortController::class, 'join'])->middleware(['permission:learning.use', 'throttle:10,1'])->name('cohorts.join');
             Route::post('/learners/{learner}/reveal-id', [LearnerController::class, 'revealId'])->whereUuid('learner')
                 ->middleware(['permission:learners.reveal_id', 'throttle:30,1'])->name('learners.reveal-id');
             Route::get('/academy', [AcademyController::class, 'show'])->middleware('permission:academy.manage')->name('academy.show');

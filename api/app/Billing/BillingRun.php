@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Billing;
 
 use App\Audit\AuditLogger;
+use App\Cohorts\Enrolments;
 use App\Models\Invoice;
 use App\Models\LicencePool;
 use App\Models\Tenant;
@@ -17,7 +18,8 @@ use Illuminate\Support\Facades\Notification;
  *  1. expire finished pools (fixed term past its end; cancelled monthly pools after their last month);
  *  2. invoice monthly pools for the current month (once: one invoice per pool per month);
  *  3. payment reminders at the due date, then after 7, 14 and 30 days (30 days = buying and enrolling blocked);
- *  4. renewal reminders 30 and 7 days before a fixed-term pool ends.
+ *  4. renewal reminders 30 and 7 days before a fixed-term pool ends;
+ *  5. seats of learners who never started go back to their pool (14-day no-show rule).
  */
 final class BillingRun
 {
@@ -27,12 +29,13 @@ final class BillingRun
         private readonly TenantContext $context,
         private readonly Invoicer $invoicer,
         private readonly AuditLogger $audit,
+        private readonly Enrolments $enrolments,
     ) {}
 
-    /** @return array{expired: int, invoiced: int, reminders: int, renewals: int} */
+    /** @return array{expired: int, invoiced: int, reminders: int, renewals: int, no_shows: int} */
     public function run(): array
     {
-        $totals = ['expired' => 0, 'invoiced' => 0, 'reminders' => 0, 'renewals' => 0];
+        $totals = ['expired' => 0, 'invoiced' => 0, 'reminders' => 0, 'renewals' => 0, 'no_shows' => 0];
         foreach (Tenant::query()->where('status', '!=', Tenant::STATUS_ARCHIVED)->get() as $tenant) {
             $result = $this->context->runAs($tenant, fn (): array => $this->forTenant($tenant));
             foreach ($result as $k => $v) {
@@ -43,7 +46,7 @@ final class BillingRun
         return $totals;
     }
 
-    /** @return array{expired: int, invoiced: int, reminders: int, renewals: int} */
+    /** @return array{expired: int, invoiced: int, reminders: int, renewals: int, no_shows: int} */
     private function forTenant(Tenant $tenant): array
     {
         $email = $tenant->billing_email ?? $tenant->contact_email;
@@ -113,6 +116,6 @@ final class BillingRun
             }
         }
 
-        return ['expired' => $expired, 'invoiced' => $invoiced, 'reminders' => $reminders, 'renewals' => $renewals];
+        return ['expired' => $expired, 'invoiced' => $invoiced, 'reminders' => $reminders, 'renewals' => $renewals, 'no_shows' => $this->enrolments->returnNoShows()];
     }
 }

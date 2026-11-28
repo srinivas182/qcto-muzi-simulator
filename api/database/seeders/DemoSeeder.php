@@ -6,9 +6,14 @@ namespace Database\Seeders;
 
 use App\Billing\LicenceOrders;
 use App\Billing\Payments;
+use App\Cohorts\Cohorts;
+use App\Cohorts\Enrolments;
 use App\Identity\ConsentService;
 use App\Learners\LearnerDirectory;
 use App\Models\BillingSetting;
+use App\Models\Centre;
+use App\Models\Cohort;
+use App\Models\Enrolment;
 use App\Models\Learner;
 use App\Models\LicencePool;
 use App\Models\OutcomeCoverage;
@@ -89,6 +94,7 @@ final class DemoSeeder extends Seeder
         $this->demoPackages();
         $this->demoBilling($context);
         $this->demoLearners($context);
+        $this->demoCohort($context);
 
         $this->command?->info('Demo ready. Password for every account: '.self::PASSWORD);
     }
@@ -135,6 +141,26 @@ final class DemoSeeder extends Seeder
             $directory = app(LearnerDirectory::class);
             $directory->import($tenant, $import, false, false, $admin);
             Learner::query()->where('surname', 'Ndlovu')->update(['status' => Learner::ACTIVE, 'joined_at' => now()->subDays(3)]);
+        });
+    }
+
+    /** A Technical Support cohort at Ubuntu with six learners from the register (seats from the paid licence). */
+    private function demoCohort(TenantContext $context): void
+    {
+        $tenant = Tenant::query()->where('slug', 'ubuntu')->firstOrFail();
+        $context->runAs($tenant, function () use ($tenant): void {
+            if (Cohort::query()->exists()) {
+                return;
+            }
+            $admin = User::query()->where('email', 'admin@ubuntu.demo')->firstOrFail();
+            $cohort = app(Cohorts::class)->create([
+                'name' => 'Technical Support — February 2027', 'centre_id' => Centre::query()->firstOrCreate(['name' => 'Durban campus'])->id,
+                'programme_id' => Programme::query()->where('code', 'technical-support')->value('id'), 'starts_on' => today()->addDays(5)->toDateString(),
+                'ends_on' => today()->addMonths(12)->toDateString(),
+            ], $admin);
+            $ids = Learner::query()->orderBy('surname')->limit(6)->pluck('id')->all();
+            app(Enrolments::class)->enrol($tenant, $cohort, $ids, $admin);
+            Enrolment::query()->where('learner_id', $ids[0])->update(['started_at' => now(), 'status' => Enrolment::ACTIVE, 'progress' => 12]);
         });
     }
 

@@ -15,6 +15,7 @@ return [
         ['id' => 'admin.programmes', 'section' => 'Curriculum', 'label' => 'Programmes', 'icon' => 'graduation-cap', 'path' => '/admin/programmes', 'permission' => 'catalogue.view'],
         ['id' => 'admin.guide', 'section' => 'Curriculum', 'label' => 'Mentor guide', 'icon' => 'book-open', 'path' => '/admin/guide', 'permission' => 'catalogue.view'],
         ['id' => 'admin.learners', 'section' => 'People', 'label' => 'Learners', 'icon' => 'users', 'path' => '/admin/learners', 'permission' => 'learners.view'],
+        ['id' => 'admin.cohorts', 'section' => 'People', 'label' => 'Cohorts', 'icon' => 'graduation-cap', 'path' => '/admin/cohorts', 'permission' => 'classes.view'],
         ['id' => 'admin.staff', 'section' => 'People', 'label' => 'Staff', 'icon' => 'user-cog', 'path' => '/admin/staff', 'permission' => 'staff.manage'],
         ['id' => 'admin.roles', 'section' => 'People', 'label' => 'Roles', 'icon' => 'shield-check', 'path' => '/admin/roles', 'permission' => 'roles.manage_tenant'],
         ['id' => 'admin.centres', 'section' => 'People', 'label' => 'Centres', 'icon' => 'building', 'path' => '/admin/centres', 'permission' => 'centres.manage'],

@@ -350,3 +350,34 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
   and every language, 240 KB) was replaced with checks that match what a user actually downloads: first load
   ≤ 170 KB (unchanged, non-negotiable; now 138.7 KB), each language file ≤ 15 KB (now ≤ 11.7 KB), and each
   page or on-demand helper ≤ 25 KB (largest now 7.0 KB). CSS stays ≤ 30 KB. See `web/scripts/shell-size.mjs`.
+
+## Sub-sprint 3.6a notes (cohorts and enrolments)
+
+3.6 is split into two PRs: **3.6a** (cohorts, enrolments, seat rules, QR join) and **3.6b** (QCTO deadline
+and enrolment register, licence health, learner home on web and mobile).
+
+- **Cohorts** have a centre, a programme pinned to the version published on the day they are created,
+  dates, facilitators and a QCTO type (qualification · skills programme · not reported). Learners can be
+  moved to another cohort on the same programme, and their seat moves with them. A cohort can be archived
+  once nobody is still learning in it.
+- **Enrolling takes seats, all or nothing:** if 12 learners are picked and only 8 seats are free, nobody is
+  enrolled, and the message says to buy 4 more seats or pick fewer learners. Only active pools that have
+  not ended count, with the pool that ends first used first. An invoice more than 30 days overdue blocks new
+  enrolments (423); learners already enrolled keep learning.
+- **Never oversold:** the pool rows are locked while seats are counted. A database trigger also locks the
+  pool and counts again on every insert, so two admins enrolling at once cannot take more seats than the
+  pool has. It also refuses pools that are not active or that belong to another provider. Tested by
+  passing the application check and inserting past the limit.
+- **Seat rules (decision 2):** a learner who has not started 14 days after enrolment, or after the cohort
+  start if that is later, gets status *did not start* and the seat goes back to the pool. This runs in
+  `billing:daily`. Withdrawing a learner before 10% progress also returns the seat; after that it stays
+  used. The learner's record is never deleted.
+- **QR join (moved here from 3.5):** each cohort has an 8-character code that is easy to read aloud (no 0/O
+  or 1/I/L) and a QR poster that can be printed. A learner already on the register scans it, signs in and
+  taps Join, which takes a seat like any enrolment. A new code stops the old poster from working, and
+  joining can be switched off.
+- **Permissions:** creating and editing cohorts needs `classes.manage`. Enrolling, withdrawing and moving
+  learners use paid seats, so they need `learners.manage`: admins and centre managers can, facilitators
+  cannot.
+- **QCTO finding for 3.6b:** QCTO's first enrolment upload is due **21 working days** after training
+  starts. QCTO's file is Excel with 43 fixed columns (A–AQ), most of which we do not collect yet.
