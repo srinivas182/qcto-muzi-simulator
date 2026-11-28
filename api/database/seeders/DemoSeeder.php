@@ -13,6 +13,7 @@ use App\Learners\IdNumbers;
 use App\Learners\LearnerDirectory;
 use App\Learning\ActivityCatalogue;
 use App\Learning\LessonContent;
+use App\Learning\ScenarioContent;
 use App\Models\Activity;
 use App\Models\BillingSetting;
 use App\Models\Centre;
@@ -178,6 +179,34 @@ final class DemoSeeder extends Seeder
         ],
     ];
 
+    /** The first simulator: "A PC won't boot" on the PC bench scene (Sprint 4.4; Scenario Studio edits it from 4.5). */
+    private const DEMO_SCENARIO = [
+        'scene' => 'pc-bench', 'pass_mark' => 70,
+        'job' => ['minutes' => 12, 'customer' => 'Thandi from accounts needs her PC back before payroll at 14:00.'],
+        'steps' => [
+            ['id' => 'press', 'type' => 'tap', 'target' => 'pc-power', 'prompt' => 'Thandi says her PC will not start. Press its power button and watch what happens.', 'sets' => ['monitor' => 'beeps'],
+                'hints' => ['Look at the front of the PC.', 'The round button on the front of the case.'], 'why' => 'See the fault for yourself before you change anything.', 'outcome' => 'TS-2.2',
+                'wrong' => [['on' => '*', 'effect' => 'none', 'message' => 'First see the fault for yourself: try to switch the PC on.']]],
+            ['id' => 'diagnose', 'type' => 'choose', 'prompt' => 'Three long beeps and a blank screen. What is the most likely cause?', 'options' => ['The power supply is dead', 'A memory (RAM) problem', 'A virus'], 'answer' => 1,
+                'hints' => ['The PC has power: the fans spin and it beeps.', 'Long repeated beeps at start-up usually point to memory.'], 'why' => 'Beep codes tell you where to look, so you do not replace parts that are fine.', 'outcome' => 'TS-2.2', 'lesson' => ['code' => 'TS-L01'],
+                'wrong' => [['on' => 'option:0', 'effect' => 'none', 'message' => 'A dead power supply gives no beeps and no fans. This PC beeps.'], ['on' => 'option:2', 'effect' => 'none', 'message' => 'A virus cannot stop the PC beeping before Windows starts.']]],
+            ['id' => 'unplug', 'type' => 'tap', 'target' => 'wall-switch', 'critical' => true, 'prompt' => 'Make the PC safe before you open it.', 'sets' => ['wall-switch' => 'off', 'monitor' => 'off'],
+                'hints' => ['Power must be off at the source.', 'Switch off at the wall socket.'], 'why' => 'Opening a live PC can shock you and destroy parts.', 'outcome' => 'TS-3.2', 'lesson' => ['code' => 'TS-L02'],
+                'wrong' => [['on' => 'case-panel', 'effect' => 'spark', 'message' => 'You opened a live PC. In a real job this can shock you and damage the motherboard.']]],
+            ['id' => 'strap', 'type' => 'tap', 'target' => 'strap', 'critical' => true, 'prompt' => 'Protect the parts from static.', 'sets' => ['strap' => 'on'],
+                'hints' => ['Something on the bench stops static from your body.', 'Put on the antistatic wrist strap.'], 'why' => 'Static from your hand can kill a RAM stick without a visible mark.', 'outcome' => 'TS-3.2', 'lesson' => ['code' => 'TS-L02'],
+                'wrong' => [['on' => 'ram-new', 'effect' => 'static', 'message' => 'You touched the RAM without a strap. Static can damage it without you seeing anything.'], ['on' => 'case-panel', 'effect' => 'static', 'message' => 'Put the strap on before you reach inside the case.']]],
+            ['id' => 'open', 'type' => 'tap', 'target' => 'case-panel', 'prompt' => 'Open the side of the case.', 'sets' => ['case-panel' => 'open'], 'hints' => ['The flat panel on the side of the PC.'], 'why' => 'You need to see the memory slots.', 'outcome' => 'TS-3.2'],
+            ['id' => 'remove', 'type' => 'tap', 'target' => 'ram-old', 'prompt' => 'Take out the faulty RAM stick.', 'sets' => ['ram-old' => 'out', 'slot-a1' => 'empty'], 'hints' => ['It is in the slot next to the processor.', 'Press the clips at both ends, then lift the green stick.'], 'why' => 'Release the clips first so the slot is not damaged.', 'outcome' => 'TS-3.2'],
+            ['id' => 'insert', 'type' => 'place', 'target' => 'ram-new', 'slot' => 'slot-a1', 'prompt' => 'Fit the new RAM stick into the empty slot.', 'sets' => ['ram-new' => 'in', 'slot-a1' => 'full'],
+                'hints' => ['Pick up the new stick from the bench.', 'Tap the new stick, then tap the empty slot A1.'], 'why' => 'Line up the notch and press until both clips click, or the PC will still not boot.', 'outcome' => 'TS-3.2',
+                'wrong' => [['on' => 'ram-old', 'effect' => 'beep', 'message' => 'That is the faulty stick. Use the new one from the bench.']]],
+            ['id' => 'close', 'type' => 'tap', 'target' => 'case-panel', 'prompt' => 'Close the case.', 'sets' => ['case-panel' => 'closed'], 'hints' => ['Put the side panel back.'], 'why' => 'A closed case keeps dust out and air flowing the right way.', 'outcome' => 'TS-3.2'],
+            ['id' => 'power', 'type' => 'tap', 'target' => 'wall-switch', 'prompt' => 'Switch the power back on at the wall.', 'sets' => ['wall-switch' => 'on'], 'hints' => ['The same switch you turned off.'], 'why' => 'Power comes back only once the case is closed.', 'outcome' => 'TS-3.2'],
+            ['id' => 'test', 'type' => 'tap', 'target' => 'pc-power', 'prompt' => 'Start the PC and check that it boots.', 'sets' => ['monitor' => 'ok'], 'hints' => ['Press the power button on the PC again.'], 'why' => 'Always test before you tell the user it is fixed.', 'outcome' => 'TS-2.2', 'lesson' => ['code' => 'TS-L03']],
+        ],
+    ];
+
     private function demoActivities(TenantContext $context): void
     {
         $context->runAs(null, function (): void {
@@ -192,6 +221,12 @@ final class DemoSeeder extends Seeder
                 ['scenario', 'TS-S01', 'A PC won’t boot', 'Diagnose the fault and replace the faulty RAM safely.', 12, 2, ['TS-2.2', 'TS-3.2']],
                 ['lesson', 'TS-L03', 'Explaining the fix', 'Tell the user what you did, in plain words.', 3, 1, ['TS-6.1', 'TS-6.2']],
             ] as [$kind, $code, $title, $summary, $minutes, $weight, $outcomes]) {
+                if ($kind === 'scenario') {
+                    $catalogue->publish($catalogue->create($version, ['kind' => $kind, 'code' => $code, 'title' => $title, 'summary' => $summary, 'minutes' => $minutes, 'weight' => $weight,
+                        'content' => ScenarioContent::clean(self::DEMO_SCENARIO)[0] + ['i18n' => [], 'review' => ['en' => ['by' => 'Zanele Mthembu (HQ)', 'at' => now()->toIso8601String()]]]], $outcomes));
+
+                    continue;
+                }
                 $content = self::DEMO_LESSONS[$code] ?? [];
                 $blocks = array_map(fn (array $b, int $i) => ['id' => strtolower($code).'b'.$i] + $b, $content, array_keys($content));
                 $catalogue->publish($catalogue->create($version, ['kind' => $kind, 'code' => $code, 'title' => $title, 'summary' => $summary, 'minutes' => $minutes, 'weight' => $weight,

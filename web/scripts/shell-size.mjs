@@ -1,7 +1,8 @@
 // Speed budgets, measured as a user experiences them (approved by Srini, 28 Nov 2026):
 //  1. First load: the entry script plus everything it preloads must stay within 170 KB gzip (non-negotiable).
 //  2. Each language file (loaded only for the language the user picks) must stay within 15 KB gzip.
-//  3. Each other lazy chunk (a page, or a helper a page loads on demand) must stay within 25 KB gzip.
+//  3. The 3D engine (three.js), downloaded only when a simulator opens, must stay within 150 KB gzip.
+//  4. Each other lazy chunk (a page, or a helper a page loads on demand) must stay within 25 KB gzip.
 // A total of all files is not checked: no user downloads every page and every language.
 import { readdirSync, readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
@@ -11,6 +12,8 @@ const dist = new URL('../dist/', import.meta.url).pathname;
 const SHELL_KB = Number(process.env.SHELL_LIMIT_KB ?? 170);
 const LANGUAGE_KB = 15;
 const CHUNK_KB = 25;
+const ENGINE_KB = 150;
+const ENGINE = /^assets\/three-[\w-]+\.js$/;
 const LANGUAGE = /^assets\/lang-(zu|af|xh)-(learner|staff)-[\w-]+\.js$/;
 
 const kb = (f) => gzipSync(readFileSync(join(dist, f))).length / 1024;
@@ -31,8 +34,9 @@ const lazy = readdirSync(join(dist, 'assets')).map((f) => `assets/${f}`).filter(
 let largest = { f: '', size: 0 };
 for (const f of lazy) {
   const size = kb(f);
-  const limit = LANGUAGE.test(f) ? LANGUAGE_KB : CHUNK_KB;
-  if (!LANGUAGE.test(f) && size > largest.size) largest = { f, size };
+  const limit = LANGUAGE.test(f) ? LANGUAGE_KB : ENGINE.test(f) ? ENGINE_KB : CHUNK_KB;
+  if (ENGINE.test(f)) console.log(`${size.toFixed(1).padStart(7)} KB  ${f} (3D engine, limit ${ENGINE_KB} KB)`);
+  else if (!LANGUAGE.test(f) && size > largest.size) largest = { f, size };
   if (LANGUAGE.test(f)) console.log(`${size.toFixed(1).padStart(7)} KB  ${f} (language, limit ${LANGUAGE_KB} KB)`);
   if (size > limit) failures.push(`${f} is ${size.toFixed(1)} KB (limit ${limit} KB).`);
 }

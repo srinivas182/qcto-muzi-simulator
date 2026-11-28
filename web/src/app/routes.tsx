@@ -52,7 +52,7 @@ export const routes: RouteObject[] = [
           { path: 'learn/details', lazy: page(() => import('../pages/learn/MyDetails')) },
           { path: 'learn/enrolments/:eid', lazy: page(() => import('../pages/learn/Programme')) },
           { path: 'learn/enrolments/:eid/lessons/:aid', lazy: page(() => import('../pages/learn/Lesson')) },
-          { path: 'learn/enrolments/:eid/simulators/:aid', lazy: page(() => import('../pages/learn/SimulatorSoon')) },
+          { path: 'learn/enrolments/:eid/simulators/:aid', lazy: page(() => import('../pages/learn/Simulator')) },
           { path: '*', element: <Fallback /> },
         ],
       },

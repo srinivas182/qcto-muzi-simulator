@@ -6,6 +6,7 @@ namespace Tests\Feature\Learning;
 
 use App\Learners\IdNumbers;
 use App\Learning\ActivityCatalogue;
+use App\Learning\ScenarioContent;
 use App\Models\Activity;
 use App\Models\Attempt;
 use App\Models\Centre;
@@ -27,6 +28,14 @@ use Tests\Feature\Access\AccessTestCase;
 /** Sprint 4.1: activities, offline-safe attempt sync, and progress from required activities. */
 final class AttemptSyncTest extends AccessTestCase
 {
+    private const SCENARIO = ['scene' => 'pc-bench', 'pass_mark' => 70, 'job' => ['minutes' => 10, 'customer' => 'Thandi'], 'steps' => [
+        ['id' => 'unplug', 'type' => 'tap', 'target' => 'wall-switch', 'critical' => true, 'prompt' => 'Make it safe.', 'hints' => ['At the wall.']],
+        ['id' => 'cause', 'type' => 'choose', 'prompt' => 'Cause?', 'options' => ['PSU', 'RAM'], 'answer' => 1],
+        ['id' => 'fitram', 'type' => 'place', 'target' => 'ram-new', 'slot' => 'slot-a1', 'prompt' => 'Fit it.'],
+    ]];
+
+    private const RIGHT = [['step' => 'unplug', 'action' => 'tap', 'value' => 'wall-switch'], ['step' => 'cause', 'action' => 'choose', 'value' => '1'], ['step' => 'fitram', 'action' => 'place', 'value' => 'ram-new>slot-a1']];
+
     private ProgrammeVersion $version;
 
     /** @var array<string, Activity> */
@@ -51,6 +60,7 @@ final class AttemptSyncTest extends AccessTestCase
                 $this->a[$code] = $catalogue->create($this->version, ['kind' => $kind, 'code' => "TS-{$code}", 'title' => "Activity {$code}", 'weight' => $weight, 'required' => $required], [$codes[$i % 3]]);
                 $catalogue->publish($this->a[$code]);
             }
+            $this->a['S1']->update(['content' => ScenarioContent::clean(self::SCENARIO)[0] + ['review' => ['en' => ['by' => 'HQ']]]]);
             $this->a['D1'] = $catalogue->create($this->version, ['kind' => 'lesson', 'code' => 'TS-D1', 'title' => 'Draft', 'weight' => 1], []);
         }, platform: true);
         [$this->token, $this->enrolment] = $this->enrolled($this->ubuntu, $package = Package::query()->create(['code' => 'ts', 'name' => 'TS', 'programme_id' => $programme, 'includes_simulators' => true, 'includes_courses' => true, 'billing' => 'term', 'term_months' => 12, 'min_seats' => 1]));
@@ -83,7 +93,7 @@ final class AttemptSyncTest extends AccessTestCase
         return $over + [
             'client_id' => (string) Str::uuid(), 'enrolment_id' => $this->enrolment->id, 'activity_id' => $this->a[$activity]->id,
             'mode' => $this->a[$activity]->kind === 'lesson' ? 'lesson' : 'practice', 'started_at' => '2027-02-10T08:00:00Z', 'finished_at' => '2027-02-10T08:06:00Z',
-            'completed' => true, 'score' => 80, 'duration_seconds' => 360, 'result' => ['blocks' => 6],
+            'completed' => true, 'score' => 80, 'duration_seconds' => 360, 'result' => $this->a[$activity]->kind === 'lesson' ? ['blocks' => 6] : ['events' => self::RIGHT],
         ];
     }
 
@@ -128,7 +138,8 @@ final class AttemptSyncTest extends AccessTestCase
         $changed = $batch[1];
         $changed['score'] = 5;
         $this->sync([$changed])->assertOk();
-        $this->assertSame(80, app(TenantContext::class)->runAs($this->ubuntu, fn () => Attempt::query()->where('client_id', $changed['client_id'])->value('score')));
+        // (simulator scores come from the server, so the stored score is the clean run's 100, not the device's 80)
+        $this->assertSame(100, app(TenantContext::class)->runAs($this->ubuntu, fn () => Attempt::query()->where('client_id', $changed['client_id'])->value('score')));
 
         // An unfinished attempt can be updated until it finishes (resumed after going offline).
         $open = $this->item('L2', ['completed' => false, 'finished_at' => null, 'score' => null]);
@@ -211,5 +222,43 @@ final class AttemptSyncTest extends AccessTestCase
         $home()->assertJsonPath('data.enrolments.0.next.title', 'Activity X1'); // then optional ones
         $this->sync([$this->item('X1')]);
         $home()->assertJsonPath('data.enrolments.0.next', null);
+    }
+
+    public function test_simulator_scores_are_worked_out_on_the_server_from_the_learners_moves(): void
+    {
+        $find = fn (string $id) => app(TenantContext::class)->runAs($this->ubuntu, fn () => Attempt::query()->where('client_id', $id)->firstOrFail());
+        // A clean run scores 100 whatever the device claims.
+        $this->sync([$clean = $this->item('S1', ['score' => 3, 'completed' => false])])->assertJsonPath('data.accepted.0', $clean['client_id']);
+        $a = $find($clean['client_id']);
+        $this->assertSame([100, true, true], [$a->score, $a->completed, $a->result['passed']]);
+
+        // A claimed 100 with skipped steps is not completed.
+        $this->sync([$skip = $this->item('S1', ['score' => 100, 'result' => ['events' => [self::RIGHT[2]]]])]);
+        $this->assertSame([0, false], [$find($skip['client_id'])->score, $find($skip['client_id'])->completed]);
+
+        // One hint and one wrong choice in practice: (0.85 + 0.75 + 1) / 3 = 87, passed.
+        $events = [['step' => 'unplug', 'action' => 'hint'], self::RIGHT[0], ['step' => 'cause', 'action' => 'choose', 'value' => '0'], self::RIGHT[1], self::RIGHT[2]];
+        $this->sync([$p = $this->item('S1', ['result' => ['events' => $events]])]);
+        $this->assertSame([87, true], [$find($p['client_id'])->score, $find($p['client_id'])->result['passed']]);
+
+        // A safety mistake fails real-job mode even with a good score.
+        $events = [['step' => 'unplug', 'action' => 'tap', 'value' => 'case-panel'], ...self::RIGHT];
+        $this->sync([$j = $this->item('S1', ['mode' => 'job', 'result' => ['events' => $events]])]);
+        $this->assertSame([92, false, true], [$find($j['client_id'])->score, $find($j['client_id'])->result['passed'], $find($j['client_id'])->result['critical']]);
+    }
+
+    public function test_the_scenario_comes_with_lesson_links_and_the_learners_best_results(): void
+    {
+        $this->a['S1']->update(['content' => ScenarioContent::clean(self::SCENARIO)[0] + ['i18n' => ['zu' => ['steps' => ['unplug' => ['prompt' => 'Yenza kuphephe.']]]], 'review' => ['en' => ['by' => 'HQ'], 'zu' => ['by' => 'HQ']]]]);
+        $url = fn (string $loc = 'en') => $this->url("/learn/enrolments/{$this->enrolment->id}/scenarios/{$this->a['S1']->id}?locale={$loc}");
+        $this->fresh()->getJson($url(), $this->bearer($this->token))->assertOk()
+            ->assertJsonPath('data.content.scene', 'pc-bench')->assertJsonPath('data.content.steps.0.prompt', 'Make it safe.')
+            ->assertJsonPath('data.lessons.TS-L1', $this->a['L1']->id)->assertJsonPath('data.results.practice', null)
+            ->assertJsonMissingPath('data.content.i18n');
+        $this->fresh()->getJson($url('zu'), $this->bearer($this->token))->assertJsonPath('data.content.steps.0.prompt', 'Yenza kuphephe.');
+
+        $this->sync([$this->item('S1')]);
+        $this->fresh()->getJson($url(), $this->bearer($this->token))->assertJsonPath('data.results.practice.best', 100)->assertJsonPath('data.results.practice.passed', true);
+        $this->fresh()->getJson($this->url("/learn/enrolments/{$this->enrolment->id}/scenarios/{$this->a['L1']->id}"), $this->bearer($this->token))->assertNotFound();
     }
 }

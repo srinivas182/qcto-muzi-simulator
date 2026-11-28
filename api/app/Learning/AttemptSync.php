@@ -61,14 +61,25 @@ final class AttemptSync
                     return 'ok'; // already final: repeating a sync changes nothing
                 }
                 $finished = isset($item['finished_at']) ? Carbon::parse((string) $item['finished_at']) : null;
+                $result = is_array($item['result'] ?? null) ? $item['result'] : [];
+                $completed = $finished !== null && (bool) ($item['completed'] ?? false);
+                $score = isset($item['score']) ? max(0, min(100, (int) $item['score'])) : null;
+                if ($activity->kind === Activity::SCENARIO) {
+                    // Simulator results are worked out here from the learner's moves, never taken from the device.
+                    $scored = ScenarioContent::score($activity->content ?? [], $result['events'] ?? [], (string) $item['mode']);
+                    $completed = $finished !== null && $scored['completed'];
+                    $score = $finished !== null ? $scored['score'] : null;
+                    $result = ['events' => array_slice(array_values(array_filter((array) ($result['events'] ?? []), 'is_array')), 0, 2000)]
+                        + ($finished !== null ? ['passed' => $scored['passed'], 'critical' => $scored['critical'], 'steps' => $scored['steps']] : []);
+                }
                 $values = [
                     'enrolment_id' => $enrolment->id, 'activity_id' => $activity->id, 'mode' => $item['mode'],
                     'content_version' => (int) ($item['content_version'] ?? $activity->content_version),
                     'started_at' => Carbon::parse((string) $item['started_at']), 'finished_at' => $finished,
-                    'completed' => $finished !== null && (bool) ($item['completed'] ?? false),
-                    'score' => isset($item['score']) ? max(0, min(100, (int) $item['score'])) : null,
+                    'completed' => $completed,
+                    'score' => $score,
                     'duration_seconds' => max(0, min(86400, (int) ($item['duration_seconds'] ?? 0))),
-                    'result' => is_array($item['result'] ?? null) ? $item['result'] : [],
+                    'result' => $result,
                     'device' => isset($item['device']) ? mb_substr((string) $item['device'], 0, 40) : null,
                 ];
                 $existing === null ? Attempt::query()->create($values + ['client_id' => $clientId]) : $existing->update($values);

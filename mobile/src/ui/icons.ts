@@ -28,3 +28,14 @@ export { default as ClipboardList } from 'lucide-react-native/icons/clipboard-li
 export { default as MapPin } from 'lucide-react-native/icons/map-pin';
 export { default as QrCode } from 'lucide-react-native/icons/qr-code';
 export { default as Users } from 'lucide-react-native/icons/users';
+export { default as Lightbulb } from 'lucide-react-native/icons/lightbulb';
+export { default as Clock } from 'lucide-react-native/icons/clock';
+export { default as Briefcase } from 'lucide-react-native/icons/briefcase';
+export { default as Dumbbell } from 'lucide-react-native/icons/dumbbell';
+export { default as Volume2 } from 'lucide-react-native/icons/volume-2';
+export { default as Hand } from 'lucide-react-native/icons/hand';
+export { default as RotateCcw } from 'lucide-react-native/icons/rotate-ccw';
+export { default as BookOpen } from 'lucide-react-native/icons/book-open';
+export { default as ShieldAlert } from 'lucide-react-native/icons/shield-alert';
+export { default as UserRound } from 'lucide-react-native/icons/user-round';
+export { default as CircleAlert } from 'lucide-react-native/icons/circle-alert';
