@@ -1,6 +1,6 @@
 # Sprint 4 — Learning content: simulators, AI courses, real progress
 
-**Status:** draft, awaiting Srini's approval (28 Nov 2026).
+**Status:** direction and decisions approved by Srini (28 Nov 2026); building starts on his go-ahead.
 **Moves forward:** C3 (translations: course text gets an AI draft, then first-language review), and the
 foundation for C1 (staff tools read the same progress data).
 
@@ -30,27 +30,27 @@ progress that drives the seat rules, the QCTO file and, later, assessment.
   outcomes; people review it and publish it.
 - **Progress is real:** it drives the 10% withdrawal rule, at-risk alerts, and the learner's own home screen.
 
-## Decisions needed (asked separately)
+## Decisions (Srini, 28 Nov 2026)
 
-1. **How simulators look:**
-   - **Real-time 3D (recommended):** about 135 KB engine plus scenes of up to 3 MB.
-   - **360° photos:** realistic, but you can only look, not handle objects.
-   - **2D illustrated:** lightest, least immersive.
-2. **Budget for the 3D engine:** pages and helpers are limited to 25 KB each. The 3D engine needs its own
-   limit, proposed at **150 KB gzip**, downloaded only when a simulator opens and then cached. The first load
-   (170 KB) does not change.
-3. **AI for courses:**
-   - **Recommended:** Claude drafts lesson text, checks and translations from the outcomes; HQ reviews and
-     publishes. Narration audio comes from a text-to-speech provider (chosen in 4.2 by voice quality in
-     isiZulu, isiXhosa and Afrikaans).
-   - **Alternative:** avatar video from Synthesia or similar, at higher data and licence cost.
+1. **Simulators are real-time 3D.** Learners handle tools and parts in a 3D workplace on their own phone or in
+   the browser. Phones without WebGL get a 2D step-by-step fallback.
+2. **The 3D engine has its own budget of 150 KB gzip.** It downloads only when a simulator opens and is then
+   cached. It is checked in CI like the other budgets. First load stays at 170 KB and pages at 25 KB.
+3. **Courses use both kinds of lesson:**
+   - **By default, animated lessons.** Claude drafts the text, checks and translations from the outcomes; HQ
+     reviews and publishes. Narration comes from a text-to-speech provider, chosen in 4.2 by voice quality in
+     isiZulu, isiXhosa and Afrikaans.
+   - **Optional avatar video for key lessons.** This is a "video" block in Course Studio, with a low-data
+     version and captions; the learner's data saver offers text instead.
+   - **Still to choose (in 4.2, with costs for Srini):** the avatar-video provider and its licence. Until then
+     the video block accepts an uploaded MP4.
 
 ## Sub-sprints
 
 | # | Scope | Main deliverables |
 |---|---|---|
 | **4.1** | Foundation | Language files split by area (HQ / provider / learner) so each stays under 15 KB. The content model (activities, attempts, progress events), with an offline-safe sync API where each attempt has an ID from the device, so sending twice is harmless. Enrolment progress is calculated from required activities. |
-| **4.2** | Course Studio (HQ) | Lessons made of blocks (text, picture, key points, narration, a short check, "try it in the simulator"). AI draft from the outcomes, then review, publish, and version with the programme. AI draft translations are marked "needs first-language review" (C3). |
+| **4.2** | Course Studio (HQ) | Lessons made of blocks (text, picture, key points, narration, avatar video (optional), a short check, "try it in the simulator"). AI draft from the outcomes, then review, publish, and version with the programme. AI draft translations are marked "needs first-language review" (C3). |
 | **4.3** | Course player | Web and mobile; narration with a data-saver setting (text only); resume where you left off; checks feed progress; works offline from a downloaded pack. |
 | **4.4** | Simulator runtime | Scenario format: scene, steps (instruction, tap or inspect an object, choose, drag to place), hints, scoring linked to outcomes, attempts saved. Touch-first 3D on web; on mobile, the same runtime in a WebView, downloaded with the pack (the app size stays under 25 MB). A step-by-step 2D fallback for phones without WebGL. |
 | **4.5** | Scenario Studio (HQ) and the first simulator | A form-based step editor on ready-made scenes, with preview. First scenario for Technical Support: "A PC won't boot — diagnose it and replace the faulty RAM safely" (antistatic strap, power off, reseat, test). |
@@ -70,8 +70,8 @@ progress that drives the seat rules, the QCTO file and, later, assessment.
 ## Budgets and quality bars
 
 - **First load:** stays ≤ 170 KB.
-- **Lazy files:** pages ≤ 25 KB; 3D engine ≤ 150 KB (if approved).
-- **Content size:** a scene is ≤ 3 MB; a lesson is ≤ 200 KB with audio.
+- **Lazy files:** pages ≤ 25 KB; 3D engine ≤ 150 KB.
+- **Content size:** a scene is ≤ 3 MB; a lesson is ≤ 200 KB with audio; an avatar video's low-data version is ≤ 4 MB per minute.
 - **Phone performance:** a simulator runs at 30 fps or better on a budget Android phone (checked in the
   emulator in CI, and on a real phone under C4).
 - **Offline:** finish a lesson and a simulator offline, reconnect, and progress appears with no duplicates.
