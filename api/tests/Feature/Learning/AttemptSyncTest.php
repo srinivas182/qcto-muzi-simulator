@@ -261,4 +261,41 @@ final class AttemptSyncTest extends AccessTestCase
         $this->fresh()->getJson($url(), $this->bearer($this->token))->assertJsonPath('data.results.practice.best', 100)->assertJsonPath('data.results.practice.passed', true);
         $this->fresh()->getJson($this->url("/learn/enrolments/{$this->enrolment->id}/scenarios/{$this->a['L1']->id}"), $this->bearer($this->token))->assertNotFound();
     }
+
+    public function test_the_facilitator_board_shows_every_learner_and_activity_with_at_risk_first(): void
+    {
+        [, $staff] = $this->person($this->ubuntu, 'facilitator');
+        [$quietToken, $quiet] = $this->enrolled($this->ubuntu, Package::query()->firstOrFail());
+        $this->sync([$this->item('L1'), $this->item('S1', ['mode' => 'job'])]);
+        Carbon::setTestNow('2027-02-20 09:00:00'); // ten days later
+        $this->fresh()->postJson($this->url('/learn/attempts/sync'), ['attempts' => [$this->item('L1', ['enrolment_id' => $quiet->id, 'started_at' => '2027-02-20T08:00:00Z', 'finished_at' => '2027-02-20T08:05:00Z'])]], $this->bearer($quietToken))->assertOk();
+        // The first learner has now been quiet for 10 days; the second was active today, but in another cohort.
+        $board = $this->fresh()->getJson($this->url("/cohorts/{$this->enrolment->cohort_id}/progress"), $this->bearer($staff))->assertOk();
+        $board->assertJsonPath('data.summary.learners', 1)->assertJsonPath('data.summary.at_risk', 1)
+            ->assertJsonPath('data.learners.0.at_risk', true)
+            ->assertJsonPath("data.learners.0.cells.{$this->a['S1']->id}.job_passed", true)
+            ->assertJsonPath("data.learners.0.cells.{$this->a['L2']->id}", null)
+            ->assertJsonPath('data.learners.0.job_ready.shown', 1);
+        $this->assertCount(4, $board->json('data.activities')); // published only
+        $this->fresh()->getJson($this->url("/cohorts/{$this->enrolment->cohort_id}"), $this->bearer($staff))->assertJsonPath('data.enrolments.0.at_risk', true);
+        $this->fresh()->getJson($this->url("/cohorts/{$this->enrolment->cohort_id}/progress"), $this->bearer($this->token))->assertForbidden(); // learners cannot
+    }
+
+    public function test_the_job_ready_checklist_marks_outcomes_shown_or_practised(): void
+    {
+        $codes = DB::table('activity_outcomes')->whereIn('activity_id', [$this->a['L1']->id, $this->a['S1']->id])->pluck('outcome_code', 'activity_id');
+        $this->sync([$this->item('L1', ['score' => 90]), $this->item('S1', ['mode' => 'job'])]);
+        $areas = $this->fresh()->getJson($this->url("/learn/enrolments/{$this->enrolment->id}/checklist"), $this->bearer($this->token))->assertOk()->json('data.areas');
+        $status = collect($areas)->flatMap(fn ($a) => $a['outcomes'])->pluck('status', 'code');
+        $this->assertSame('shown', $status[$codes[$this->a['S1']->id]]);
+        if ($codes[$this->a['L1']->id] !== $codes[$this->a['S1']->id]) {
+            $this->assertSame('practised', $status[$codes[$this->a['L1']->id]]);
+        }
+        $this->assertSame('not_yet', $status->last());
+
+        [, $staff] = $this->person($this->ubuntu, 'facilitator');
+        $this->fresh()->getJson($this->url("/enrolments/{$this->enrolment->id}/checklist"), $this->bearer($staff))->assertOk()->assertJsonPath('data.learner', 'Sipho Ndlovu');
+        [$other] = $this->enrolled($this->ubuntu, Package::query()->firstOrFail());
+        $this->fresh()->getJson($this->url("/learn/enrolments/{$this->enrolment->id}/checklist"), $this->bearer($other))->assertNotFound();
+    }
 }

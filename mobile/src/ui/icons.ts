@@ -39,3 +39,6 @@ export { default as BookOpen } from 'lucide-react-native/icons/book-open';
 export { default as ShieldAlert } from 'lucide-react-native/icons/shield-alert';
 export { default as UserRound } from 'lucide-react-native/icons/user-round';
 export { default as CircleAlert } from 'lucide-react-native/icons/circle-alert';
+export { default as CircleCheck } from 'lucide-react-native/icons/circle-check';
+export { default as Circle } from 'lucide-react-native/icons/circle';
+export { default as ListChecks } from 'lucide-react-native/icons/list-checks';

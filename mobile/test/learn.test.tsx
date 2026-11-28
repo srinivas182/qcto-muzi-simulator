@@ -105,3 +105,21 @@ describe('simulator', () => {
     expect(sent).toMatchObject({ activity_id: 's1', mode: 'practice', completed: true, score: 88, device: 'mobile' });
   });
 });
+
+describe('job-ready checklist', () => {
+  it('shows each skill with its status, from the programme screen', async () => {
+    await seed({ signedIn: true });
+    mockApi({
+      '/session': { data: session() },
+      '/learn/enrolments/e1/activities': { data: { progress: 40, activities: [] } },
+      '/learn/enrolments/e1/checklist': { data: { areas: [{ number: 2, title: 'Diagnose faults', outcomes: [
+        { code: 'TS-2.2', statement: 'Diagnose memory faults', plain_words: 'Find why a PC will not start', status: 'shown' },
+        { code: 'TS-2.3', statement: 'Diagnose network faults', plain_words: null, status: 'not_yet' },
+      ] }] } },
+    });
+    await renderRouter('./app', { initialUrl: '/learn/e1' });
+    await act(async () => fireEvent.press(await screen.findByText('Job-ready checklist')));
+    expect(await screen.findByText('1 of 2 skills shown')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Find why a PC will not start: Shown on a real job')).toBeOnTheScreen();
+  });
+});

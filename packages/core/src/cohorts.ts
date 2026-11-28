@@ -34,6 +34,29 @@ export interface EnrolmentItem {
   ended_at: string | null;
   reason: string | null;
   seat_returns_on: string | null;
+  /** Last time the learner did anything (lesson, simulator). */
+  last_activity_at?: string | null;
+  /** Started, then quiet for 7 days or more. */
+  at_risk?: boolean;
+}
+
+export type OutcomeStatus = 'shown' | 'practised' | 'not_yet';
+/** Job-ready checklist: QCTO outcomes by duty area. */
+export interface ChecklistArea {
+  number: number;
+  title: string;
+  outcomes: { code: string; statement: string; plain_words: string | null; status: OutcomeStatus }[];
+}
+
+/** Facilitator board: every learner × every published activity. */
+export interface CohortBoard {
+  activities: { id: string; kind: 'lesson' | 'scenario'; code: string; title: string; required: boolean }[];
+  learners: {
+    id: string; name: string; status: EnrolmentStatus; progress: number; last_activity_at: string | null; at_risk: boolean;
+    job_ready: { shown: number; of: number };
+    cells: Record<string, { status: 'started' | 'done'; best: number | null; tries: number; job_passed: boolean } | null>;
+  }[];
+  summary: { learners: number; average: number; at_risk: number; job_ready: number };
 }
 
 export interface CohortDetail extends CohortItem {

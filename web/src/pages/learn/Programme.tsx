@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, BookOpen, Box, CheckCircle2, CircleDot, Circle } from 'lucide-react';
+import { ArrowLeft, BookOpen, Box, CheckCircle2, CircleDot, Circle, ListChecks } from 'lucide-react';
 import type { LearnActivity } from '@simuwork/core';
 import { Card, cx, Skeleton } from '../../components/ui';
 import { api } from '../../lib/api';
@@ -23,7 +23,11 @@ export default function Programme() {
             <div className="flex justify-between text-[13px]"><span className="font-semibold text-ink">{t('lh.progress')}</span><span className="text-muted">{d.progress}%</span></div>
             <div className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-brand" style={{ width: `${d.progress}%` }} /></div>
           </div>
-          <Card className="mt-6 overflow-hidden p-0">
+          <Link to={`/learn/enrolments/${eid}/checklist`} className="mt-4 flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 hover:border-brand">
+            <ListChecks className="size-5 text-brand" />
+            <span className="flex-1"><span className="block font-semibold text-ink">{t('jr.title')}</span><span className="block text-[13px] text-muted">{t('jr.cardLead')}</span></span>
+          </Link>
+          <Card className="mt-4 overflow-hidden p-0">
             <ol className="divide-y divide-line">
               {d.activities.map((a, i) => <Row key={a.id} eid={eid} a={a} n={i + 1} />)}
             </ol>

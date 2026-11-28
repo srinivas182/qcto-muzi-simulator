@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Cohorts;
 
+use App\Learning\CohortProgress;
 use App\Models\Cohort;
 use App\Models\Enrolment;
 use App\Models\User;
@@ -52,6 +53,8 @@ final class CohortPresenter
             'status' => $e->status,
             'holds_seat' => $e->holds_seat,
             'progress' => $e->progress,
+            'last_activity_at' => $e->last_activity_at?->toIso8601String(),
+            'at_risk' => CohortProgress::atRisk($e),
             'seat_taken_at' => $e->seat_taken_at->toIso8601String(),
             'started_at' => $e->started_at?->toIso8601String(),
             'ended_at' => $e->ended_at?->toIso8601String(),
