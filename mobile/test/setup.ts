@@ -17,6 +17,7 @@ jest.mock('expo-haptics', () => ({
   ImpactFeedbackStyle: { Light: 'light' }, NotificationFeedbackType: { Success: 'success', Error: 'error' },
 }));
 jest.mock('expo-camera', () => ({ CameraView: () => null, useCameraPermissions: () => [{ granted: false }, jest.fn()] }));
+jest.mock('expo-audio', () => ({ useAudioPlayer: () => ({ play: jest.fn(), pause: jest.fn() }), useAudioPlayerStatus: () => ({ playing: false }) }));
 jest.mock('expo-linear-gradient', () => {
   const { View } = jest.requireActual('react-native');
   return { LinearGradient: View };

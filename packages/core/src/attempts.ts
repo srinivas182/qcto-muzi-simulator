@@ -198,3 +198,25 @@ export function localiseBlocks(blocks: LessonBlock[], i18n: LessonI18n, locale: 
   const tr = i18n[locale] ?? {};
   return blocks.map((b) => ({ ...b, ...(tr[b.id] ?? {}) }) as LessonBlock);
 }
+
+/** A published lesson for the learner (GET /learn/enrolments/{e}/lessons/{a}). */
+export interface LearnLesson {
+  id: string;
+  code: string;
+  title: string;
+  minutes: number;
+  content_version: number;
+  /** The language actually served: a translation that is not reviewed yet comes in English. */
+  locale: ContentLocale;
+  blocks: LessonBlock[];
+  assets: Record<string, ContentAssetItem>;
+  scenarios: Record<string, { id: string; code: string; title: string }>;
+}
+
+/** Score of a lesson from its quick checks: first answer counts (no fishing for the right one). */
+export function lessonScore(blocks: LessonBlock[], answers: Record<string, boolean>): { checks: number; answered: number; right: number; score: number | null } {
+  const checks = blocks.filter((b) => b.type === 'check');
+  const answered = checks.filter((b) => b.id in answers).length;
+  const right = checks.filter((b) => answers[b.id] === true).length;
+  return { checks: checks.length, answered, right, score: checks.length ? Math.round((right * 100) / checks.length) : null };
+}

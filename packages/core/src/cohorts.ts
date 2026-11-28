@@ -61,6 +61,8 @@ export interface LearnEnrolment {
   ends_on: string | null;
   days_left: number | null;
   seat_returns_on: string | null;
+  /** The "Continue" card: the first required activity not done yet; null when everything is done. */
+  next: { id: string; kind: 'lesson' | 'scenario'; title: string; minutes: number; started: boolean } | null;
 }
 
 export interface LearnHomeData {

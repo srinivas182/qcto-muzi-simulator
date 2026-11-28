@@ -167,6 +167,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::get('/learn/home', [LearnController::class, 'home'])->name('learn.home');
                 Route::post('/learn/enrolments/{enrolment}/start', [LearnController::class, 'start'])->whereUuid('enrolment')->name('learn.start');
                 Route::get('/learn/enrolments/{enrolment}/activities', [LearnController::class, 'activities'])->whereUuid('enrolment')->name('learn.activities');
+                Route::get('/learn/enrolments/{enrolment}/lessons/{activity}', [LearnController::class, 'lesson'])->whereUuid(['enrolment', 'activity'])->name('learn.lesson');
                 Route::post('/learn/attempts/sync', [LearnController::class, 'sync'])->middleware('throttle:60,1')->name('learn.sync');
                 Route::get('/learn/me/qcto', [LearnController::class, 'qcto'])->name('learn.qcto');
                 Route::patch('/learn/me/qcto', [LearnController::class, 'updateQcto'])->middleware('throttle:30,1')->name('learn.qcto.update');

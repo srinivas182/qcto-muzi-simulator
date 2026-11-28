@@ -44,6 +44,21 @@ final class Progress
     }
 
     /**
+     * The next thing to do: the first required activity not completed yet (then optional ones), or null when done.
+     *
+     * @return array{id: string, kind: string, title: string, minutes: int, started: bool}|null
+     */
+    public static function next(Enrolment $e): ?array
+    {
+        $done = Attempt::query()->where('enrolment_id', $e->id)->where('completed', true)->pluck('activity_id')->flip();
+        $started = Attempt::query()->where('enrolment_id', $e->id)->pluck('activity_id')->flip();
+        $all = self::activities($e);
+        $a = $all->where('required', true)->first(fn (Activity $x) => ! $done->has($x->id)) ?? $all->first(fn (Activity $x) => ! $done->has($x->id));
+
+        return $a === null ? null : ['id' => $a->id, 'kind' => $a->kind, 'title' => $a->title, 'minutes' => $a->minutes, 'started' => $started->has($a->id)];
+    }
+
+    /**
      * Each activity with this learner's status on it.
      *
      * @return list<array<string, mixed>>

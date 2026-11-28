@@ -197,3 +197,33 @@ We fix what the pilot shows before producing content for the other 12 programmes
 - **Demo:** three Technical Support lessons with real content, reviewed in English.
 - **Still to decide:** the narration voice provider and the avatar-video provider, with costs, before content
   production. Until then narration is text, or an uploaded recording, and video is an uploaded MP4.
+
+## Sub-sprint 4.3 notes (course player)
+
+**Built**
+- API: `GET /learn/enrolments/{e}/lessons/{a}?locale=` returns the lesson in the learner's language (reviewed
+  translations only, otherwise English, and says which it served), its pictures and audio, and the titles of
+  the scenarios it links to. Another learner's enrolment, a draft or a scenario gives 404.
+  `GET /learn/home` now carries `next` per programme (the first required activity not yet done).
+- Web: programme page (`/learn/enrolments/:eid`), lesson player, simulator placeholder until 4.4,
+  Continue / Start here card on learner home.
+- Mobile: same three screens in expo-router (`app/learn/[eid]/…`), a native lesson view, narration via
+  expo-audio, the Continue card on home.
+- Both apps save each attempt on the device first (core `AttemptQueue`: localStorage on web, AsyncStorage on
+  mobile) and sync on reconnect (online / visibility on web, NetInfo on mobile). The done screen says
+  "Saved to your record" or "Saved on this phone".
+- Data saver on by default: narration as text, pictures only on tap, video replaced by its text.
+
+**Checks:** API 246 tests, web 86, mobile 32; first load 143.4 KB of 170; learner language part ≤ 5.1 KB.
+
+### Gaps we fill and best recommendations (4.3)
+| Gap against the leaders | What we did | When |
+|---|---|---|
+| Labster / Transfr need a laptop or headset and a steady connection | Lessons run on any phone, work offline, sync later | This sprint |
+| Video-only courses (Synthesia-style) burn data | Data saver: text-first, pictures on tap | This sprint |
+| Learners lose their place | Continue card on home, Next after every lesson | This sprint |
+| Quizzes only at the end | Quick checks inside the lesson with an instant why | This sprint |
+| Learners in Zulu / Xhosa / Afrikaans get English-only content | Reviewed translations, clear "in English for now" note | This sprint |
+| Narration has no voice yet | Choose a TTS provider (open decision) | Proposed for later |
+| A wrong answer just shows the answer | "Fix it" retry with a hint before the answer | Proposed for 4.5 |
+| Learners cannot jump from a lesson into practice | "Try it" opens the simulator | Wired now, live in 4.4 |
