@@ -234,7 +234,7 @@ final class ScenarioContent
     }
 
     /** @param array<string, mixed> $step */
-    private static function isRight(array $step, string $action, string $value): bool
+    public static function isRight(array $step, string $action, string $value): bool
     {
         return match ($step['type']) {
             'tap' => $action === 'tap' && $value === $step['target'],
