@@ -23,7 +23,7 @@ type Run = { mode: SimMode; n: number };
 type Finished = { mode: SimMode; state: SimState; score: SimScore; seconds: number; synced: boolean };
 
 function Play({ eid, sc }: { eid: string; sc: LearnScenario }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const qc = useQueryClient();
   const [run, setRun] = useState<Run | null>(null);
   const [finished, setFinished] = useState<Finished | null>(null);
@@ -51,13 +51,15 @@ function Play({ eid, sc }: { eid: string; sc: LearnScenario }) {
     })();
   }, [eid, qc, sc.content, sc.id]);
 
+  const coach = useCallback((step: string, kind: 'why' | 'help', variant: string | null) =>
+    api<{ data: { answer: string } }>(`/learn/enrolments/${eid}/scenarios/${sc.id}/coach`, { method: 'POST', body: { step, kind, variant, locale } }).then((r) => r.data.answer), [eid, sc.id, locale]);
   const back = <Link to={`/learn/enrolments/${eid}`} className="inline-flex items-center gap-1 text-[14px] font-semibold text-brand hover:underline"><ArrowLeft className="size-4" />{t('lp.allLessons')}</Link>;
 
   if (run) {
     return (
       <div className="sw-in mx-auto max-w-3xl">
         <h1 className="mb-3 text-[20px] font-bold text-ink">{sc.title}</h1>
-        <SimRunner key={run.n} content={sc.content} mode={run.mode} customer={sc.content.job?.customer ?? null} onMove={onMove} onDone={onDone} onQuit={() => setRun(null)} />
+        <SimRunner key={run.n} content={sc.content} mode={run.mode} coach={coach} customer={sc.content.job?.customer ?? null} onMove={onMove} onDone={onDone} onQuit={() => setRun(null)} />
       </div>
     );
   }

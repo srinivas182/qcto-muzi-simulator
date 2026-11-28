@@ -206,6 +206,12 @@ final class ScenarioContent
             }
             $st = $steps[$i];
             $action = (string) ($e['action'] ?? '');
+            if ($action === 'coach') {
+                // Asking the coach for help costs like a hint; asking "why" after a mistake is free.
+                ($e['value'] ?? '') === 'help' && $per[$st['id']]['hints']++;
+
+                continue;
+            }
             if ($action === 'hint') {
                 $per[$st['id']]['hints']++;
 

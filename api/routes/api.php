@@ -179,6 +179,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::post('/learn/enrolments/{enrolment}/shares', [ShareController::class, 'store'])->whereUuid('enrolment')->middleware('throttle:10,1')->name('learn.shares.store');
                 Route::delete('/learn/shares/{share}', [ShareController::class, 'destroy'])->whereUuid('share')->name('learn.shares.destroy');
                 Route::patch('/learn/me/reminders', [ShareController::class, 'reminders'])->name('learn.reminders');
+                Route::post('/learn/enrolments/{enrolment}/scenarios/{activity}/coach', [LearnController::class, 'coach'])->whereUuid(['enrolment', 'activity'])->middleware('throttle:20,1')->name('learn.coach');
                 Route::get('/learn/enrolments/{enrolment}/scenarios/{activity}', [LearnController::class, 'scenario'])->whereUuid(['enrolment', 'activity'])->name('learn.scenario');
                 Route::post('/learn/attempts/sync', [LearnController::class, 'sync'])->middleware('throttle:60,1')->name('learn.sync');
                 Route::get('/learn/me/qcto', [LearnController::class, 'qcto'])->name('learn.qcto');

@@ -44,3 +44,4 @@ export { default as Circle } from 'lucide-react-native/icons/circle';
 export { default as ListChecks } from 'lucide-react-native/icons/list-checks';
 export { default as BellRing } from 'lucide-react-native/icons/bell-ring';
 export { default as Share2 } from 'lucide-react-native/icons/share-2';
+export { default as MessageCircleQuestion } from 'lucide-react-native/icons/message-circle-question';

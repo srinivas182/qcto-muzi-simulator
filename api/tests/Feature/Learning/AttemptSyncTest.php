@@ -22,6 +22,7 @@ use App\Programmes\GuideImporter;
 use App\Tenancy\TenantContext;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Tests\Feature\Access\AccessTestCase;
@@ -377,5 +378,37 @@ final class AttemptSyncTest extends AccessTestCase
         $this->fresh()->getJson($url, $this->bearer($this->token) + ['If-None-Match' => $etag])->assertOk()->assertJsonPath("data.lessons.{$this->a['L1']->id}.title", 'Safety first');
         [$other] = $this->enrolled($this->ubuntu, Package::query()->firstOrFail());
         $this->fresh()->getJson($url, $this->bearer($other))->assertNotFound();
+    }
+
+    public function test_the_coach_answers_in_the_learners_language_without_personal_data_and_falls_back_to_the_author(): void
+    {
+        $url = $this->url("/learn/enrolments/{$this->enrolment->id}/scenarios/{$this->a['S1']->id}/coach");
+        config(['services.anthropic.key' => '']);
+        $this->fresh()->postJson($url, ['step' => 'unplug', 'kind' => 'help'], $this->bearer($this->token))->assertOk()
+            ->assertJsonPath('data.source', 'author')->assertJsonPath('data.answer', 'At the wall.');
+
+        config(['services.anthropic.key' => 'test-key']);
+        Http::fake(['api.anthropic.com/*' => Http::response(['content' => [['type' => 'text', 'text' => '{"answer":"Cabanga ngogesi kuqala."}']]])]);
+        $ask = fn () => $this->fresh()->postJson($url, ['step' => 'unplug', 'kind' => 'why', 'locale' => 'zu'], $this->bearer($this->token));
+        $ask()->assertOk()->assertJsonPath('data.source', 'ai')->assertJsonPath('data.answer', 'Cabanga ngogesi kuqala.');
+        $ask()->assertOk();
+        Http::assertSentCount(1); // cached per step and language
+        Http::assertSent(function ($r): bool {
+            $body = (string) json_encode($r->data());
+
+            return str_contains($body, 'isiZulu') && str_contains($body, 'Make it safe.') && ! str_contains($body, 'Sipho') && ! str_contains($body, 'Ndlovu');
+        });
+
+        [$other] = $this->enrolled($this->ubuntu, Package::query()->firstOrFail());
+        $this->fresh()->postJson($url, ['step' => 'unplug', 'kind' => 'why'], $this->bearer($other))->assertNotFound();
+    }
+
+    public function test_asking_the_coach_for_help_costs_like_a_hint_and_asking_why_is_free(): void
+    {
+        [$content] = ScenarioContent::clean(self::SCENARIO);
+        $events = [['step' => 'unplug', 'action' => 'coach', 'value' => 'why'], ...self::RIGHT];
+        $this->assertSame(100, ScenarioContent::score($content, $events, 'practice')['score']);
+        $events = [['step' => 'unplug', 'action' => 'coach', 'value' => 'help'], ...self::RIGHT];
+        $this->assertSame(95, ScenarioContent::score($content, $events, 'practice')['score']); // (0.85 + 1 + 1) / 3
     }
 }

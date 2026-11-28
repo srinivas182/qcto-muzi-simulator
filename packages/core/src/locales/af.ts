@@ -1247,6 +1247,10 @@ const af: Messages = {
   'lv.tryOnce': "Kyk weer en probeer nog een keer.",
   'lv.fixedIt': "Reggemaak!",
   'ls.f.hint': "Wenk ná ’n verkeerde eerste antwoord (opsioneel)",
+  // Sprint 4.7a: AI coach in the simulator (learner)
+  'sim.askCoach': "Vra die afrigter",
+  'sim.why': "Hoekom?",
+  'sim.coachThinking': "Die afrigter dink…",
 };
 
 export default af;

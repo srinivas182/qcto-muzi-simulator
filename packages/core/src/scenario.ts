@@ -55,7 +55,8 @@ export interface LearnScenario {
 }
 
 /** What a learner did, in order. `t` is seconds since the start. */
-export interface SimEvent { step: string; action: 'tap' | 'choose' | 'place' | 'hint'; value?: string; t: number }
+/** `coach` events: value 'help' costs like a hint, 'why' is free. */
+export interface SimEvent { step: string; action: 'tap' | 'choose' | 'place' | 'hint' | 'coach'; value?: string; t: number }
 
 /** Ready-made scenes: the objects a learner can touch and how each starts. Labels are `sim.obj.<id>` strings. */
 export const SCENES: Record<string, Record<string, string>> = {
@@ -91,6 +92,7 @@ export type SimAction =
   | { type: 'tap'; object: string; t: number }
   | { type: 'choose'; index: number; t: number }
   | { type: 'hint'; t: number }
+  | { type: 'coach'; ask: 'why' | 'help'; t: number }
   | { type: 'dismiss' };
 
 /** The steps of one run: all of them, or those of the chosen cause. */
@@ -127,6 +129,10 @@ export function simReducer(s: SimState, a: SimAction): SimState {
   const step = s.steps[s.step];
   if (s.done || !step) return s;
 
+  if (a.type === 'coach') {
+    if (s.mode === 'job') return s;
+    return { ...s, events: [...s.events, { step: step.id, action: 'coach', value: a.ask, t: a.t }] };
+  }
   if (a.type === 'hint') {
     if (s.mode === 'job' || (s.hints[step.id] ?? 0) >= step.hints.length) return s;
     return { ...s, hints: { ...s.hints, [step.id]: (s.hints[step.id] ?? 0) + 1 }, events: [...s.events, { step: step.id, action: 'hint', t: a.t }] };
@@ -179,6 +185,7 @@ export function scoreRun(content: ScenarioContent, events: SimEvent[], mode: Sim
     const st = list[i];
     const p = st && steps[st.id];
     if (!st || !p || e.step !== st.id) continue;
+    if (e.action === 'coach') { if (e.value === 'help') p.hints++; continue; }
     if (e.action === 'hint') { p.hints++; continue; }
     if (isRight(st, e.action, e.value ?? '')) { p.done = true; i++; } else { p.mistakes++; critical ||= st.critical; }
   }

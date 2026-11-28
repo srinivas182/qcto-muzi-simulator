@@ -9,7 +9,7 @@ import { api } from '../../../../src/lib/api';
 import { attempts, syncAttempts } from '../../../../src/lib/attempts';
 import { onlineOrPack, runtimeFile } from '../../../../src/lib/packs';
 import { useI18n } from '../../../../src/lib/i18n';
-import { BookOpen, Briefcase, Check, Clock, Dumbbell, Hand, Lightbulb, ShieldAlert, UserRound, Volume2, Wifi, WifiOff, X } from '../../../../src/ui/icons';
+import { BookOpen, Briefcase, Check, Clock, Dumbbell, Hand, Lightbulb, MessageCircleQuestion, ShieldAlert, UserRound, Volume2, Wifi, WifiOff, X } from '../../../../src/ui/icons';
 import { Button, Card, haptics, radius, Screen, space, T, useTheme } from '../../../../src/ui';
 
 const now = () => Date.now();
@@ -59,7 +59,7 @@ function Play({ eid, sc }: { eid: string; sc: LearnScenario }) {
     void qc.invalidateQueries({ queryKey: ['learn-scenario', sc.id] });
   };
 
-  if (run) return <Runner key={run.n} sc={sc} mode={run.mode} onMove={onMove} onDone={(s, sec) => void onDone(s, sec)} onQuit={() => setRun(null)} />;
+  if (run) return <Runner key={run.n} eid={eid} sc={sc} mode={run.mode} onMove={onMove} onDone={(s, sec) => void onDone(s, sec)} onQuit={() => setRun(null)} />;
   if (finished) return <Debrief eid={eid} sc={sc} f={finished} onAgain={start} />;
 
   return (
@@ -80,8 +80,8 @@ function Play({ eid, sc }: { eid: string; sc: LearnScenario }) {
   );
 }
 
-function Runner({ sc, mode, onMove, onDone, onQuit }: {
-  sc: LearnScenario; mode: SimMode; onMove: (s: SimState, sec: number) => void; onDone: (s: SimState, sec: number) => void; onQuit: () => void;
+function Runner({ eid, sc, mode, onMove, onDone, onQuit }: {
+  eid: string; sc: LearnScenario; mode: SimMode; onMove: (s: SimState, sec: number) => void; onDone: (s: SimState, sec: number) => void; onQuit: () => void;
 }) {
   const { t, tx, locale } = useI18n();
   const { c } = useTheme();
@@ -119,7 +119,19 @@ function Runner({ sc, mode, onMove, onDone, onQuit }: {
     return () => clearInterval(id);
   }, [mode, content.job?.minutes]);
 
+  const [answer, setAnswer] = useState<{ step: string; text: string | null } | null>(null);
+  // The AI coach (practice only); offline or on failure it falls back to the author's hints and "why it matters".
+  const ask = (kind: 'why' | 'help') => {
+    if (!step) return;
+    dispatch({ type: 'coach', ask: kind, t: secondsSince(started.current) });
+    setAnswer({ step: step.id, text: null });
+    const fallback = kind === 'why' ? step.why || step.hints[0] || '' : step.hints.join(' ');
+    api<{ data: { answer: string } }>(`/learn/enrolments/${eid}/scenarios/${sc.id}/coach`, { method: 'POST', body: { step: step.id, kind, variant: s.variant, locale } })
+      .then((r) => r.data.answer || fallback, () => fallback)
+      .then((text) => setAnswer((cur) => (cur?.step === step.id ? { step: step.id, text } : cur)));
+  };
   if (!step) return <Screen center>{null}</Screen>;
+  const coachAnswer = answer && answer.step === step.id ? answer : null;
   const name = (id: string) => tx(`sim.obj.${id}`, id);
   const at = () => secondsSince(started.current);
 
@@ -137,15 +149,21 @@ function Runner({ sc, mode, onMove, onDone, onQuit }: {
           <Pressable accessibilityRole="button" accessibilityLabel={t('sim.readAloud')} onPress={() => { Speech.stop(); Speech.speak(step.prompt, { language: VOICES[locale] ?? 'en-ZA' }); }} style={styles.iconBtn}><Volume2 size={22} color="#FFFFFF" /></Pressable>
         </View>
         {step.hints.slice(0, s.hints[step.id] ?? 0).map((h, i) => <View key={i} style={[styles.row, { marginTop: space.sm }]}><Lightbulb size={16} color="#FCD34D" /><T tone="inverse" style={{ flex: 1, opacity: 0.9 }}>{h}</T></View>)}
-        {mode === 'practice' && step.hints.length > (s.hints[step.id] ?? 0) ? (
-          <Pressable accessibilityRole="button" onPress={() => dispatch({ type: 'hint', t: at() })} style={[styles.row, styles.hintBtn]}><Lightbulb size={16} color="#FFFFFF" /><T tone="inverse" style={{ fontWeight: '700' }}>{t('sim.hint')}</T></Pressable>
+        {coachAnswer ? <View accessibilityLiveRegion="polite" style={[styles.row, styles.coach]}><MessageCircleQuestion size={16} color="#93C5FD" /><T tone="inverse" style={{ flex: 1 }}>{coachAnswer.text ?? t('sim.coachThinking')}</T></View> : null}
+        {mode === 'practice' ? (
+          <View style={[styles.row, { flexWrap: 'wrap' }]}>
+            {step.hints.length > (s.hints[step.id] ?? 0) ? <Pressable accessibilityRole="button" onPress={() => dispatch({ type: 'hint', t: at() })} style={[styles.row, styles.hintBtn]}><Lightbulb size={16} color="#FFFFFF" /><T tone="inverse" style={{ fontWeight: '700' }}>{t('sim.hint')}</T></Pressable> : null}
+            <Pressable accessibilityRole="button" onPress={() => ask('help')} style={[styles.row, styles.hintBtn]}><MessageCircleQuestion size={16} color="#FFFFFF" /><T tone="inverse" style={{ fontWeight: '700' }}>{t('sim.askCoach')}</T></Pressable>
+          </View>
         ) : null}
       </View>
 
       {s.feedback?.kind === 'wrong' ? (
-        <Pressable accessibilityRole="alert" onPress={() => dispatch({ type: 'dismiss' })} style={[styles.note, { backgroundColor: '#FDECEC' }]}>
+        <View accessibilityRole="alert" style={[styles.note, { backgroundColor: '#FDECEC' }]}>
           <T style={{ flex: 1, color: '#7F1D1D' }}><T style={{ fontWeight: '700', color: '#7F1D1D' }}>{`${t('sim.wrong')} `}</T>{s.feedback.message}</T>
-        </Pressable>
+          {mode === 'practice' ? <Pressable accessibilityRole="button" onPress={() => { ask('why'); dispatch({ type: 'dismiss' }); }} style={styles.small}><T style={{ fontWeight: '700', color: '#7F1D1D' }}>{t('sim.why')}</T></Pressable> : null}
+          <Pressable accessibilityRole="button" onPress={() => dispatch({ type: 'dismiss' })} style={styles.small}><T style={{ fontWeight: '700', color: '#7F1D1D' }}>{t('sim.ok')}</T></Pressable>
+        </View>
       ) : null}
       {s.holding ? <View style={[styles.note, { backgroundColor: c.brandSoft }]}><Hand size={16} color={c.brand} /><T style={{ flex: 1 }}>{t('sim.holding', { name: name(s.holding).toLowerCase() })}</T></View> : null}
 
@@ -237,6 +255,8 @@ const styles = StyleSheet.create({
   hintBtn: { alignSelf: 'flex-start', marginTop: space.md, paddingHorizontal: space.md, minHeight: 44, borderRadius: radius.md, backgroundColor: 'rgba(255,255,255,0.12)' },
   option: { minHeight: 56, justifyContent: 'center', paddingHorizontal: space.lg, borderRadius: radius.md, borderWidth: 1.5 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
+  coach: { marginTop: space.md, padding: space.md, borderRadius: radius.md, backgroundColor: 'rgba(255,255,255,0.12)' },
+  small: { minHeight: 44, minWidth: 44, paddingHorizontal: space.sm, alignItems: 'center', justifyContent: 'center' },
   scene: { height: 300, borderRadius: radius.lg, borderWidth: 1, overflow: 'hidden', marginBottom: space.md },
   toggle: { minHeight: 44, paddingHorizontal: space.md, borderRadius: radius.md, borderWidth: 1.5, justifyContent: 'center' },
   tile: { width: '48%', minHeight: 64, padding: space.md, borderRadius: radius.md, borderWidth: 1.5, justifyContent: 'center' },
