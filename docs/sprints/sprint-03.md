@@ -246,3 +246,22 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
   - **Archived:** the academy's addresses stop resolving, so nobody can sign in.
 - **Provider page (HQ):** status actions, invite admin, people and roles, centres, the own-outcomes switch,
   and the provider's activity from the audit log. Archiving asks HQ to type the provider's name.
+
+## Sub-sprint 3.2 notes (packages and price list)
+- **Package:** one programme; simulators, courses or both (at least one, checked by the database); billing
+  **fixed term** (1–60 months, a price per seat for the whole term) or **monthly** (a price per seat per month);
+  minimum seats; up to 10 price bands ("from N seats, R x per seat", cents, excluding VAT).
+- **Life cycle:** draft → published (on sale) → retired. Published and retired packages are **frozen by a
+  database trigger** (fields and prices), so a purchase always matches what was on sale; the only allowed
+  change is published → retired. To change a package, HQ duplicates it into a new draft. Publishing needs a
+  price band that starts at or below the minimum seats, and a programme with a published version. Every step
+  is audited.
+- **Pricing rules** (API `PriceCalculator`, web `quotePackage` in `packages/core`, tested to give the same
+  results): the highest band at or below the number of seats; subtotal = seats × band price; VAT (15% until the
+  billing settings in 3.3) rounded once, half up; "per learner per month" shown for comparison.
+- **HQ → Packages:** on sale / drafts / retired, editor drawer with price bands and a live price preview,
+  publish, retire, duplicate, delete draft. `packages.manage` edits; `billing.view` can look.
+- **Provider → Licences & packages:** the shop (published packages on programmes with a published version)
+  with a live calculator and a hint for the next price band. Ordering arrives in 3.3 (`licences.manage`).
+- Demo: three packages on sale (Technical Support 12-month bundle, Data Analytics monthly courses,
+  Cybersecurity Defender 6-month simulators).

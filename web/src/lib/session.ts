@@ -55,7 +55,7 @@ export function useRefreshSession() {
 }
 
 /** Screens that exist today; others in the menu show "on the way" until their sprint. */
-const BUILT = ['/hq', '/admin', '/learn', '/admin/roles', '/admin/audit', '/admin/branding', '/hq/roles', '/hq/audit', '/hq/programmes', '/hq/providers', '/admin/programmes', '/admin/guide', '/admin/academy'];
+const BUILT = ['/hq', '/admin', '/learn', '/admin/roles', '/admin/audit', '/admin/branding', '/hq/roles', '/hq/audit', '/hq/programmes', '/hq/providers', '/admin/programmes', '/admin/guide', '/admin/academy', '/admin/licences', '/hq/packages'];
 
 /** Where a person lands: their first menu item that is built, else their first menu item. */
 export function homePath(session: Session): string {

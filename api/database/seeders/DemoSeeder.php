@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Identity\ConsentService;
 use App\Models\OutcomeCoverage;
+use App\Models\Package;
 use App\Models\Programme;
 use App\Models\Role;
 use App\Models\Tenant;
@@ -79,8 +80,39 @@ final class DemoSeeder extends Seeder
 
         app(GuideImporter::class)->import(null, publish: true);
         $this->demoCoverage();
+        $this->demoPackages();
 
         $this->command?->info('Demo ready. Password for every account: '.self::PASSWORD);
+    }
+
+    /** Three packages on sale: a fixed-term bundle, a monthly courses-only plan, and a simulator pack. */
+    private function demoPackages(): void
+    {
+        $packages = [
+            ['code' => 'technical-support-12-months', 'name' => 'Technical Support — simulators and courses, 12 months', 'programme' => 'technical-support', 'sim' => true, 'course' => true, 'billing' => 'term', 'term' => 12, 'min' => 10,
+                'prices' => [10 => 250000, 50 => 210000, 200 => 180000], 'description' => 'Everything a cohort needs for a full year: every simulator scenario and every course.'],
+            ['code' => 'data-analytics-courses-monthly', 'name' => 'Data Analytics — courses, monthly', 'programme' => 'data-analytics', 'sim' => false, 'course' => true, 'billing' => 'monthly', 'term' => null, 'min' => 5,
+                'prices' => [5 => 19900, 50 => 16900], 'description' => 'Animated courses with quizzes and recaps, billed per learner per month.'],
+            ['code' => 'cybersecurity-defender-simulators-6-months', 'name' => 'Cybersecurity Defender — simulators, 6 months', 'programme' => 'cybersecurity-defender', 'sim' => true, 'course' => false, 'billing' => 'term', 'term' => 6, 'min' => 10,
+                'prices' => [10 => 145000, 100 => 120000], 'description' => 'Hands-on incident response simulators for a six-month workplace component.'],
+        ];
+        foreach ($packages as $p) {
+            if (Package::query()->where('code', $p['code'])->exists()) {
+                continue;
+            }
+            $programme = Programme::query()->where('code', $p['programme'])->first();
+            if ($programme === null) {
+                continue;
+            }
+            $package = Package::query()->create([
+                'code' => $p['code'], 'name' => $p['name'], 'description' => $p['description'], 'programme_id' => $programme->id,
+                'includes_simulators' => $p['sim'], 'includes_courses' => $p['course'], 'billing' => $p['billing'], 'term_months' => $p['term'], 'min_seats' => $p['min'],
+            ]);
+            foreach ($p['prices'] as $from => $cents) {
+                $package->prices()->create(['from_seats' => $from, 'unit_price_cents' => $cents]);
+            }
+            $package->forceFill(['status' => Package::PUBLISHED, 'published_at' => now()])->save();
+        }
     }
 
     /** A believable coverage map for the demo: Technical Support well under way, two others started. */

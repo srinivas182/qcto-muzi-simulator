@@ -6,3 +6,4 @@ export * from './i18n';
 export * from './brand';
 export * from './tokens';
 export type { MessageKey, Messages } from './locales/en';
+export * from './pricing';
