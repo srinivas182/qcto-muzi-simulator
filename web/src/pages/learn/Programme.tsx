@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, BookOpen, Box, CheckCircle2, CircleDot, Circle, ListChecks } from 'lucide-react';
+import { ArrowLeft, BookOpen, Box, CheckCircle2, CircleDot, Circle, ClipboardCheck, ListChecks } from 'lucide-react';
 import type { LearnActivity } from '@simuwork/core';
 import { Card, cx, Skeleton } from '../../components/ui';
 import { api } from '../../lib/api';
@@ -26,6 +26,10 @@ export default function Programme() {
           <Link to={`/learn/enrolments/${eid}/checklist`} className="mt-4 flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 hover:border-brand">
             <ListChecks className="size-5 text-brand" />
             <span className="flex-1"><span className="block font-semibold text-ink">{t('jr.title')}</span><span className="block text-[13px] text-muted">{t('jr.cardLead')}</span></span>
+          </Link>
+          <Link to={`/learn/enrolments/${eid}/assessments`} className="mt-3 flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 hover:border-brand">
+            <ClipboardCheck className="size-5 text-brand" />
+            <span className="flex-1"><span className="block font-semibold text-ink">{t('as.title')}</span><span className="block text-[13px] text-muted">{t('as.cardLead')}</span></span>
           </Link>
           <Card className="mt-4 overflow-hidden p-0">
             <ol className="divide-y divide-line">

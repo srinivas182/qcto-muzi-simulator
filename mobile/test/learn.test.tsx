@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, cleanup, fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
 import { mockApi, seed, session } from './helpers';
 
@@ -207,5 +208,31 @@ describe('class mode', () => {
     await settle();
     const sync = calls.find((c) => c.path === '/learn/attempts/sync');
     expect(JSON.parse(String(sync!.init.body)).attempts[0]).toMatchObject({ mode: 'practice', result: { class_session: 'cs1' } });
+  });
+});
+
+describe('knowledge tests', () => {
+  it('takes a test on the phone, keeps answers on the phone and hands in', async () => {
+    await seed({ signedIn: true });
+    const paper = { id: 's1', task: { id: 't1', code: 'TS-A01', title: 'Knowledge test', pass_mark: 70 }, attempt: 1, locale: 'en', status: 'open', started_at: '', deadline_at: '', seconds_left: 1200, answers: {},
+      questions: [{ id: 'q1', type: 'single', prompt: 'What do you do first?', marks: 1, options: ['Call the user', 'Switch off and unplug'] }] };
+    const calls = mockApi({
+      '/session': { data: session() },
+      '/learn/enrolments/e1/tests/t1/start': { data: paper },
+      '/learn/sittings/s1': ((b: { submit?: boolean }) => [200, { data: b.submit ? { id: 's1', status: 'marked', attempt: 1, score: 100, result: 'competent', late: false, submitted_at: '', revise: [] } : paper }]) as never,
+    });
+    await renderRouter('./app', { initialUrl: '/learn/e1/test/t1' });
+    await act(async () => fireEvent.press(await screen.findByText('Start the test')));
+    await act(async () => fireEvent.press(await screen.findByLabelText('Switch off and unplug')));
+    expect(JSON.parse((await AsyncStorage.getItem('sw.test.s1'))!)).toEqual({ q1: 1 });
+    const { Alert } = jest.requireActual<typeof import('react-native')>('react-native');
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    alert.mockClear(); // an earlier test may have spied on Alert already
+    await act(async () => fireEvent.press(screen.getByText('Hand in')));
+    await act(async () => (alert.mock.calls[0]![2] as { onPress?: () => void }[])[1]!.onPress!());
+    await settle();
+    expect(await screen.findByText('Competent. Well done!')).toBeOnTheScreen();
+    const put = calls.filter((c) => c.path === '/learn/sittings/s1').pop()!;
+    expect(JSON.parse(String(put.init.body))).toEqual({ answers: { q1: 1 }, submit: true });
   });
 });

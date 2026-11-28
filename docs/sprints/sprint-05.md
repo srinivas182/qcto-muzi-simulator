@@ -163,3 +163,48 @@ None of them produces evidence of practical competence by itself.
 | Questions leak once learners share them | Each sitting draws a random set from the bank; answer keys never reach the device | 5.1b |
 | One fixed pass mark | Per-task pass mark and attempts; providers set the integrity level | This sprint |
 | Item statistics | Show which questions most learners get wrong, so HQ can fix unclear ones | Proposed for later |
+
+## Sub-sprint 5.1b notes (learners take knowledge tests)
+
+**Built**
+- **`test_sittings`** (with RLS): each sitting fixes its paper when it starts, so a resumed sitting shows the
+  same paper. The paper is a random draw of questions with each question's options shuffled.
+  - The **deadline is the server's.**
+  - Answers keep the order the learner saw; the server maps them back to the original options.
+- **The learner's device never receives answers:** no answer keys, explanations or model answers (tested).
+  Reviewed translations are used.
+- **Offline-safe:**
+  - every answer is kept on the device first (localStorage on web, AsyncStorage on mobile) and sent 1.5
+    seconds later;
+  - if sending fails, it is sent again when the connection is back;
+  - the server accepts answers up to **15 minutes after the deadline**, flagged "late" and visible to the
+    assessor;
+  - after that, the sitting closes with the answers the server already has;
+  - when time runs out on the device, it hands in automatically.
+- **Marking:**
+  - choice questions are marked straight away (multi-choice needs exactly the right set);
+  - **short answers wait for an assessor**: `GET /sittings/{s}` shows the answers, the key and the model
+    answers, and `POST /sittings/{s}/mark` records marks, after which the result is final;
+  - blank short answers score 0 without needing marking;
+  - the result is competent or not yet competent against the task's pass mark;
+  - the attempts limit is enforced, and a passed test can't be retaken.
+- **What the learner sees afterwards:** the score, the result, and **the outcomes to revise, never the
+  answers**, so the question bank is protected.
+- **Learner screens (web and mobile):**
+  - an Assessments page grouped by component, showing questions, time, pass mark, tries left and status;
+  - a "ready to start" page with the three rules in plain words;
+  - the test itself, with a sticky timer, an answered count, an offline notice, a hand-in confirmation, and the
+    result.
+- **Audit:** every start, hand-in and marking.
+
+**Checks:** API 4 new tests, web 2 new tests, mobile 1 new test.
+
+### Gaps we fill and best recommendations (5.1b)
+| Gap against the leaders | What we did | When |
+|---|---|---|
+| Online tests fail when the signal drops; learners lose their answers | Answers are kept on the phone, synced later, with a 15-minute grace period visible to the assessor | This sprint |
+| Leaked answer sheets | Random draw and shuffled options per sitting; keys never sent; learners see the outcomes to revise, not the answers | This sprint |
+| The device clock can be changed | The server sets and enforces the deadline | This sprint |
+| Marking written answers on paper | Assessor screen with the answer, the model answer and marks (full workspace in 5.2) | This sprint (API), 5.2 (screens) |
+| Learners who need more time | Accommodations per learner (extra time, read-aloud), set by the provider | Proposed for 5.2 |
+| Read-aloud of test questions | Questions read aloud, as in the simulator | Proposed for 5.2 |

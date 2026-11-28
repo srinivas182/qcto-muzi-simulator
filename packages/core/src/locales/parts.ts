@@ -6,7 +6,7 @@
  * English ships whole with the app. The source stays one file per language (translators and the mobile app
  * see no change); the split happens when the web app is built.
  */
-export const LEARNER_PREFIXES = ['common', 'nav', 'auth', 'm', 'home', 'lh', 'join', 'consent', 'shell', 'palette', 'section', 'hold', 'qd', 'lv', 'lp', 'sim', 'jr', 'off'] as const;
+export const LEARNER_PREFIXES = ['common', 'nav', 'auth', 'm', 'home', 'lh', 'join', 'consent', 'shell', 'palette', 'section', 'hold', 'qd', 'lv', 'lp', 'sim', 'jr', 'off', 'as'] as const;
 
 /** Course Studio, Lesson Studio, Scenario Studio and the assessment plan: used only by HQ. */
 export const HQ_PREFIXES = ['cs', 'ls', 'ss', 'ap'] as const;
