@@ -25,6 +25,7 @@ return [
         ['id' => 'moderate', 'section' => 'Quality assurance', 'label' => 'Moderation', 'icon' => 'gavel', 'path' => '/moderate', 'permission' => 'moderation.perform'],
         ['id' => 'qa.eisa', 'section' => 'Quality assurance', 'label' => 'EISA readiness', 'icon' => 'clipboard-check', 'path' => '/qa/eisa', 'permission' => 'eisa.manage'],
         ['id' => 'mentor', 'section' => 'Quality assurance', 'label' => 'Workplace days', 'icon' => 'briefcase', 'path' => '/mentor', 'permission' => 'attendance.confirm_workplace'],
+        ['id' => 'admin.academy', 'section' => 'Account', 'label' => 'Academy details', 'icon' => 'building-2', 'path' => '/admin/academy', 'permission' => 'academy.manage'],
         ['id' => 'admin.licences', 'section' => 'Account', 'label' => 'Licences & packages', 'icon' => 'key-round', 'path' => '/admin/licences', 'permission' => 'licences.manage'],
         ['id' => 'admin.billing', 'section' => 'Account', 'label' => 'Billing', 'icon' => 'receipt', 'path' => '/admin/billing', 'permission' => 'billing.tenant'],
         ['id' => 'admin.branding', 'section' => 'Account', 'label' => 'Branding & website', 'icon' => 'palette', 'path' => '/admin/branding', 'permission' => 'branding.manage'],

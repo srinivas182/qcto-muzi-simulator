@@ -68,6 +68,7 @@ return [
             'review_pack.view' => ['scope' => 'tenant', 'label' => 'Open a shared QCTO review pack (read-only)'],
         ],
         'Account' => [
+            'academy.manage' => ['scope' => 'tenant', 'label' => "See the academy's company and accreditation details; change its contact and billing details"],
             'licences.manage' => ['scope' => 'tenant', 'label' => 'Buy packages and assign licences'],
             'billing.tenant' => ['scope' => 'tenant', 'label' => 'See and pay invoices'],
             'branding.manage' => ['scope' => 'tenant', 'label' => 'Change branding, domain and website'],

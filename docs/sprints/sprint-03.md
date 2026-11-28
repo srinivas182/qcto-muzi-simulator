@@ -224,3 +224,25 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
 5. **Seller details are settings, not code.** Muzi's South African company is the seller. Super Admin enters
    its company details, address, VAT number, EFT banking details and the gateway keys in HQ → Billing settings.
    Nothing is hard-coded; development and tests use placeholder details.
+
+## Sub-sprint 3.1 notes (provider management)
+- **Onboarding:** HQ → Training providers → New provider. HQ enters the academy name, web address (suggested
+  from the name; reserved and used addresses refused), optional accreditation number and expiry, and the first
+  admin's name and email. One step creates the provider (status *trial*), its sub-domain and a "Main campus"
+  centre, and emails a TP Admin invitation. The invitation link is also shown once, for sharing by WhatsApp or
+  SMS. HQ can send more admin invitations later.
+- **Details:** company (name, registered name, registration and VAT numbers), QCTO accreditation (number,
+  expiry), contact and billing (emails, phone, address) and payment terms (*pay first* or *on account* with N
+  days, used in 3.3). These are stored on `tenants` (one row per provider) rather than a separate
+  `provider_profiles` table. HQ edits everything; the provider's **Academy details** page shows everything
+  and lets it edit only contact, billing and address (new permission `academy.manage`, TP Admin).
+- **Accreditation warnings:** *expiring* within 60 days, *expired*, or *not captured*, shown in the HQ list,
+  on the provider page and on the provider's Academy details. QCTO rejects enrolment uploads outside the
+  accreditation period.
+- **Status:** trial → active · suspended · archived; suspended → active · archived; archiving is final. A
+  reason is required and kept in the audit log, which is recorded under the provider.
+  - **Suspended:** staff see "account on hold" (API answers 423 on provider routes). Learners keep learning,
+    and HQ support sessions still work.
+  - **Archived:** the academy's addresses stop resolving, so nobody can sign in.
+- **Provider page (HQ):** status actions, invite admin, people and roles, centres, the own-outcomes switch,
+  and the provider's activity from the audit log. Archiving asks HQ to type the provider's name.
