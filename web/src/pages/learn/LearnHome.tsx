@@ -50,7 +50,8 @@ function ProgrammeCard({ e }: { e: LearnEnrolment }) {
     onError: () => toast(t('common.error'), 'error'),
   });
   const date = (d: string) => new Date(d).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
-  const notYet = new Date(e.starts_on) > new Date();
+  const [now] = useState(() => Date.now());
+  const notYet = new Date(e.starts_on).getTime() > now;
 
   return (
     <Card className="overflow-hidden p-0">

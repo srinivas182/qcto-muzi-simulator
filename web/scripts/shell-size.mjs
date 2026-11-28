@@ -11,7 +11,7 @@ const dist = new URL('../dist/', import.meta.url).pathname;
 const SHELL_KB = Number(process.env.SHELL_LIMIT_KB ?? 170);
 const LANGUAGE_KB = 15;
 const CHUNK_KB = 25;
-const LANGUAGE = /^assets\/(zu|af|xh)-[\w-]+\.js$/;
+const LANGUAGE = /^assets\/lang-(zu|af|xh)-(learner|staff)-[\w-]+\.js$/;
 
 const kb = (f) => gzipSync(readFileSync(join(dist, f))).length / 1024;
 const html = readFileSync(join(dist, 'index.html'), 'utf8');

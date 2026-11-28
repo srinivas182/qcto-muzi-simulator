@@ -128,6 +128,10 @@ export function AppShell({ session }: { session: Session }) {
 
   const items = session.navigation;
   const learnerOnly = items.length > 0 && items.every((i) => i.id === 'learn' || i.id.startsWith('learn.'));
+  const { needStaff } = useI18n();
+  useEffect(() => {
+    if (items.length > 0 && !learnerOnly) needStaff();
+  }, [items.length, learnerOnly, needStaff]);
   const current = activeItem(items, location.pathname);
 
   const toggleCollapsed = () =>

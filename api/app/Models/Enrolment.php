@@ -33,6 +33,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $created_by
  * @property Carbon $created_at
  * @property Carbon|null $sor_issued_on
+ * @property Carbon|null $last_activity_at
  * @property-read Learner $learner
  * @property-read Cohort $cohort
  * @property-read LicencePool $pool
@@ -57,11 +58,11 @@ class Enrolment extends Model
 
     public const FREE_WITHDRAWAL_BELOW = 10;
 
-    protected $fillable = ['learner_id', 'cohort_id', 'programme_id', 'programme_version_id', 'licence_pool_id', 'holds_seat', 'status', 'progress', 'seat_taken_at', 'started_at', 'ended_at', 'reason', 'created_by', 'sor_issued_on'];
+    protected $fillable = ['learner_id', 'cohort_id', 'programme_id', 'programme_version_id', 'licence_pool_id', 'holds_seat', 'status', 'progress', 'seat_taken_at', 'started_at', 'ended_at', 'reason', 'created_by', 'sor_issued_on', 'last_activity_at'];
 
     protected function casts(): array
     {
-        return ['holds_seat' => 'boolean', 'progress' => 'integer', 'seat_taken_at' => 'datetime', 'started_at' => 'datetime', 'ended_at' => 'datetime', 'sor_issued_on' => 'date'];
+        return ['holds_seat' => 'boolean', 'progress' => 'integer', 'seat_taken_at' => 'datetime', 'started_at' => 'datetime', 'ended_at' => 'datetime', 'sor_issued_on' => 'date', 'last_activity_at' => 'datetime'];
     }
 
     /** @return BelongsTo<Learner, $this> */
