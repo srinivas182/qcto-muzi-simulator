@@ -49,7 +49,7 @@ describe('Learner home', () => {
     const calls = mockApi({ '/learn/me/qcto': { data: details }, '/learn/home': { data: home } }, learner());
     renderAt('/learn/details');
     fireEvent.change(await screen.findByLabelText('Title', {}, { timeout: 4000 }), { target: { value: 'Mr' } });
-    expect(screen.getByText(/Prefer not to say/)).toBeInTheDocument();
+    expect(screen.getByText(/QCTO asks every learner for this/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Save details' }));
     await waitFor(() => expect(sent(calls, '/learn/me/qcto', 'PATCH')).toBeDefined());
     expect(JSON.parse(String((sent(calls, '/learn/me/qcto', 'PATCH')![1] as RequestInit).body))).toMatchObject({ title: 'Mr' });
