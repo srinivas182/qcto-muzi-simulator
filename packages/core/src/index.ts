@@ -12,3 +12,4 @@ export * from './cohorts';
 export * from './qcto';
 export * from './attempts';
 export * from './scenario';
+export * from './assessment';

@@ -47,6 +47,7 @@ export const routes: RouteObject[] = [
           { path: 'hq/programmes/:code', lazy: page(() => import('../pages/hq/ProgrammeDetail')) },
           { path: 'hq/programmes/:code/lessons/:id', lazy: page(() => import('../pages/hq/LessonStudio')) },
           { path: 'hq/programmes/:code/scenarios/:id', lazy: page(() => import('../pages/hq/ScenarioStudio')) },
+          { path: 'hq/programmes/:code/assessment/:id', lazy: page(() => import('../pages/hq/AssessmentTask')) },
           { path: 'hq/studio/scenarios', lazy: async () => { const S = (await import('../pages/hq/StudioHome')).default; return { Component: () => <S kind="scenario" /> }; } },
           { path: 'hq/studio/courses', lazy: async () => { const S = (await import('../pages/hq/StudioHome')).default; return { Component: () => <S kind="lesson" /> }; } },
           { path: 'hq/providers', lazy: page(() => import('../pages/hq/Providers')) },

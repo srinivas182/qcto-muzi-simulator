@@ -8,8 +8,8 @@
  */
 export const LEARNER_PREFIXES = ['common', 'nav', 'auth', 'm', 'home', 'lh', 'join', 'consent', 'shell', 'palette', 'section', 'hold', 'qd', 'lv', 'lp', 'sim', 'jr', 'off'] as const;
 
-/** Course Studio, Lesson Studio and Scenario Studio: used only by HQ. */
-export const HQ_PREFIXES = ['cs', 'ls', 'ss'] as const;
+/** Course Studio, Lesson Studio, Scenario Studio and the assessment plan: used only by HQ. */
+export const HQ_PREFIXES = ['cs', 'ls', 'ss', 'ap'] as const;
 
 export type LocalePart = 'learner' | 'staff' | 'hq';
 
