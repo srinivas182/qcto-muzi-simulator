@@ -9,6 +9,7 @@ use App\Billing\Payments;
 use App\Cohorts\Cohorts;
 use App\Cohorts\Enrolments;
 use App\Identity\ConsentService;
+use App\Learners\IdNumbers;
 use App\Learners\LearnerDirectory;
 use App\Models\BillingSetting;
 use App\Models\Centre;
@@ -159,6 +160,11 @@ final class DemoSeeder extends Seeder
                 'ends_on' => today()->addMonths(12)->toDateString(),
             ], $admin);
             $ids = Learner::query()->orderBy('surname')->limit(6)->pluck('id')->all();
+            // The demo learner account (learner@ubuntu.demo) is on the register too, so its home shows the programme.
+            $thandiwe = User::query()->where('email', 'learner@ubuntu.demo')->firstOrFail();
+            $ids[] = Learner::query()->create(['user_id' => $thandiwe->id, 'first_names' => 'Thandiwe', 'surname' => 'Khumalo', 'id_type' => 'sa_id', 'date_of_birth' => '2001-03-08',
+                'gender' => 'female', 'citizenship' => 'sa', 'home_language' => 'zu', 'phone' => '+27825550120', 'status' => Learner::ACTIVE, 'joined_at' => now(), 'popi_agreed_at' => now(), 'created_by' => $admin->id]
+                + IdNumbers::protect('sa_id', self::luhn('010308012308')))->id;
             app(Enrolments::class)->enrol($tenant, $cohort, $ids, $admin);
             // QCTO details for three learners, so the cohort shows a realistic mix of complete and missing data.
             $tenant->update(['qcto_sdp_code' => 'SDP-DEMO-0001']);

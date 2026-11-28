@@ -320,6 +320,11 @@ export interface LicencePoolItem {
   seats: number;
   seats_used: number;
   seats_free: number;
+  /** Holding a seat but not started yet; the seat comes back after 14 days. */
+  seats_not_started: number;
+  next_return_on: string | null;
+  /** Seats given back by the no-show and early-withdrawal rules. */
+  seats_returned: number;
   seats_next_month: number | null;
   starts_on: string | null;
   ends_on: string | null;

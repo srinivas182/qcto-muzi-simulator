@@ -14,7 +14,7 @@ const account = { blocked: false, open_invoices: 0, owed_cents: 0, overdue_cents
 const pool = (over: Partial<LicencePoolItem>): LicencePoolItem => ({
   id: 'p1', package: { code: 'ts-12', name: 'Technical Support — 12 months', min_seats: 10, includes_simulators: true, includes_courses: true },
   programme: { code: 'technical-support', title: 'Technical Support', prefix: 'TS' }, billing: 'term', term_months: 12, unit_price_cents: 210000,
-  seats: 60, seats_used: 12, seats_free: 48, seats_next_month: null, starts_on: '2027-01-01', ends_on: '2027-12-31', days_left: 300, cancel_at_period_end: false, status: 'active', ...over,
+  seats: 60, seats_used: 12, seats_free: 48, seats_not_started: 2, next_return_on: '2027-02-17', seats_returned: 1, seats_next_month: null, starts_on: '2027-01-01', ends_on: '2027-12-31', days_left: 300, cancel_at_period_end: false, status: 'active', ...over,
 });
 const invoice: InvoiceDetail = {
   id: 'i1', number: 'INV-000001', kind: 'order', issue_date: '2027-01-01', due_date: '2027-01-08', period_start: null, period_end: null,
@@ -53,6 +53,8 @@ describe('Provider licences and invoices', () => {
 
     expect(await screen.findByText('12 of 60 seats in use')).toBeInTheDocument();
     expect(screen.getByText(/Ends .*\(300 days left\)/)).toBeInTheDocument();
+    expect(screen.getByText(/2 not started — seats come back from/)).toBeInTheDocument();
+    expect(screen.getByText('1 seats returned to the pool')).toBeInTheDocument();
     expect(screen.getByRole('alert')).toHaveTextContent('more than 30 days overdue');
     expect(screen.getByRole('button', { name: 'Add seats' })).toBeDisabled();
   });

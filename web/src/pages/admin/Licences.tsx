@@ -95,7 +95,13 @@ function PoolCard({ pool, blocked, onTopUp }: { pool: LicencePoolItem; blocked: 
         <>
           <div className="mt-4">
             <div className="mb-1 flex justify-between text-[13px]"><span className="font-semibold text-ink">{t('lic.used', { used: pool.seats_used, total: pool.seats })}</span><span className="text-muted">{t('lic.free', { n: pool.seats_free })}</span></div>
-            <div className="h-2 overflow-hidden rounded-full bg-surface-2" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={t('lic.usedLabel')}><div className="h-full rounded-full bg-brand transition-all" style={{ width: `${pct}%` }} /></div>
+            <div className="h-2 overflow-hidden rounded-full bg-surface-2" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label={t('lic.usedLabel')}><div className="flex h-full"><div className="h-full bg-brand transition-all" style={{ width: `${pool.seats ? ((pool.seats_used - pool.seats_not_started) / pool.seats) * 100 : 0}%` }} /><div className="h-full bg-[#F5A524] transition-all" style={{ width: `${pool.seats ? (pool.seats_not_started / pool.seats) * 100 : 0}%` }} /></div></div>
+            {(pool.seats_not_started > 0 || pool.seats_returned > 0) && (
+              <p className="mt-2 text-[12px] text-muted">
+                {pool.seats_not_started > 0 && <span className="mr-3 inline-flex items-center gap-1.5"><span className="size-2 rounded-full bg-[#F5A524]" />{t('lic.notStarted', { n: pool.seats_not_started, date: pool.next_return_on ? date(pool.next_return_on) : '' })}</span>}
+                {pool.seats_returned > 0 && <span>{t('lic.returned', { n: pool.seats_returned })}</span>}
+              </p>
+            )}
           </div>
           <p className="mt-3 flex items-center gap-1.5 text-[13px] text-muted">
             <CalendarClock className="size-4" />

@@ -24,12 +24,15 @@ export function QctoDetailsDrawer({ learner, onClose }: { learner: LearnerItem; 
   const details = useQuery({ queryKey: ['learner-qcto', learner.id], queryFn: () => api<{ data: QctoDetails }>(`/learners/${learner.id}/qcto`) });
   return (
     <Drawer open onClose={onClose} width="max-w-2xl" title={t('qd.title', { name: learner.name })} subtitle={t('qd.lead')}>
-      {details.data ? <QctoForm learner={learner} details={details.data.data} onClose={onClose} /> : <Skeleton className="h-96 rounded-xl" />}
+      {details.data ? <QctoForm endpoint={`/learners/${learner.id}/qcto`} queryKey={['learner-qcto', learner.id]} details={details.data.data} hasSaId={learner.id_type === 'sa_id'} onDone={onClose} /> : <Skeleton className="h-96 rounded-xl" />}
     </Drawer>
   );
 }
 
-function QctoForm({ learner, details, onClose }: { learner: LearnerItem; details: QctoDetails; onClose: () => void }) {
+/** The QCTO details form, used by staff (drawer) and by learners themselves (Learn → My details). */
+export function QctoForm({ endpoint, queryKey, details, hasSaId, onDone, self = false }: {
+  endpoint: string; queryKey: unknown[]; details: QctoDetails; hasSaId: boolean; onDone: () => void; self?: boolean;
+}) {
   const { t } = useI18n();
   const toast = useToast();
   const qc = useQueryClient();
@@ -45,14 +48,15 @@ function QctoForm({ learner, details, onClose }: { learner: LearnerItem; details
       const body: Record<string, unknown> = Object.fromEntries(Object.entries(rest).map(([k, v]) => [k, v === '' ? null : v]));
       body.home_address = home.line1 || home.line2 || home.postal_code ? home : null;
       body.postal_address = samePostal ? null : postal;
-      if (learner.id_type === 'sa_id') delete body.alt_id_type;
-      return api<{ data: QctoDetails }>(`/learners/${learner.id}/qcto`, { method: 'PATCH', body });
+      if (hasSaId) delete body.alt_id_type;
+      return api<{ data: QctoDetails }>(endpoint, { method: 'PATCH', body });
     },
     onSuccess: (r) => {
-      qc.setQueryData(['learner-qcto', learner.id], r);
+      qc.setQueryData(queryKey, r);
       void qc.invalidateQueries({ queryKey: ['qcto-check'] });
+      void qc.invalidateQueries({ queryKey: ['learn-home'] });
       toast(r.data.missing.length ? t('qd.savedMissing', { n: r.data.missing.length }) : t('qd.savedComplete'));
-      onClose();
+      onDone();
     },
     onError: (e) => {
       if (e instanceof ApiError && Object.keys(e.errors).length) setErrors(Object.fromEntries(Object.entries(e.errors).map(([k, v]) => [k.split('.')[0] ?? k, v[0] ?? ''])));
@@ -89,7 +93,7 @@ function QctoForm({ learner, details, onClose }: { learner: LearnerItem; details
       </Group>
       <Group title={t('qd.citizenship')}>
         <div className="grid gap-3 sm:grid-cols-2">
-          {learner.id_type !== 'sa_id' && select('alt_id_type', 'alt_id_types', t('qd.f.altId'))}
+          {!hasSaId && select('alt_id_type', 'alt_id_types', t('qd.f.altId'))}
           {select('nationality_code', 'nationality', t('qd.f.nationality'))}
           {select('citizen_status', 'citizen', t('qd.f.citizen'))}
           {select('immigrant_status', 'immigrant', t('qd.f.immigrant'))}
@@ -113,16 +117,16 @@ function QctoForm({ learner, details, onClose }: { learner: LearnerItem; details
           <Field label={t('qd.f.flcNumber')} value={form.flc_sor_number} onChange={(e) => set('flc_sor_number')(e.target.value)} hint={t('qd.flcHint')} />
         </div>
       </Group>
-      <Group title={t('qd.special')} icon={<Lock className="size-4" />} note={t('qd.specialNote')}>
+      <Group title={t('qd.special')} icon={<Lock className="size-4" />} note={t(self ? 'qd.specialNoteSelf' : 'qd.specialNote')}>
         <div className="grid gap-3 sm:grid-cols-2">
           {select('equity', 'equity', t('qd.f.equity'))}
           {select('disability_status', 'disability', t('qd.f.disability'))}
           {form.disability_status !== '' && form.disability_status !== 'N' && select('disability_rating', 'disability_rating', t('qd.f.rating'))}
         </div>
       </Group>
-      <p className="text-[12px] text-muted">{details.popi_agreed_at ? t('qd.popiYes') : t('qd.popiNo')}</p>
+      {!self && <p className="text-[12px] text-muted">{details.popi_agreed_at ? t('qd.popiYes') : t('qd.popiNo')}</p>}
       <div className="flex justify-end gap-2 border-t border-line pt-4">
-        <Button variant="secondary" onClick={onClose}>{t('common.cancel')}</Button>
+        <Button variant="secondary" onClick={onDone}>{t('common.cancel')}</Button>
         <Button type="submit" loading={save.isPending}>{t('qd.save')}</Button>
       </div>
     </form>

@@ -47,3 +47,23 @@ export interface CohortOptions {
   programmes: { id: string; code: string; title: string; free_seats: number }[];
   staff: { id: string; name: string }[];
 }
+
+/** Learner home (GET /learn/home). */
+export interface LearnEnrolment {
+  id: string;
+  status: EnrolmentStatus;
+  progress: number;
+  started: boolean;
+  programme: { code: string; title: string; prefix: string };
+  version: number;
+  cohort: { name: string; centre: string; facilitators: string[] };
+  starts_on: string;
+  ends_on: string | null;
+  days_left: number | null;
+  seat_returns_on: string | null;
+}
+
+export interface LearnHomeData {
+  learner: { name: string; qcto_missing: number } | null;
+  enrolments: LearnEnrolment[];
+}

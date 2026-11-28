@@ -414,3 +414,16 @@ mobile, and learners filling in their own QCTO details).
   which load only on the two screens that use them. Language files went from 14.9 KB to 13.9 KB. **Watch:**
   every new screen's text goes into the language files too, so in Sprint 4 they should be split by area
   (HQ, provider, learner) to stay under 15 KB.
+
+## Sub-sprint 3.6c notes (learner home, own details, seat health)
+
+- **Learner home (web and mobile):** each programme the learner is in, with its version, cohort, centre,
+  facilitators, start date or days left, and progress. **Start learning** marks the enrolment as started,
+  which stops the 14-day no-show rule; the card says by when to tap it. Simulators and courses open here from
+  Sprint 4. A learner who is not in a class can type the code from the class poster.
+- **Own QCTO details:** a banner asks learners to complete their details. On the web this opens
+  *My details*, the same form staff use; it explains why QCTO asks for equity and disability and offers
+  "prefer not to say". On the phone the banner opens that page in the browser, because a native form is
+  not worth building twice. The audit log records whether the learner or staff made the change.
+- **Seat health on Licences:** the seat bar now shows learning (brand colour) and enrolled but not started
+  (amber), the date the first unstarted seat comes back, and how many seats the rules have returned.

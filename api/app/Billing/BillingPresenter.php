@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Billing;
 
+use App\Models\Enrolment;
 use App\Models\Invoice;
 use App\Models\LicencePool;
 use App\Models\Payment;
@@ -56,6 +57,10 @@ final class BillingPresenter
     {
         $p->loadMissing(['package', 'programme']);
         $used = SeatUsage::used($p);
+        // Seat health: who is learning, who has a seat but has not started (and when the first seat comes back).
+        $waiting = Enrolment::query()->with('cohort')->where('licence_pool_id', $p->id)->where('holds_seat', true)
+            ->where('status', Enrolment::ENROLLED)->whereNull('started_at')->get();
+        $returned = Enrolment::query()->where('licence_pool_id', $p->id)->where('holds_seat', false)->count();
 
         return [
             'id' => $p->id,
@@ -67,6 +72,9 @@ final class BillingPresenter
             'seats' => $p->seats,
             'seats_used' => $used,
             'seats_free' => max(0, $p->seats - $used),
+            'seats_not_started' => $waiting->count(),
+            'next_return_on' => $waiting->map(fn (Enrolment $e) => $e->noShowDate($e->cohort))->sort()->first()?->toDateString(),
+            'seats_returned' => $returned,
             'seats_next_month' => $p->seats_next_month,
             'starts_on' => $p->starts_on?->toDateString(),
             'ends_on' => $p->ends_on?->toDateString(),

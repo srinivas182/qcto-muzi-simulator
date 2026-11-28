@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\V1\Cohorts\CohortController;
 use App\Http\Controllers\Api\V1\CurrentTenantController;
 use App\Http\Controllers\Api\V1\DomainAllowedController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\Learn\LearnController;
 use App\Http\Controllers\Api\V1\Learners\LearnerController;
 use App\Http\Controllers\Api\V1\Programmes\CatalogueController;
 use App\Http\Controllers\Api\V1\Programmes\CoverageController;
@@ -161,6 +162,12 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
             Route::get('/cohorts/{cohort}/qcto-check', [QctoController::class, 'check'])->whereUuid('cohort')->middleware('permission:classes.view')->name('cohorts.qcto-check');
             Route::get('/cohorts/{cohort}/qcto-register', [QctoController::class, 'register'])->whereUuid('cohort')
                 ->middleware(['permission:learners.reveal_id', 'throttle:20,1'])->name('cohorts.qcto-register');
+            Route::middleware('permission:learning.use')->group(function (): void {
+                Route::get('/learn/home', [LearnController::class, 'home'])->name('learn.home');
+                Route::post('/learn/enrolments/{enrolment}/start', [LearnController::class, 'start'])->whereUuid('enrolment')->name('learn.start');
+                Route::get('/learn/me/qcto', [LearnController::class, 'qcto'])->name('learn.qcto');
+                Route::patch('/learn/me/qcto', [LearnController::class, 'updateQcto'])->middleware('throttle:30,1')->name('learn.qcto.update');
+            });
             Route::post('/cohorts/join', [CohortController::class, 'join'])->middleware(['permission:learning.use', 'throttle:10,1'])->name('cohorts.join');
             Route::post('/learners/{learner}/reveal-id', [LearnerController::class, 'revealId'])->whereUuid('learner')
                 ->middleware(['permission:learners.reveal_id', 'throttle:30,1'])->name('learners.reveal-id');
