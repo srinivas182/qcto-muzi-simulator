@@ -271,3 +271,28 @@ None of them produces evidence of practical competence by itself.
 | Observation is paper, typed up later | Checklist on screen, saved on the device as you go | In this sprint (full offline send in 5.2b) |
 | Assessor can't watch the 3D run itself | A visual replay in the 3D scene, driven by the stored moves | Proposed for later |
 | Assessors re-type the same feedback | Feedback snippets per step, learned from earlier decisions (AI-suggested, assessor-approved) | Proposed for later |
+
+## 5.2b notes: offline sign-off, accommodations, mobile feedback (done)
+
+**Built**
+- **Offline sign-off**: an observation or run decision signed off with no signal is kept in an outbox on the device. A banner shows how many are waiting, and they are sent when the browser is back online or when the queue opens.
+  - Each decision carries a **client id**, so retries never record it twice.
+  - It also carries the time it was **signed**, not the time it was sent, capped at "now".
+  - If the server refuses one (for example, the learner was already judged), it is listed for the assessor to check.
+- **Accommodations** per learner, set from the run, observation or marking screen by anyone with `assessments.signoff`, and audited:
+  - **extra time** of +25%, +50% or +100%, added to the server deadline when the test starts and copied onto the sitting, so the marker sees it;
+  - **read-aloud**: a button on each question reads the question and its choices in the test's language (browser speech on web, expo-speech on the phone).
+  - **POPIA**: only the setting is stored, never the reason, which may be health information. The test proves a submitted reason is dropped.
+- **Mobile learner feedback**: the assessor's feedback, *Practise this step* and *Redo the lesson* links, and the opportunities left, on the Assessments screen.
+
+**Tests**: API 279, web 116, mobile 43. First load 150.4 KB.
+
+### Gaps we fill and best recommendations (5.2b)
+| Gap against leaders | What we did / recommend | When |
+|---|---|---|
+| Workplace observation needs signal, so assessors write on paper and type it up later | Sign off with no signal; sent once, with the time it was signed | In this sprint |
+| Accommodations live in a spreadsheet, and the test platform doesn't know about them | Extra time is applied on the server clock; read-aloud is in the test itself | In this sprint |
+| Reasons for an accommodation (health) are stored in the LMS | Only the setting is stored; documents stay in the provider's own file | In this sprint |
+| Read-aloud quality in isiZulu and isiXhosa depends on the phone's voices | Use the chosen TTS voice provider (open item) for pre-recorded question audio | Proposed for later |
+| Accommodations can't be applied to a whole group | Set accommodations for a group of learners from the cohort page | Proposed for later |
+| Assessor app for observation on a phone | Observation checklist in the mobile app, for assessors working on site | Proposed for later |

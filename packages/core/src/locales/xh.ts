@@ -1463,6 +1463,23 @@ const xh: Messages = {
   'as.fb.lesson': "Phinda isifundo: {what}",
   'as.fb.step': "Ziqhelise eli nyathelo: {what}",
   'as.fb.tries': "Amanye amathuba ali-{n} kulo msebenzi.",
+  // Sprint 5.2b: offline sign-off, accommodations
+  'rv.queued': "Akukho mqondiso. Isigqibo sigcinwe kwesi sixhobo kwaye siya kuthunyelwa xa ubuyele kwi-intanethi.",
+  'rv.outbox': "Izigqibo ezi-{n} zilinde kwesi sixhobo kwaye ziya kuthunyelwa xa ukwi-intanethi.",
+  'rv.refused': "Ezi azikwazanga kurekhodwa (umfundi wayesele egwetyiwe, okanye umsebenzi utshintshile): {list}. Nceda uzijonge kwakhona.",
+  'rv.acc.button': "Uncedo olukhethekileyo",
+  'rv.acc.title': "Uncedo olukhethekileyo luka-{name}",
+  'rv.acc.lead': "Kubafundi abaludingayo kwiimvavanyo, njengokuvumelana nomboneleli.",
+  'rv.acc.extra': "Ixesha elongezelelweyo kwiimvavanyo",
+  'rv.acc.none': "Akukho xesha longezelelweyo",
+  'rv.acc.more': "+{n}% ixesha",
+  'rv.acc.read': "Funda ngokuvakalayo",
+  'rv.acc.readLead': "Iqhosha lifunda umbuzo ngamnye nokhetho lwawo ngokuvakalayo.",
+  'rv.acc.popia': "Kugcinwa isicwangciso kuphela, hayi isizathu. Gcina naziphi na iincwadi ezixhasayo kwifayile yomfundi kumboneleli.",
+  'rv.acc.save': "Gcina",
+  'as.acc.extra': "Unexesha elongezelelweyo eli-{n}% kolu vavanyo.",
+  'as.acc.read': "Funda ngokuvakalayo",
+  'as.acc.readQ': "Funda umbuzo {n} ngokuvakalayo",
 };
 
 export default xh;

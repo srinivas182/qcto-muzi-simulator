@@ -128,6 +128,7 @@ final class TestController extends Controller
         $bank = collect((array) ($sitting->task->content['questions'] ?? []))->keyBy('id');
 
         return response()->json(['data' => TestSittings::resultFor($sitting) + [
+            'enrolment_id' => $sitting->enrolment_id, 'accommodations' => $sitting->accommodations,
             'learner' => $sitting->enrolment->learner->fullName(), 'task' => ['code' => $sitting->task->code, 'title' => $sitting->task->title],
             'camera' => $sitting->camera, 'photos' => SittingPhoto::query()->where('test_sitting_id', $sitting->id)->orderBy('taken_at')->get()->map(fn (SittingPhoto $p) => ['id' => $p->id, 'taken_at' => $p->taken_at->toIso8601String()])->all(),
             'questions' => array_map(function (array $p) use ($bank, $sitting): array {

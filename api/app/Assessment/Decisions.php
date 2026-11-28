@@ -11,6 +11,7 @@ use App\Models\AssessmentTask;
 use App\Models\Attempt;
 use App\Models\Enrolment;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -48,7 +49,7 @@ final class Decisions
     /**
      * Record a decision.
      *
-     * @param  array{result: string, feedback?: string|null, links?: list<array<string, mixed>>, attempt_id?: string|null, observation?: list<array<string, mixed>>|null}  $input
+     * @param  array{result: string, feedback?: string|null, links?: list<array<string, mixed>>, attempt_id?: string|null, observation?: list<array<string, mixed>>|null, client_id?: string|null, declared_at?: string|null}  $input
      */
     public function decide(Enrolment $e, AssessmentTask $task, array $input, User $assessor): AssessmentDecision
     {
@@ -56,7 +57,16 @@ final class Decisions
             throw ValidationException::withMessages(['task' => 'This task is not a practical task of this learner’s programme.']);
         }
 
-        return DB::transaction(function () use ($e, $task, $input, $assessor): AssessmentDecision {
+        $client = isset($input['client_id']) && preg_match('/^[0-9a-f-]{36}$/', (string) $input['client_id']) === 1 ? (string) $input['client_id'] : null;
+        if ($client !== null && ($same = AssessmentDecision::query()->where('client_id', $client)->first()) !== null) {
+            if ($same->enrolment_id !== $e->id || $same->assessment_task_id !== $task->id) {
+                throw ValidationException::withMessages(['client_id' => 'This id belongs to another decision.']);
+            }
+
+            return $same; // sent again from a device that was offline: already recorded
+        }
+
+        return DB::transaction(function () use ($e, $task, $input, $assessor, $client): AssessmentDecision {
             $earlier = AssessmentDecision::query()->where('enrolment_id', $e->id)->where('assessment_task_id', $task->id)->lockForUpdate()->get();
             if ($earlier->contains('result', 'competent')) {
                 throw ValidationException::withMessages(['result' => 'This learner is already competent on this task.']);
@@ -77,7 +87,7 @@ final class Decisions
                 'enrolment_id' => $e->id, 'assessment_task_id' => $task->id, 'round' => $earlier->count() + 1, 'result' => $result,
                 'attempt_id' => $attempt?->id, 'observation' => $observation, 'feedback' => $feedback === '' ? null : mb_substr($feedback, 0, 2000),
                 'links' => $this->links($task, $input['links'] ?? []), 'evidence_hash' => $hash,
-                'assessor_id' => $assessor->id, 'declared_at' => now(),
+                'assessor_id' => $assessor->id, 'declared_at' => isset($input['declared_at']) ? min(now(), Carbon::parse((string) $input['declared_at'])) : now(), 'client_id' => $client,
             ]);
             $this->audit->record('assessments.decided', $decision, null, ['task' => $task->code, 'result' => $result, 'round' => $decision->round, 'hash' => $hash], $assessor);
 

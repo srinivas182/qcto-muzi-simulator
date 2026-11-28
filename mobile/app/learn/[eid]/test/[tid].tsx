@@ -5,10 +5,11 @@ import NetInfo from '@react-native-community/netinfo';
 import { useLocalSearchParams } from 'expo-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as Speech from 'expo-speech';
 import type { LearnAssessmentItem, TestPaper, TestResult } from '@simuwork/core';
 import { api } from '../../../../src/lib/api';
 import { useI18n } from '../../../../src/lib/i18n';
-import { Check, Clock, WifiOff } from '../../../../src/ui/icons';
+import { Check, Clock, Volume2, WifiOff } from '../../../../src/ui/icons';
 import { Button, Card, radius, Screen, space, T, useTheme } from '../../../../src/ui';
 
 type Answers = TestPaper['answers'];
@@ -106,11 +107,18 @@ function Sitting({ p, onDone }: { p: TestPaper; onDone: (r: TestResult) => void 
     <Screen title={p.task.title} subtitle={t('as.answered', { done, n: p.questions.length })}
       bottom={<Button title={t('as.handIn')} onPress={() => Alert.alert(t('as.handIn'), t('as.handInConfirm', { done, n: p.questions.length }), [{ text: t('common.cancel'), style: 'cancel' }, { text: t('as.handIn'), onPress: () => void send(true) }])} />}>
       <View style={[styles.row, { marginBottom: space.md }]}><Clock size={16} color={left < 120 ? c.danger : c.text} /><T style={{ fontWeight: '700', color: left < 120 ? c.danger : c.text }} accessibilityLiveRegion="polite">{clock(left)}</T></View>
+      {(p.extra_time ?? 0) > 0 ? <T variant="caption" tone="muted" style={{ marginBottom: space.sm }}>{t('as.acc.extra', { n: p.extra_time ?? 0 })}</T> : null}
       {p.camera ? <CameraCheck sitting={p.id} minutes={Math.ceil(p.seconds_left / 60)} label={t('as.cam.on')} /> : null}
       {offline ? <View style={[styles.row, styles.note]}><WifiOff size={16} color="#7A4B00" /><T style={{ flex: 1, color: '#7A4B00' }}>{t('as.offline')}</T></View> : null}
       {p.questions.map((q, i) => (
         <Card key={q.id} style={{ marginBottom: space.md, gap: space.sm }}>
           <T style={{ fontWeight: '700', fontSize: 16 }}>{`${i + 1}. ${q.prompt} `}<T variant="caption" tone="muted">{t('as.marks', { n: q.marks })}</T></T>
+          {p.read_aloud ? (
+            <Pressable accessibilityRole="button" accessibilityLabel={t('as.acc.readQ', { n: i + 1 })} style={[styles.row, { alignSelf: 'flex-start' }]}
+              onPress={() => { Speech.stop(); Speech.speak([q.prompt, ...q.options.map((o, k) => `${k + 1}. ${o}`)].join('. '), { language: `${p.locale}-ZA`, rate: 0.9 }); }}>
+              <Volume2 size={16} color={c.brand} /><T tone="brand" style={{ fontWeight: '700' }}>{t('as.acc.read')}</T>
+            </Pressable>
+          ) : null}
           {q.type === 'short' ? (
             <TextInput accessibilityLabel={q.prompt} multiline value={(answers[q.id] as string | undefined) ?? ''} onChangeText={(v) => answer(q.id, v)}
               style={[styles.input, { borderColor: c.line, color: c.text, backgroundColor: c.surface }]} />

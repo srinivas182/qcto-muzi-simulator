@@ -35,7 +35,7 @@ class AssessmentDecision extends Model
 {
     use BelongsToTenant, HasUuids;
 
-    protected $fillable = ['enrolment_id', 'assessment_task_id', 'round', 'result', 'attempt_id', 'observation', 'feedback', 'links', 'evidence_hash', 'assessor_id', 'declared_at'];
+    protected $fillable = ['enrolment_id', 'assessment_task_id', 'round', 'result', 'attempt_id', 'observation', 'feedback', 'links', 'evidence_hash', 'assessor_id', 'declared_at', 'client_id'];
 
     protected $attributes = ['links' => '[]'];
 

@@ -7,6 +7,7 @@ namespace Tests\Feature\Assessment;
 use App\Learners\IdNumbers;
 use App\Learning\ScenarioContent;
 use App\Models\Activity;
+use App\Models\AssessmentDecision;
 use App\Models\AssessmentTask;
 use App\Models\Attempt;
 use App\Models\Centre;
@@ -162,5 +163,23 @@ final class AssessorWorkspaceTest extends AccessTestCase
         $this->fresh()->getJson($this->url('/assess/queue', 'lebone.simuwork.test'), $this->bearer($other))->assertOk()->assertJsonCount(0, 'data.runs');
         $this->fresh()->getJson($this->url("/assess/attempts/{$run->id}", 'lebone.simuwork.test'), $this->bearer($other))->assertNotFound();
         $this->fresh()->getJson($this->url('/assess/queue'), $this->bearer($this->person($this->ubuntu, 'learner')[1]))->assertForbidden();
+    }
+
+    public function test_an_observation_signed_off_offline_is_recorded_once_and_accommodations_are_set_without_a_reason(): void
+    {
+        $body = ['result' => 'competent', 'observation' => [['met' => true], ['met' => true]], 'client_id' => (string) Str::uuid(), 'declared_at' => '2027-02-10T08:30:00Z'];
+        $first = $this->decide($body, $this->obs)->assertCreated();
+        $this->decide($body, $this->obs)->assertCreated()->assertJsonPath('data.id', $first->json('data.id')); // retried after the signal came back
+        $this->assertSame(1, app(TenantContext::class)->runAs($this->ubuntu, fn () => AssessmentDecision::query()->count()));
+        $this->assertSame('2027-02-10 08:30:00', app(TenantContext::class)->runAs($this->ubuntu, fn () => AssessmentDecision::query()->firstOrFail()->declared_at->format('Y-m-d H:i:s')));
+
+        $url = $this->url("/assess/enrolments/{$this->enrolment->id}/accommodations");
+        $this->fresh()->putJson($url, ['extra_time' => 50, 'read_aloud' => true], $this->bearer($this->person($this->ubuntu, 'moderator')[1]))->assertForbidden();
+        $this->fresh()->putJson($url, ['extra_time' => 40, 'read_aloud' => true], $this->bearer($this->assessor))->assertUnprocessable();
+        $this->fresh()->putJson($url, ['extra_time' => 50, 'read_aloud' => true, 'reason' => 'dyslexia'], $this->bearer($this->assessor))->assertOk()->assertJsonPath('data.extra_time', 50);
+        $this->assertAudited('assessments.accommodations');
+        $stored = app(TenantContext::class)->runAs($this->ubuntu, fn () => DB::table('enrolments')->where('id', $this->enrolment->id)->value('accommodations'));
+        $this->assertStringNotContainsString('dyslexia', (string) $stored);
+        $this->fresh()->getJson($url, $this->bearer($this->assessor))->assertJsonPath('data.read_aloud', true);
     }
 }

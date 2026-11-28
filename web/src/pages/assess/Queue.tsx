@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Camera, Inbox } from 'lucide-react';
 import type { AssessQueue, CohortItem } from '@simuwork/core';
 import { Badge, Card, cx, EmptyState, inputClass, PageHeader, Skeleton } from '../../components/ui';
 import { api } from '../../lib/api';
+import { flush, pending } from '../../lib/decisionOutbox';
 import { useI18n } from '../../lib/i18n';
 
 type Tab = 'mark' | 'runs' | 'observe' | 'done';
@@ -17,6 +18,15 @@ export default function AssessQueuePage() {
   const cohorts = useQuery({ queryKey: ['cohorts', false], queryFn: () => api<{ data: CohortItem[] }>('/cohorts') });
   const q = useQuery({ queryKey: ['assess-queue', cohort], queryFn: () => api<{ data: AssessQueue }>(`/assess/queue${cohort ? `?cohort=${cohort}` : ''}`) });
   const data = q.data?.data;
+  const [waiting, setWaiting] = useState(() => pending().length);
+  const [refused, setRefused] = useState<string[]>([]);
+  const refetch = q.refetch;
+  useEffect(() => {
+    const send = () => void flush().then((r) => { setWaiting(pending().length); if (r.refused.length) setRefused(r.refused.map((p) => `${p.learner}: ${p.task}`)); if (r.sent) void refetch(); });
+    send();
+    window.addEventListener('online', send);
+    return () => window.removeEventListener('online', send);
+  }, [refetch]);
   const date = (s?: string | null) => (s ? new Date(s).toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : '');
   const count = (k: Tab) => (data ? data[k].length : 0);
 
@@ -40,6 +50,8 @@ export default function AssessQueuePage() {
           {cohorts.data?.data.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
       } />
+      {waiting > 0 && <p role="status" className="mb-4 rounded-xl bg-[#FDF4E1] px-4 py-3 text-[14px] font-medium text-[#8A5A00]">{t('rv.outbox', { n: waiting })}</p>}
+      {refused.length > 0 && <p role="alert" className="mb-4 rounded-xl bg-[#FCEBEB] px-4 py-3 text-[14px] font-medium text-[#C92A2F]">{t('rv.refused', { list: refused.join(', ') })}</p>}
       <div role="tablist" className="mb-4 inline-flex flex-wrap rounded-xl bg-surface-2 p-1">
         {(['runs', 'observe', 'mark', 'done'] as Tab[]).map((k) => (
           <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={cx('h-9 rounded-lg px-4 text-[13px] font-semibold transition', tab === k ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink')}>

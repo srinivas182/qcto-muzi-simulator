@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Camera, CircleCheck, Clock, Hourglass, WifiOff } from 'lucide-react';
+import { ArrowLeft, Camera, Volume2, CircleCheck, Clock, Hourglass, WifiOff } from 'lucide-react';
 import type { LearnAssessmentItem, TestPaper, TestResult } from '@simuwork/core';
 import { startCameraCheck } from '../../lib/cameraCheck';
 import { Button, Card, cx, inputClass } from '../../components/ui';
@@ -60,6 +60,16 @@ export default function Test() {
       </Card>
     </div>
   );
+}
+
+/** Read a question and its choices aloud in the test's language (accommodation, Sprint 5.2b). */
+function speak(text: string, locale: string) {
+  if (typeof speechSynthesis === 'undefined') return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = `${locale}-ZA`;
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
 }
 
 function Sitting({ p, onDone }: { p: TestPaper; onDone: (r: TestResult) => void }) {
@@ -125,11 +135,18 @@ function Sitting({ p, onDone }: { p: TestPaper; onDone: (r: TestResult) => void 
         <span className={cx('flex items-center gap-1 font-semibold tabular-nums', left < 120 ? 'text-[#C92A2F]' : 'text-ink')} aria-live="polite"><Clock className="size-4" />{clock(left)}</span>
       </div>
       {p.camera && <p className="flex items-center gap-2 text-[12px] text-muted"><Camera className="size-3.5" />{t('as.cam.on')}</p>}
+      {(p.extra_time ?? 0) > 0 && <p className="text-[12px] text-muted">{t('as.acc.extra', { n: p.extra_time ?? 0 })}</p>}
       {offline && <p role="status" className="flex items-center gap-2 rounded-xl bg-[#FFF4E5] px-3 py-2 text-[14px] text-[#7A4B00]"><WifiOff className="size-4" />{t('as.offline')}</p>}
       {p.questions.map((q, i) => (
         <Card key={q.id} className="p-5">
           <fieldset>
             <legend className="text-[16px] font-semibold text-ink">{`${i + 1}. ${q.prompt}`} <span className="text-[12px] font-normal text-muted">{t('as.marks', { n: q.marks })}</span></legend>
+            {p.read_aloud && (
+              <button type="button" onClick={() => speak([q.prompt, ...q.options.map((o, k) => `${k + 1}. ${o}`)].join('. '), p.locale)}
+                className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1 text-[13px] font-semibold text-brand" aria-label={t('as.acc.readQ', { n: i + 1 })}>
+                <Volume2 className="size-4" />{t('as.acc.read')}
+              </button>
+            )}
             {q.type === 'short' ? (
               <textarea aria-label={q.prompt} rows={4} className={cx(inputClass, 'mt-3 h-auto py-2.5')} value={(answers[q.id] as string | undefined) ?? ''} onChange={(e) => answer(q.id, e.target.value)} />
             ) : (

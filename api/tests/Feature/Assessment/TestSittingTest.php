@@ -195,4 +195,10 @@ final class TestSittingTest extends AccessTestCase
         $this->assertSame(0, app(TenantContext::class)->runAs($this->ubuntu, fn () => SittingPhoto::query()->count()));
         Storage::disk('local')->assertDirectoryEmpty("sittings/{$this->ubuntu->id}/{$id}");
     }
+
+    public function test_extra_time_and_read_aloud_follow_the_learner_into_the_sitting(): void
+    {
+        app(TenantContext::class)->runAs($this->ubuntu, fn () => $this->enrolment->forceFill(['accommodations' => ['extra_time' => 50, 'read_aloud' => true]])->save());
+        $this->start()->assertCreated()->assertJsonPath('data.seconds_left', 1800)->assertJsonPath('data.read_aloud', true)->assertJsonPath('data.extra_time', 50);
+    }
 }

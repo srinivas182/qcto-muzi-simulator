@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Check, Fingerprint, Lightbulb, X } from 'lucide-react';
 import type { RunReplay } from '@simuwork/core';
+import { AccommodationsButton } from '../../components/assessment/Accommodations';
 import { DecisionForm, DecisionHistory } from '../../components/assessment/DecisionForm';
 import { Badge, Card, PageHeader, Skeleton } from '../../components/ui';
 import { api } from '../../lib/api';
@@ -20,7 +21,7 @@ export default function RunReview() {
   return (
     <div className="sw-in max-w-5xl">
       <Link to="/assess" className="mb-3 inline-flex items-center gap-1 text-[13px] font-semibold text-brand"><ArrowLeft className="size-4" />{t('rv.back')}</Link>
-      <PageHeader title={r.learner} lead={`${r.simulator.title} · ${new Date(r.finished_at ?? r.started_at).toLocaleString(locale)} · ${Math.round(r.duration_seconds / 60)} min${r.device ? ` · ${r.device}` : ''}`} />
+      <PageHeader title={r.learner} actions={<AccommodationsButton enrolmentId={r.enrolment_id} learner={r.learner} />} lead={`${r.simulator.title} · ${new Date(r.finished_at ?? r.started_at).toLocaleString(locale)} · ${Math.round(r.duration_seconds / 60)} min${r.device ? ` · ${r.device}` : ''}`} />
       <div className="grid gap-5 lg:grid-cols-[1fr_380px]">
         <div className="space-y-4">
           <Card className="flex flex-wrap items-center gap-3 p-4">
@@ -70,7 +71,7 @@ export default function RunReview() {
               <p className={`mt-3 text-[12px] font-semibold ${r.decision.hash_matches ? 'text-[#0E7C66]' : 'text-[#C92A2F]'}`}>{t(r.decision.hash_matches ? 'rv.hashSame' : 'rv.hashChanged')}</p>
             </Card>
           ) : r.task ? (
-            <DecisionForm task={r.task} enrolmentId={r.enrolment_id} attemptId={r.id} onDone={() => void qc.invalidateQueries({ queryKey: ['assess-run', id] })} />
+            <DecisionForm task={r.task} enrolmentId={r.enrolment_id} learner={r.learner} attemptId={r.id} onDone={() => void qc.invalidateQueries({ queryKey: ['assess-run', id] })} />
           ) : <Card className="p-5 text-[14px] text-muted">{t('rv.notATask')}</Card>}
           {r.task && <DecisionHistory history={r.task.history} />}
         </div>

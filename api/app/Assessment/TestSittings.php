@@ -55,7 +55,7 @@ final class TestSittings
         $sitting = TestSitting::query()->create([
             'enrolment_id' => $e->id, 'assessment_task_id' => $task->id, 'content_version' => $task->content_version, 'attempt' => $used + 1,
             'locale' => in_array($locale, QuestionBank::LOCALES, true) && isset($task->content['review'][$locale]['by']) ? $locale : 'en',
-            'started_at' => now(), 'deadline_at' => now()->addMinutes((int) ($task->settings['minutes'] ?? 30)), 'paper' => $paper, 'device' => $device === null ? null : mb_substr($device, 0, 40),
+            'started_at' => now(), 'deadline_at' => now()->addMinutes(Accommodations::minutes((int) ($task->settings['minutes'] ?? 30), $e)), 'accommodations' => Accommodations::of($e) === ['extra_time' => 0, 'read_aloud' => false] ? null : Accommodations::of($e), 'paper' => $paper, 'device' => $device === null ? null : mb_substr($device, 0, 40),
             'camera' => $camera, 'camera_consent_at' => $camera ? now() : null,
         ]);
         $this->audit->record('tests.started', $sitting, null, ['task' => $task->code, 'attempt' => $sitting->attempt, 'camera' => $camera], $actor);
@@ -78,7 +78,7 @@ final class TestSittings
             'id' => $s->id, 'task' => ['id' => $task->id, 'code' => $task->code, 'title' => $task->title, 'pass_mark' => (int) ($task->settings['pass_mark'] ?? 70)],
             'attempt' => $s->attempt, 'locale' => $s->locale, 'status' => $s->status, 'started_at' => $s->started_at->toIso8601String(),
             'deadline_at' => $s->deadline_at->toIso8601String(), 'seconds_left' => max(0, (int) now()->diffInSeconds($s->deadline_at, false)),
-            'answers' => $s->answers, 'camera' => $s->camera, 'photos_max' => $s->camera ? CameraChecks::MAX_PHOTOS : 0,
+            'answers' => $s->answers, 'read_aloud' => (bool) ($s->accommodations['read_aloud'] ?? false), 'extra_time' => (int) ($s->accommodations['extra_time'] ?? 0), 'camera' => $s->camera, 'photos_max' => $s->camera ? CameraChecks::MAX_PHOTOS : 0,
             'questions' => array_map(function (array $p) use ($bank, $tr): array {
                 $q = (array) $bank->get($p['id']);
                 $t = (array) ($tr[$p['id']] ?? []);

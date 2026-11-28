@@ -1463,6 +1463,23 @@ const zu: Messages = {
   'as.fb.lesson': "Phinda isifundo: {what}",
   'as.fb.step': "Zijwayeze lesi sinyathelo: {what}",
   'as.fb.tries': "Amanye amathuba angu-{n} kulo msebenzi.",
+  // Sprint 5.2b: offline sign-off, accommodations
+  'rv.queued': "Ayikho isignali. Isinqumo sigcinwe kule divayisi futhi sizothunyelwa uma usubuyele ku-inthanethi.",
+  'rv.outbox': "Izinqumo ezingu-{n} zilinde kule divayisi futhi zizothunyelwa uma uku-inthanethi.",
+  'rv.refused': "Lokhu akukwazanga ukurekhodwa (umfundi wayesehlulelwe, noma umsebenzi ushintshile): {list}. Sicela ukuhlole futhi.",
+  'rv.acc.button': "Izinhlinzeko ezikhethekile",
+  'rv.acc.title': "Izinhlinzeko ezikhethekile zika-{name}",
+  'rv.acc.lead': "Zabafundi abazidingayo ekuhlolweni, njengokuvumelana nomhlinzeki.",
+  'rv.acc.extra': "Isikhathi esengeziwe ekuhlolweni",
+  'rv.acc.none': "Asikho isikhathi esengeziwe",
+  'rv.acc.more': "+{n}% isikhathi",
+  'rv.acc.read': "Funda ngokuzwakalayo",
+  'rv.acc.readLead': "Inkinobho ifunda umbuzo ngamunye nezinketho zawo ngokuzwakalayo.",
+  'rv.acc.popia': "Kugcinwa isilungiselelo kuphela, hhayi isizathu. Gcina noma yimiphi imibhalo esekelayo efayeleni lomfundi kumhlinzeki.",
+  'rv.acc.save': "Gcina",
+  'as.acc.extra': "Unesikhathi esengeziwe esingu-{n}% kulokhu kuhlolwa.",
+  'as.acc.read': "Funda ngokuzwakalayo",
+  'as.acc.readQ': "Funda umbuzo {n} ngokuzwakalayo",
 };
 
 export default zu;
