@@ -227,3 +227,56 @@ We fix what the pilot shows before producing content for the other 12 programmes
 | Narration has no voice yet | Choose a TTS provider (open decision) | Proposed for later |
 | A wrong answer just shows the answer | "Fix it" retry with a hint before the answer | Proposed for 4.5 |
 | Learners cannot jump from a lesson into practice | "Try it" opens the simulator | Wired now, live in 4.4 |
+
+## Sub-sprint 4.4 notes (simulator runtime)
+
+**Built**
+- **Scenario format** (`api/app/Learning/ScenarioContent.php`, mirrored in `packages/core/src/scenario.ts`):
+  - A scene from the library (first: `pc-bench`), a pass mark, and a real-job brief (minutes and the customer).
+  - Steps of three kinds: `tap`, `choose` and `place`. Place is tap-then-tap, so there is no precise dragging.
+  - Each step has hints, a "why it matters" note, a QCTO outcome, a lesson link, a `critical` (safety) flag,
+    `sets` (how the scene changes) and `wrong[]` (the consequence of each wrong move).
+  - Reviewed translations only, the same rule as lessons.
+- **Runtime:** a pure reducer shared by the web 3D view, the web simple view and the mobile app.
+- **Server-side scoring:** a simulator attempt's score, completion and pass are worked out on the server
+  from the learner's moves. Whatever the device claims is ignored.
+  - Each step is worth 1, less 0.25 per mistake and 0.15 per hint.
+  - A safety mistake fails real-job mode.
+- **Modes:**
+  - Practice has hints that get more specific each time.
+  - Real job has no hints, a countdown and the customer's brief.
+  - The mode screen shows the best score and tries for each mode.
+- **Consequences:** a live PC sparks, static crackles blue and a wrong part beeps red, each with a message.
+- **Debrief:** score and verdict, then every step marked (right first time, mistakes, hints), with when it
+  happened, why it matters and "Review the lesson".
+- **3D:** three.js in its own lazy chunk, 127.8 KB of 150 KB. The scene is built from shapes, so it needs no
+  model download.
+  - It renders only on change, at a pixel ratio of 1.5 or less.
+  - Drag to look around; the camera steps back on narrow screens.
+  - An object can't be tapped through the case wall.
+  - Every object is also a big button below the scene (accessibility).
+- **2D fallback:** phones without WebGL get the simple view, and anyone can switch to it.
+- **Read aloud:** every instruction can be read aloud (browser speech on web, expo-speech on mobile).
+- **Mobile:** the native step-by-step runtime with the same scoring, modes and debrief.
+
+**Change from the plan (for Srini):** the 3D view on mobile (the WebView with a bundled runtime) moves to 4.6,
+together with offline packs. The WebView has to load from the downloaded pack anyway. Until then, the app uses
+the step-by-step view, and the browser on the same phone gives full 3D.
+
+**Checks:** API 248 tests, web 92, mobile 33. First load is 144.2 KB of 170. The 3D engine is 127.8 KB of 150,
+now checked in CI. The learner language part is at most 5.9 KB.
+
+### Gaps we fill and best recommendations (4.4)
+| Gap against the leaders | What we did | When |
+|---|---|---|
+| Transfr needs a headset; Labster needs a laptop | 3D in any phone browser; step-by-step view in the app and on phones without WebGL | This sprint |
+| Wrong moves just say "incorrect" | Consequences you see (sparks, static, beeps) plus a plain-language reason | This sprint |
+| One mode for everyone | Practice with graded hints; real job with clock, customer, no hints, and safety steps that fail the job | This sprint |
+| Scores can be gamed on the device | Server re-scores every attempt from the moves | This sprint |
+| No link back to learning | Debrief marks each step and links to the lesson that covers it | This sprint |
+| Low-literacy learners | Read aloud on every instruction, big object buttons, icons | This sprint |
+| Same fault, same fix every time | Branching causes for the same symptom | Proposed for 4.5 |
+| Debrief is a list, not a picture | An animated 3D replay with mistakes marked | Proposed for later |
+| Isolated practice | AI coach ("Why?" / "Help") inside the run | Proposed for 4.7 |
+| 3D in the app offline | WebView runtime shipped in the offline pack | Proposed for 4.6 |
+| Pinch to zoom on phones | Add pinch zoom to the 3D view | Proposed for later |

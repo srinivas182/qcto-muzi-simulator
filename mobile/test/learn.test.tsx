@@ -70,3 +70,38 @@ describe('lesson player', () => {
     expect(sent).toMatchObject({ enrolment_id: 'e1', activity_id: 'a1', mode: 'lesson', completed: true, score: 100, device: 'mobile' });
   });
 });
+
+describe('simulator', () => {
+  const base = { hints: [], why: '', outcome: null, lesson: null, critical: false, sets: {}, wrong: [] };
+  const scenario = {
+    id: 's1', code: 'TS-S01', title: 'A PC won’t boot', summary: null, minutes: 12, content_version: 1, locale: 'en', lessons: { 'TS-L02': 'l2' }, results: { practice: null, job: null },
+    content: { scene: 'pc-bench', pass_mark: 70, job: { minutes: 12, customer: 'Thandi' }, steps: [
+      { ...base, id: 'unplug', type: 'tap', target: 'wall-switch', prompt: 'Make the PC safe.', critical: true, why: 'Live PCs shock.', lesson: { code: 'TS-L02', block: null },
+        sets: { 'wall-switch': 'off' }, wrong: [{ on: 'case-panel', effect: 'spark', message: 'You opened a live PC.' }] },
+      { ...base, id: 'fitram', type: 'place', target: 'ram-new', slot: 'slot-a1', prompt: 'Fit the new RAM.', sets: { 'ram-new': 'in' } },
+    ] },
+  };
+
+  it('plays a practice run step by step, shows consequences and debriefs with the server-matching score', async () => {
+    await seed({ signedIn: true });
+    const calls = mockApi({
+      '/session': { data: session() },
+      '/learn/enrolments/e1/scenarios/s1?locale=en': { data: scenario },
+      '/learn/attempts/sync': ((b: { attempts: { client_id: string }[] }) => [200, { data: { accepted: b.attempts.map((a) => a.client_id), rejected: [], progress: { e1: 60 } } }]) as never,
+    });
+    await renderRouter('./app', { initialUrl: '/learn/e1/simulator/s1' });
+    await act(async () => fireEvent.press(await screen.findByText('Start: Practice')));
+    expect(await screen.findByText('Make the PC safe.')).toBeOnTheScreen();
+    await act(async () => fireEvent.press(screen.getByText('Side panel of the case')));
+    expect(screen.getByText(/You opened a live PC\./)).toBeOnTheScreen();
+    await act(async () => fireEvent.press(screen.getByText('Wall socket switch')));
+    await act(async () => fireEvent.press(screen.getByText('New RAM stick')));
+    expect(screen.getByText('Holding the new ram stick. Now tap where it goes.')).toBeOnTheScreen();
+    await act(async () => fireEvent.press(screen.getByText('Memory slot A1')));
+    await settle();
+    expect(await screen.findByText('Score 88%')).toBeOnTheScreen(); // (0.75 + 1) / 2
+    expect(screen.getByText('Review the lesson')).toBeOnTheScreen();
+    const sent = JSON.parse(String(calls.find((c) => c.path === '/learn/attempts/sync')!.init.body)).attempts[0];
+    expect(sent).toMatchObject({ activity_id: 's1', mode: 'practice', completed: true, score: 88, device: 'mobile' });
+  });
+});

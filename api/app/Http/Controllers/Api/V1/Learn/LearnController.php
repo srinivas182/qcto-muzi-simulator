@@ -10,7 +10,9 @@ use App\Http\Controllers\Controller;
 use App\Learning\AttemptSync;
 use App\Learning\LessonContent;
 use App\Learning\Progress;
+use App\Learning\ScenarioContent;
 use App\Models\Activity;
+use App\Models\Attempt;
 use App\Models\ContentAsset;
 use App\Models\Enrolment;
 use App\Models\Learner;
@@ -99,6 +101,31 @@ final class LearnController extends Controller
             'assets' => ContentAsset::query()->whereIn('id', $assetIds->filter(fn ($id) => preg_match('/^[0-9a-f-]{36}$/', (string) $id) === 1))->get()->mapWithKeys(fn (ContentAsset $a) => [$a->id => $a->present()]),
             'scenarios' => Activity::query()->where('programme_version_id', $activity->programme_version_id)->where('kind', Activity::SCENARIO)->where('status', Activity::PUBLISHED)->get(['id', 'code', 'title'])->keyBy('code'),
         ]])->header('Cache-Control', 'private, max-age=300');
+    }
+
+    /**
+     * A simulator scenario in the learner's language, with where each step's lesson lives (for the debrief)
+     * and the learner's best result so far in practice and in real-job mode.
+     */
+    public function scenario(Request $request, Enrolment $enrolment, Activity $activity): JsonResponse
+    {
+        if ($enrolment->learner_id !== $this->learner($request)->id || $activity->programme_version_id !== $enrolment->programme_version_id
+            || $activity->status !== Activity::PUBLISHED || $activity->kind !== Activity::SCENARIO) {
+            throw new NotFoundHttpException;
+        }
+        $locale = in_array($request->query('locale'), LessonContent::LOCALES, true) ? (string) $request->query('locale') : 'en';
+        $content = ScenarioContent::localise($activity->content ?? [], $locale);
+        $best = Attempt::query()->where('enrolment_id', $enrolment->id)->where('activity_id', $activity->id)->whereNotNull('finished_at')
+            ->get(['mode', 'score', 'result'])->groupBy('mode')
+            ->map(fn ($list) => ['best' => (int) $list->max('score'), 'tries' => $list->count(), 'passed' => $list->contains(fn (Attempt $a) => (bool) ($a->result['passed'] ?? false))]);
+
+        return response()->json(['data' => [
+            'id' => $activity->id, 'code' => $activity->code, 'title' => $activity->title, 'summary' => $activity->summary, 'minutes' => $activity->minutes,
+            'content_version' => $activity->content_version, 'locale' => $locale === 'en' || isset($activity->content['review'][$locale]['by']) ? $locale : 'en',
+            'content' => $content,
+            'lessons' => Activity::query()->where('programme_version_id', $activity->programme_version_id)->where('kind', Activity::LESSON)->where('status', Activity::PUBLISHED)->pluck('id', 'code'),
+            'results' => ['practice' => $best->get('practice'), 'job' => $best->get('job')],
+        ]])->header('Cache-Control', 'private, no-cache');
     }
 
     /** Attempts from the device, online or queued offline. Safe to send again; see AttemptSync. */

@@ -22,6 +22,8 @@ export default defineConfig({
         manualChunks(id: string) {
           if (/node_modules\/(react|react-dom|react-router|scheduler)\//.test(id)) return 'react';
           if (id.includes('node_modules/@tanstack/')) return 'query';
+          // The 3D engine: only downloaded when a simulator opens (own budget, 150 KB gzip).
+          if (id.includes('node_modules/three/')) return 'three';
           if (id.startsWith('\0virtual:locale/')) return `lang-${id.split('/').slice(1).join('-')}`;
           return undefined;
         },
