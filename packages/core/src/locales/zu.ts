@@ -1251,6 +1251,26 @@ const zu: Messages = {
   'sim.askCoach': "Buza umqeqeshi",
   'sim.why': "Kungani?",
   'sim.coachThinking': "Umqeqeshi uyacabanga…",
+  // Sprint 4.7b: class mode
+  'sim.classNow': "Ikilasi lakho lenza lokhu manje",
+  'sim.joinClass': "Joyina",
+  'cm.title': "Imodi yekilasi",
+  'cm.lead': "Qhuba i-simulator eyodwa nekilasi lonke. Abafundi bayibona esikrinini sabo sasekhaya bese bejoyina; ubona isinyathelo ngasinye bukhoma nokuthi ubani obambekile.",
+  'cm.noScenarios': "Lolu hlelo alunawo ama-simulator ashicilelwe okwamanje.",
+  'cm.which': "I-simulator",
+  'cm.mode': "Imodi",
+  'cm.start': "Qala nekilasi",
+  'cm.liveNow': "Bukhoma manje",
+  'cm.end': "Qeda ikilasi",
+  'cm.ended': "Ikilasi liphelile.",
+  'cm.joined': "Bajoyinile",
+  'cm.finished': "Baqedile",
+  'cm.stuck': "Babambekile",
+  'cm.notJoined': "Akakajoyini",
+  'cm.step': "Isinyathelo {n} kwezingu-{total}",
+  'cm.counts': "amaphutha angu-{mistakes} · usizo olungu-{help}",
+  'cm.stuckBadge': "Ubambekile",
+  'cm.working': "Uyasebenza",
 };
 
 export default zu;

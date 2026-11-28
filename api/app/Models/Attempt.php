@@ -27,6 +27,7 @@ use Illuminate\Support\Carbon;
  * @property int $duration_seconds
  * @property array<string, mixed> $result
  * @property string|null $device
+ * @property Carbon $updated_at
  */
 class Attempt extends Model
 {

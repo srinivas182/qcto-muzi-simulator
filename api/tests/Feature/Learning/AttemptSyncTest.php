@@ -411,4 +411,31 @@ final class AttemptSyncTest extends AccessTestCase
         $events = [['step' => 'unplug', 'action' => 'coach', 'value' => 'help'], ...self::RIGHT];
         $this->assertSame(95, ScenarioContent::score($content, $events, 'practice')['score']); // (0.85 + 1 + 1) / 3
     }
+
+    public function test_class_mode_runs_one_simulator_for_the_class_and_shows_each_learner_live(): void
+    {
+        [, $facilitator] = $this->person($this->ubuntu, 'facilitator');
+        $cohort = $this->enrolment->cohort_id;
+        $this->fresh()->postJson($this->url("/cohorts/{$cohort}/class"), ['activity_id' => $this->a['L1']->id, 'mode' => 'practice'], $this->bearer($facilitator))->assertUnprocessable(); // lessons are not simulators
+        $this->fresh()->postJson($this->url("/cohorts/{$cohort}/class"), ['activity_id' => $this->a['S1']->id, 'mode' => 'practice'], $this->bearer($this->token))->assertForbidden();
+        $started = $this->fresh()->postJson($this->url("/cohorts/{$cohort}/class"), ['activity_id' => $this->a['S1']->id, 'mode' => 'practice'], $this->bearer($facilitator))->assertCreated()
+            ->assertJsonPath('data.summary.joined', 0)->assertJsonPath('data.learners.0.joined', false);
+        $sid = (string) $started->json('data.session.id');
+        $this->assertAudited('classes.live_started');
+
+        // The learner sees it on their home screen and joins; each move is sent straight away.
+        $this->fresh()->getJson($this->url('/learn/home'), $this->bearer($this->token))->assertJsonPath('data.enrolments.0.class.id', $sid)->assertJsonPath('data.enrolments.0.class.mode', 'practice');
+        $wrong = ['step' => 'unplug', 'action' => 'tap', 'value' => 'case-panel'];
+        $item = $this->item('S1', ['finished_at' => null, 'completed' => false, 'result' => ['events' => [$wrong, $wrong, $wrong], 'class_session' => $sid]]);
+        $this->sync([$item]);
+        $board = fn () => $this->fresh()->getJson($this->url("/cohorts/{$cohort}/class"), $this->bearer($facilitator))->assertOk();
+        $board()->assertJsonPath('data.learners.0.joined', true)->assertJsonPath('data.learners.0.step', 1)->assertJsonPath('data.learners.0.stuck', true)->assertJsonPath('data.summary.stuck', 1);
+
+        $this->sync([array_merge($item, ['finished_at' => '2027-02-10T08:09:00Z', 'result' => ['events' => [$wrong, ...self::RIGHT], 'class_session' => $sid]])]);
+        $board()->assertJsonPath('data.learners.0.finished', true)->assertJsonPath('data.learners.0.stuck', false)->assertJsonPath('data.learners.0.passed', true)->assertJsonPath('data.summary.finished', 1);
+
+        $this->fresh()->postJson($this->url("/class-sessions/{$sid}/end"), [], $this->bearer($facilitator))->assertOk()->assertJsonPath('data.live', false);
+        $board()->assertJsonPath('data', null);
+        $this->fresh()->getJson($this->url('/learn/home'), $this->bearer($this->token))->assertJsonPath('data.enrolments.0.class', null);
+    }
 }

@@ -1251,6 +1251,26 @@ const af: Messages = {
   'sim.askCoach': "Vra die afrigter",
   'sim.why': "Hoekom?",
   'sim.coachThinking': "Die afrigter dink…",
+  // Sprint 4.7b: class mode
+  'sim.classNow': "Jou klas doen dit nou",
+  'sim.joinClass': "Sluit aan",
+  'cm.title': "Klasmodus",
+  'cm.lead': "Doen een simulator met die hele klas. Leerders sien dit op hul tuisskerm en sluit aan; jy sien elke stap regstreeks en wie vassit.",
+  'cm.noScenarios': "Hierdie program het nog geen gepubliseerde simulators nie.",
+  'cm.which': "Simulator",
+  'cm.mode': "Modus",
+  'cm.start': "Begin met die klas",
+  'cm.liveNow': "Nou regstreeks",
+  'cm.end': "Beëindig klas",
+  'cm.ended': "Klas beëindig.",
+  'cm.joined': "Aangesluit",
+  'cm.finished': "Klaar",
+  'cm.stuck': "Sit vas",
+  'cm.notJoined': "Nog nie aangesluit nie",
+  'cm.step': "Stap {n} van {total}",
+  'cm.counts': "{mistakes} foute · {help} hulp",
+  'cm.stuckBadge': "Sit vas",
+  'cm.working': "Besig",
 };
 
 export default af;

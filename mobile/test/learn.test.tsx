@@ -185,3 +185,27 @@ describe('offline packs', () => {
     expect(screen.getByText('3D view')).toBeOnTheScreen();
   });
 });
+
+describe('class mode', () => {
+  it('the learner joins the class from home and moves are sent live, tagged with the class', async () => {
+    await seed({ signedIn: true });
+    const scenario = { id: 's1', code: 'TS-S01', title: 'A PC won’t boot', summary: null, minutes: 12, content_version: 1, locale: 'en', lessons: {}, results: { practice: null, job: null },
+      content: { scene: 'pc-bench', pass_mark: 70, job: null, variants: [], steps: [
+        { id: 'unplug', type: 'tap', target: 'wall-switch', prompt: 'Make it safe.', hints: [], why: '', outcome: null, lesson: null, critical: false, only: [], sets: {}, wrong: [] },
+        { id: 'strap', type: 'tap', target: 'strap', prompt: 'Strap on.', hints: [], why: '', outcome: null, lesson: null, critical: false, only: [], sets: {}, wrong: [] },
+      ] } };
+    const calls = mockApi({
+      '/session': { data: session() },
+      '/learn/home': { data: { ...home, enrolments: [{ ...home.enrolments[0], next: null, class: { id: 'cs1', cohort_id: 'c1', activity_id: 's1', title: 'A PC won’t boot', code: 'TS-S01', mode: 'practice', started_at: '', live: true } }] } },
+      '/learn/enrolments/e1/scenarios/s1?locale=en': { data: scenario },
+      '/learn/attempts/sync': ((b: { attempts: { client_id: string }[] }) => [200, { data: { accepted: b.attempts.map((a) => a.client_id), rejected: [], progress: {} } }]) as never,
+    });
+    await renderRouter('./app', { initialUrl: '/home' });
+    await act(async () => fireEvent.press(await screen.findByText('Your class is doing this now')));
+    await act(async () => fireEvent.press(await screen.findByText('Join')));
+    await act(async () => fireEvent.press(await screen.findByText('Wall socket switch')));
+    await settle();
+    const sync = calls.find((c) => c.path === '/learn/attempts/sync');
+    expect(JSON.parse(String(sync!.init.body)).attempts[0]).toMatchObject({ mode: 'practice', result: { class_session: 'cs1' } });
+  });
+});

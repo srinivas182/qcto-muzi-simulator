@@ -8,8 +8,10 @@ use App\Cohorts\CohortPresenter;
 use App\Cohorts\Cohorts;
 use App\Cohorts\Enrolments;
 use App\Http\Controllers\Controller;
+use App\Learning\ClassMode;
 use App\Learning\CohortProgress;
 use App\Models\Centre;
+use App\Models\ClassSession;
 use App\Models\Cohort;
 use App\Models\Enrolment;
 use App\Models\LicencePool;
@@ -75,6 +77,34 @@ final class CohortController extends Controller
     public function progress(Cohort $cohort, CohortProgress $progress): JsonResponse
     {
         return response()->json(['data' => $progress->board($cohort)])->header('Cache-Control', 'private, no-cache');
+    }
+
+    /** Class mode: start a simulator for the whole class (ends any class still running). */
+    public function startClass(Request $request, Cohort $cohort, ClassMode $classes): JsonResponse
+    {
+        $data = $request->validate(['activity_id' => ['required', 'uuid'], 'mode' => ['required', 'in:practice,job']]);
+        /** @var User $actor */
+        $actor = $request->user();
+        $session = $classes->start($cohort, $data['activity_id'], $data['mode'], $actor);
+
+        return response()->json(['data' => $classes->board($session->load('activity'))], 201);
+    }
+
+    /** Class mode: the live board (polled every few seconds by the facilitator's screen). */
+    public function liveClass(Cohort $cohort, ClassMode $classes): JsonResponse
+    {
+        $session = ClassSession::liveFor($cohort->id);
+
+        return response()->json(['data' => $session === null ? null : $classes->board($session)])->header('Cache-Control', 'no-store');
+    }
+
+    public function endClass(Request $request, ClassSession $session, ClassMode $classes): JsonResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        $classes->end($session, $actor);
+
+        return response()->json(['data' => ClassMode::present($session->load('activity'))]);
     }
 
     /** A learner's job-ready checklist, as their facilitator sees it. */

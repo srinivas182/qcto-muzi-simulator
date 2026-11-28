@@ -521,3 +521,30 @@ now checked in CI. The learner language part is at most 5.9 KB.
 | AI cost grows with learners | Cached per step and language; author fallback | This sprint |
 | Spoken coach | Read the coach's answer aloud (the TTS decision is still open) | Proposed for later |
 | Coach quality review | HQ sees the most-asked steps and improves those hints | Proposed for 4.7c (pilot measures) |
+
+## Sub-sprint 4.7b notes (class mode)
+
+**Built**
+- **`class_sessions`** (with RLS): the facilitator starts one simulator for a class in practice or real-job
+  mode (`POST /cohorts/{c}/class`, permission `live_classroom.run`). Starting a new class ends any class
+  still open. A class left open closes itself after 4 hours, and starting and ending are audited.
+- **Learners** see "Your class is doing this now · Join" on their home screen, on web and mobile
+  (`/learn/home` → `class`). Joining opens the simulator in the mode the facilitator chose.
+  - Each move is sent straight away, at most every 2 seconds, through the normal offline-safe sync.
+  - Each attempt is tagged `result.class_session`.
+- **Live board** (`GET /cohorts/{c}/class`, polled every 4 s, page `/admin/cohorts/:id/class`):
+  - Each learner's step, mistakes, help used, and whether they finished with their score.
+  - **Stuck** means no move for 2 minutes, or 3 mistakes on one step. Stuck learners are listed first.
+  - Tiles show how many have joined, finished, or are stuck. The facilitator can end the class.
+  - It uses the same server scoring as everything else, and no new personal data is collected.
+
+**Checks:** API 263 tests, web 106, mobile 38.
+
+### Gaps we fill and best recommendations (4.7b)
+| Gap against the leaders | What we did | When |
+|---|---|---|
+| Transfr class use needs shared headsets, one learner at a time | Every learner on their own phone, the whole class at once | This sprint |
+| Facilitators cannot see who is struggling until the end | Live board with "stuck" detection, stuck learners first | This sprint |
+| Live classrooms need fast Wi-Fi | Moves are tiny (a few hundred bytes); they work on mobile data and queue if the signal drops | This sprint |
+| Polling every 4 s | Push updates with Laravel Reverb (WebSockets) when classes grow large | Proposed for later |
+| Facilitator help | "Send a hint to Sipho" from the board | Proposed for later |

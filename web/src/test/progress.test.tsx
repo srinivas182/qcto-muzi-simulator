@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import type { ChecklistArea, CohortBoard } from '@simuwork/core';
+import type { ChecklistArea, ClassBoard, CohortBoard } from '@simuwork/core';
 import { mockApi, nav, renderAt, session } from './harness';
 
 const areas: ChecklistArea[] = [{ number: 2, title: 'Diagnose faults', outcomes: [
@@ -66,5 +66,29 @@ describe('Progress', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
     await waitFor(() => expect(calls.mock.calls.some(([u, i]) => String(u).endsWith('/learn/shares/sh1') && (i as RequestInit).method === 'DELETE')).toBe(true));
     await waitFor(() => expect(screen.queryByText(/Opened 2 times/)).not.toBeInTheDocument());
+  });
+
+  it('class mode: the facilitator starts a simulator and sees who is stuck', async () => {
+    const live: ClassBoard = {
+      session: { id: 'cs1', cohort_id: 'c1', activity_id: 's1', title: 'A PC won’t boot', code: 'TS-S01', mode: 'practice', started_at: '', live: true },
+      learners: [
+        { id: 'e1', name: 'Sipho Ndlovu', joined: true, step: 3, steps: 10, finished: false, score: null, passed: null, mistakes: 4, help: 1, last_move_at: '', stuck: true },
+        { id: 'e2', name: 'Lerato Mokoena', joined: false },
+      ],
+      summary: { learners: 2, joined: 1, finished: 0, stuck: 1 },
+    };
+    let started = false;
+    const calls = mockApi({
+      '/cohorts/c1/class': (init?: RequestInit) => { if (init?.method === 'POST') started = true; return { data: started ? live : null }; },
+      '/cohorts/c1/progress': { data: board },
+    }, session({ permissions: ['classes.view', 'live_classroom.run'], navigation: nav('admin.cohorts') }));
+    renderAt('/admin/cohorts/c1/class');
+    fireEvent.click(await screen.findByRole('button', { name: 'Start with the class' }));
+    expect(await screen.findByText('Sipho Ndlovu')).toBeInTheDocument();
+    expect(screen.getByText('Step 3 of 10')).toBeInTheDocument();
+    expect(screen.getAllByText('Stuck').length).toBeGreaterThan(0);
+    expect(screen.getByText('Not joined yet')).toBeInTheDocument();
+    const body = JSON.parse(String((calls.mock.calls.find(([u, i]) => String(u).endsWith('/cohorts/c1/class') && (i as RequestInit).method === 'POST')![1] as RequestInit).body));
+    expect(body).toEqual({ activity_id: 's1', mode: 'practice' });
   });
 });

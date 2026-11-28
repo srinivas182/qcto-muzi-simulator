@@ -98,4 +98,17 @@ describe('Simulator', () => {
     await screen.findByText('Make the PC safe before you open it.');
     expect(screen.queryByRole('button', { name: 'Ask the coach' })).not.toBeInTheDocument();
   });
+
+  it('class mode: the learner joins from the link and each move is sent straight away, tagged with the class', async () => {
+    const calls = mockApi({ '/learn/enrolments/e1/scenarios/s1': { data: scenario }, '/learn/attempts/sync': syncer }, learner());
+    renderAt('/learn/enrolments/e1/simulators/s1?class=cs1&mode=job');
+    expect(await screen.findByText('Your class is doing this now')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Join' }));
+    expect(await screen.findByText('Thandi needs her PC before payroll.')).toBeInTheDocument(); // real-job mode, as the facilitator chose
+    fireEvent.click(screen.getByRole('button', { name: /Wall socket switch/ }));
+    await waitFor(() => expect(calls.mock.calls.some(([u]) => String(u).endsWith('/learn/attempts/sync'))).toBe(true));
+    const body = JSON.parse(String((calls.mock.calls.find(([u]) => String(u).endsWith('/learn/attempts/sync'))![1] as RequestInit).body));
+    expect(body.attempts[0]).toMatchObject({ mode: 'job', result: { class_session: 'cs1' } });
+    expect(body.attempts[0].finished_at ?? null).toBeNull();
+  });
 });

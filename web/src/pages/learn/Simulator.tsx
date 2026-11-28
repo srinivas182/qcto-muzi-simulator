@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState, type ReactNode } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useParams, useSearchParams } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, BookOpen, Briefcase, Check, CircleAlert, Dumbbell, Lightbulb, RotateCcw, ShieldAlert, Wifi, WifiOff, X } from 'lucide-react';
+import { ArrowLeft, BookOpen, Briefcase, Check, CircleAlert, Dumbbell, Lightbulb, Radio, RotateCcw, ShieldAlert, Wifi, WifiOff, X } from 'lucide-react';
 import { scoreRun, type LearnScenario, type SimMode, type SimScore, type SimState } from '@simuwork/core';
 import { SimRunner } from '../../components/sim/SimRunner';
 import { Badge, Button, Card, cx, Skeleton } from '../../components/ui';
@@ -26,6 +26,12 @@ function Play({ eid, sc }: { eid: string; sc: LearnScenario }) {
   const { t, locale } = useI18n();
   const qc = useQueryClient();
   const [run, setRun] = useState<Run | null>(null);
+  // Class mode: joined from "Your class is doing this now"; every move is sent straight away so the
+  // facilitator sees it live.
+  const [params] = useSearchParams();
+  const classId = params.get('class');
+  const classMode: SimMode = params.get('mode') === 'job' ? 'job' : 'practice';
+  const lastSync = useRef(0);
   const [finished, setFinished] = useState<Finished | null>(null);
   const attempt = useRef<Promise<string> | null>(null);
 
@@ -35,13 +41,16 @@ function Play({ eid, sc }: { eid: string; sc: LearnScenario }) {
     setRun((r) => ({ mode, n: (r?.n ?? 0) + 1 }));
   };
   const onMove = useCallback((s: SimState, seconds: number) => {
-    void attempt.current?.then((id) => attempts.update(id, { result: { events: s.events, variant: s.variant }, duration_seconds: seconds }));
-  }, []);
+    void attempt.current?.then(async (id) => {
+      await attempts.update(id, { result: { events: s.events, variant: s.variant, ...(classId ? { class_session: classId } : {}) }, duration_seconds: seconds });
+      if (classId && Date.now() - lastSync.current > 2000) { lastSync.current = Date.now(); void syncAttempts(); }
+    });
+  }, [classId]);
   const onDone = useCallback((s: SimState, seconds: number) => {
     const score = scoreRun(sc.content, s.events, s.mode, s.variant);
     void (async () => {
       const id = await attempt.current!;
-      await attempts.finish(id, { completed: score.completed, score: score.score, duration_seconds: seconds, result: { events: s.events, variant: s.variant } });
+      await attempts.finish(id, { completed: score.completed, score: score.score, duration_seconds: seconds, result: { events: s.events, variant: s.variant, ...(classId ? { class_session: classId } : {}) } });
       const progress = await syncAttempts();
       setFinished({ mode: s.mode, state: s, score, seconds, synced: eid in progress });
       setRun(null);
@@ -49,7 +58,7 @@ function Play({ eid, sc }: { eid: string; sc: LearnScenario }) {
       void qc.invalidateQueries({ queryKey: ['learn-activities', eid] });
       void qc.invalidateQueries({ queryKey: ['learn-scenario', sc.id] });
     })();
-  }, [eid, qc, sc.content, sc.id]);
+  }, [eid, qc, sc.content, sc.id, classId]);
 
   const coach = useCallback((step: string, kind: 'why' | 'help', variant: string | null) =>
     api<{ data: { answer: string } }>(`/learn/enrolments/${eid}/scenarios/${sc.id}/coach`, { method: 'POST', body: { step, kind, variant, locale } }).then((r) => r.data.answer), [eid, sc.id, locale]);
@@ -64,6 +73,20 @@ function Play({ eid, sc }: { eid: string; sc: LearnScenario }) {
     );
   }
   if (finished) return <Debrief eid={eid} sc={sc} f={finished} onAgain={start} back={back} />;
+
+  if (classId) {
+    return (
+      <div className="sw-in mx-auto max-w-md pt-6">
+        <Card className="p-7 text-center">
+          <Radio className="mx-auto size-10 animate-pulse text-[#16A34A]" />
+          <p className="mt-3 text-[13px] font-bold uppercase tracking-wide text-muted">{t('sim.classNow')}</p>
+          <h1 className="mt-1 text-[22px] font-bold text-ink">{sc.title}</h1>
+          <p className="mt-2 text-[14px] text-muted">{t(classMode === 'job' ? 'sim.jobBody' : 'sim.practiceBody')}</p>
+          <Button className="mt-5 w-full" size="lg" onClick={() => start(classMode)}>{t('sim.joinClass')}</Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="sw-in mx-auto max-w-2xl space-y-4">
