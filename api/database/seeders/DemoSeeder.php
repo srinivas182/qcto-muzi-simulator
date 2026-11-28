@@ -11,6 +11,8 @@ use App\Cohorts\Enrolments;
 use App\Identity\ConsentService;
 use App\Learners\IdNumbers;
 use App\Learners\LearnerDirectory;
+use App\Learning\ActivityCatalogue;
+use App\Models\Activity;
 use App\Models\BillingSetting;
 use App\Models\Centre;
 use App\Models\Cohort;
@@ -20,6 +22,7 @@ use App\Models\LicencePool;
 use App\Models\OutcomeCoverage;
 use App\Models\Package;
 use App\Models\Programme;
+use App\Models\ProgrammeVersion;
 use App\Models\Role;
 use App\Models\Tenant;
 use App\Models\User;
@@ -94,6 +97,7 @@ final class DemoSeeder extends Seeder
         $this->demoCoverage();
         $this->demoPackages();
         $this->demoBilling($context);
+        $this->demoActivities($context);
         $this->demoLearners($context);
         $this->demoCohort($context);
 
@@ -146,6 +150,29 @@ final class DemoSeeder extends Seeder
     }
 
     /** A Technical Support cohort at Ubuntu with six learners from the register (seats from the paid licence). */
+    /**
+     * The first Technical Support activities (titles and outcome links; lesson and scenario content arrive
+     * with Course Studio and Scenario Studio). Published, so the coverage map shows them as linked.
+     */
+    private function demoActivities(TenantContext $context): void
+    {
+        $context->runAs(null, function (): void {
+            $version = ProgrammeVersion::query()->whereHas('programme', fn ($q) => $q->where('code', 'technical-support'))->where('status', 'published')->first();
+            if ($version === null || Activity::query()->where('programme_version_id', $version->id)->exists()) {
+                return;
+            }
+            $catalogue = app(ActivityCatalogue::class);
+            foreach ([
+                ['lesson', 'TS-L01', 'Logging a support request', 'Turn a phone call into a clear ticket.', 4, 1, ['TS-1.1', 'TS-1.2']],
+                ['lesson', 'TS-L02', 'Working safely inside a PC', 'Antistatic strap, power off, and why it matters.', 5, 1, ['TS-2.2']],
+                ['scenario', 'TS-S01', 'A PC won’t boot', 'Diagnose the fault and replace the faulty RAM safely.', 12, 2, ['TS-2.2', 'TS-3.2']],
+                ['lesson', 'TS-L03', 'Explaining the fix', 'Tell the user what you did, in plain words.', 3, 1, ['TS-6.1', 'TS-6.2']],
+            ] as [$kind, $code, $title, $summary, $minutes, $weight, $outcomes]) {
+                $catalogue->publish($catalogue->create($version, ['kind' => $kind, 'code' => $code, 'title' => $title, 'summary' => $summary, 'minutes' => $minutes, 'weight' => $weight], $outcomes));
+            }
+        }, platform: true);
+    }
+
     private function demoCohort(TenantContext $context): void
     {
         $tenant = Tenant::query()->where('slug', 'ubuntu')->firstOrFail();

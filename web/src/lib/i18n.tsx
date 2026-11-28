@@ -9,10 +9,13 @@ import { format, isLocale, type Locale } from '@simuwork/core';
 
 export { format, isLocale, LOCALES, sectionKey, type Locale } from '@simuwork/core';
 
-const loaders: Record<Exclude<Locale, 'en'>, () => Promise<{ default: Messages }>> = {
-  zu: () => import('@simuwork/core/locales/zu'),
-  af: () => import('@simuwork/core/locales/af'),
-  xh: () => import('@simuwork/core/locales/xh'),
+type Part = () => Promise<{ default: Record<string, string> }>;
+
+/** Each language loads in two parts (see packages/core/src/locales/parts.ts): learners never download staff text. */
+const loaders: Record<Exclude<Locale, 'en'>, { learner: Part; staff: Part }> = {
+  zu: { learner: () => import('virtual:locale/zu/learner'), staff: () => import('virtual:locale/zu/staff') },
+  af: { learner: () => import('virtual:locale/af/learner'), staff: () => import('virtual:locale/af/staff') },
+  xh: { learner: () => import('virtual:locale/xh/learner'), staff: () => import('virtual:locale/xh/staff') },
 };
 
 const KEY = 'sw-locale';
@@ -34,27 +37,38 @@ interface I18n {
   t: T;
   /** Translate a key that comes from the API (e.g. nav.<id>), falling back to the given text. */
   tx: (key: string, fallback: string, vars?: Record<string, string | number>) => string;
+  /** Staff screens call this so the staff part of the language loads too. */
+  needStaff: () => void;
 }
 
 const Ctx = createContext<I18n | null>(null);
 
 export function I18nProvider({ children, initial }: { children: ReactNode; initial?: Locale }) {
   const [locale, setLocaleState] = useState<Locale>(initial ?? storedLocale() ?? 'en');
-  const [loaded, setLoaded] = useState<Partial<Record<Locale, Messages>>>({ en });
-  // Until a language has loaded, English shows (no blank labels).
-  const messages = loaded[locale] ?? en;
+  const [loaded, setLoaded] = useState<Record<string, Record<string, string>>>({});
+  const [staff, setStaff] = useState(false);
+  // Until a part has loaded, English shows (no blank labels).
+  const messages = useMemo(
+    () => (locale === 'en' ? en : { ...loaded[`${locale}/learner`], ...loaded[`${locale}/staff`] }) as Messages,
+    [locale, loaded],
+  );
 
   useEffect(() => {
     document.documentElement.lang = locale;
-    if (locale === 'en' || loaded[locale]) return;
+    if (locale === 'en') return;
     let live = true;
-    loaders[locale]()
-      .then((m) => live && setLoaded((all) => ({ ...all, [locale]: m.default })))
-      .catch(() => undefined);
+    const wanted: ('learner' | 'staff')[] = staff ? ['learner', 'staff'] : ['learner'];
+    for (const part of wanted) {
+      const key = `${locale}/${part}`;
+      if (loaded[key]) continue;
+      loaders[locale][part]()
+        .then((m) => live && setLoaded((all) => ({ ...all, [key]: m.default })))
+        .catch(() => undefined);
+    }
     return () => {
       live = false;
     };
-  }, [locale, loaded]);
+  }, [locale, loaded, staff]);
 
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);
@@ -73,6 +87,7 @@ export function I18nProvider({ children, initial }: { children: ReactNode; initi
       setLocale,
       t: (key, vars) => format(lookup(key) ?? key, vars),
       tx: (key, fallback, vars) => format(lookup(key) ?? fallback, vars),
+      needStaff: () => setStaff(true),
     };
   }, [locale, messages, setLocale]);
 

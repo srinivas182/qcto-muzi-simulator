@@ -132,3 +132,34 @@ We fix what the pilot shows before producing content for the other 12 programmes
 - AI role-play conversations.
 - VR headsets.
 - Courses for the other 12 programmes (the studios make them possible; content production runs alongside).
+
+## Sub-sprint 4.1 notes (foundation)
+
+- **Language files split by area:** each language still has one source file (translators and the mobile app
+  see no change). The web build splits it into a learner part and a staff part:
+  - Learners download **4.6 KB** of isiZulu, isiXhosa or Afrikaans instead of 14.3 KB.
+  - Staff also load the staff part (10.5 KB) when a staff screen opens.
+  - English still ships whole, so the app never shows a blank label.
+  - Tests check that the two parts together are exactly the whole file, and that every text a learner screen
+    uses is in the learner part.
+- **Content model:**
+  - `activities` holds HQ's lessons and scenarios for a programme version, linked to outcome codes, each with
+    a weight and a "required" flag.
+  - Publishing an activity marks its outcomes as "linked" on the coverage map (course or simulator channel).
+- **Attempts (per provider, RLS):**
+  - Each attempt has an ID made on the device, unique per provider.
+  - Sending the same attempt twice changes nothing; a finished attempt never changes; an unfinished one can be
+    continued after going offline.
+  - Each record is checked on its own (the learner's own enrolment, the published activity of the
+    enrolment's pinned version, the right mode, plausible times), so one bad record never blocks the rest.
+  - The first activity counts as starting the programme, so the no-show rule stops.
+- **Progress:**
+  - Calculated as the weighted share of required activities completed at least once, and stored on the
+    enrolment with the time of the last activity (for at-risk alerts in 4.6).
+  - Progress now drives the 10% withdrawal rule.
+- **Offline queue (shared by web and mobile):**
+  - Saves every attempt on the device first, then syncs in batches of 50.
+  - Survives an app restart, never loses a change when two happen at once, and drops records the server
+    rejects for good so they are not retried forever.
+- **Demo:** four published Technical Support activities (three lessons and the "A PC won't boot" scenario),
+  with their content arriving in 4.2 and 4.5.

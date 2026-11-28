@@ -7,6 +7,8 @@ namespace App\Http\Controllers\Api\V1\Learn;
 use App\Cohorts\Enrolments;
 use App\Http\Controllers\Api\V1\Qcto\QctoController;
 use App\Http\Controllers\Controller;
+use App\Learning\AttemptSync;
+use App\Learning\Progress;
 use App\Models\Enrolment;
 use App\Models\Learner;
 use App\Models\User;
@@ -60,6 +62,26 @@ final class LearnController extends Controller
         Enrolments::markStarted($enrolment);
 
         return response()->json(['data' => ['status' => $enrolment->refresh()->status]]);
+    }
+
+    /** The activities of one of my programmes, with how far I am on each. */
+    public function activities(Request $request, Enrolment $enrolment): JsonResponse
+    {
+        if ($enrolment->learner_id !== $this->learner($request)->id) {
+            throw new NotFoundHttpException;
+        }
+
+        return response()->json(['data' => ['progress' => $enrolment->progress, 'activities' => Progress::board($enrolment)]]);
+    }
+
+    /** Attempts from the device, online or queued offline. Safe to send again; see AttemptSync. */
+    public function sync(Request $request, AttemptSync $sync): JsonResponse
+    {
+        $data = $request->validate(['attempts' => ['required', 'array', 'min:1', 'max:'.AttemptSync::MAX_BATCH], 'attempts.*' => ['array']]);
+        /** @var list<array<string, mixed>> $items */
+        $items = array_values($data['attempts']);
+
+        return response()->json(['data' => $sync->sync($this->learner($request), $items)]);
     }
 
     public function qcto(Request $request): JsonResponse
