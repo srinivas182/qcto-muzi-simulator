@@ -359,4 +359,23 @@ final class AttemptSyncTest extends AccessTestCase
         Carbon::setTestNow('2027-04-10 09:00:00');
         $this->fresh()->getJson($this->url('/checklists/'.str_repeat('a', 40)))->assertNotFound();
     }
+
+    public function test_the_offline_pack_holds_the_whole_programme_and_says_when_nothing_changed(): void
+    {
+        $this->a['L1']->update(['content' => ['blocks' => [['id' => 'b1abcdef', 'type' => 'narration', 'script' => 'Hello', 'audio_asset_id' => null]], 'i18n' => ['zu' => ['b1abcdef' => ['script' => 'Sawubona']]], 'review' => ['en' => ['by' => 'HQ'], 'zu' => ['by' => 'HQ']]]]);
+        $url = $this->url("/learn/enrolments/{$this->enrolment->id}/pack?locale=zu");
+        $pack = $this->fresh()->getJson($url, $this->bearer($this->token))->assertOk();
+        $pack->assertJsonPath("data.lessons.{$this->a['L1']->id}.blocks.0.script", 'Sawubona')
+            ->assertJsonPath("data.scenarios.{$this->a['S1']->id}.content.scene", 'pc-bench')
+            ->assertJsonPath('data.runtime.url', fn ($u) => str_ends_with($u, '/embed/sim-3d.html'))
+            ->assertJsonMissingPath("data.lessons.{$this->a['D1']->id}")
+            ->assertJsonMissingPath("data.scenarios.{$this->a['S1']->id}.results"); // personal results stay online
+        $etag = (string) $pack->headers->get('ETag');
+        $this->fresh()->getJson($url, $this->bearer($this->token) + ['If-None-Match' => $etag])->assertStatus(304);
+
+        $this->a['L1']->update(['title' => 'Safety first', 'content_version' => 2]);
+        $this->fresh()->getJson($url, $this->bearer($this->token) + ['If-None-Match' => $etag])->assertOk()->assertJsonPath("data.lessons.{$this->a['L1']->id}.title", 'Safety first');
+        [$other] = $this->enrolled($this->ubuntu, Package::query()->firstOrFail());
+        $this->fresh()->getJson($url, $this->bearer($other))->assertNotFound();
+    }
 }

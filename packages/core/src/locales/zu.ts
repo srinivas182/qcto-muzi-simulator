@@ -1228,6 +1228,21 @@ const zu: Messages = {
   'pg.nudge': "Khumbuza",
   'pg.nudged': "Isikhumbuzo sithunyelwe.",
   'pg.nudgeFailed': "Akuthunyelwanga: umfundi akanayo inombolo yocingo, uvale izikhumbuzo, noma ukhunjuzwe kuleli sonto.",
+  // Sprint 4.6c: offline packs (learner)
+  'off.title': "Yisebenzise ngaphandle kwedatha",
+  'off.body': "Landa lolu hlelo nge-Wi-Fi. Izifundo nama-simulator bese kusebenza ngaphandle kwe-inthanethi; imiphumela yakho ivumelaniswa kamuva.",
+  'off.download': "Landa",
+  'off.update': "Hlola izibuyekezo",
+  'off.remove': "Susa",
+  'off.ready': "Kulungele ukusetshenziswa ngaphandle kwe-inthanethi",
+  'off.readyBody': "{size} kule foni · kugcinwe ngo-{date}",
+  'off.saved': "Kugcinwe kule foni. Manje ungaziqeqesha ngaphandle kwedatha.",
+  'off.upToDate': "Usunayo kakade inguqulo yakamuva.",
+  'off.failed': "Ukulanda kumile. Zama futhi nge-Wi-Fi.",
+  'off.dataTitle': "Usebenzisa idatha yeselula",
+  'off.dataBody': "Lokhu kulanda kusebenzisa cishe idatha engu-{size}. I-Wi-Fi ingcono uma ungakwazi.",
+  'off.sizeUnknown': "ama-MB ambalwa",
+  'off.downloadAnyway': "Landa noma kunjalo",
 };
 
 export default zu;

@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
+import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
@@ -6,6 +7,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { scoreRun, simReducer, startRun, touchable, type LearnScenario, type SimAction, type SimMode, type SimScore, type SimState } from '@simuwork/core';
 import { api } from '../../../../src/lib/api';
 import { attempts, syncAttempts } from '../../../../src/lib/attempts';
+import { onlineOrPack, runtimeFile } from '../../../../src/lib/packs';
 import { useI18n } from '../../../../src/lib/i18n';
 import { BookOpen, Briefcase, Check, Clock, Dumbbell, Hand, Lightbulb, ShieldAlert, UserRound, Volume2, Wifi, WifiOff, X } from '../../../../src/ui/icons';
 import { Button, Card, haptics, radius, Screen, space, T, useTheme } from '../../../../src/ui';
@@ -22,7 +24,8 @@ const VOICES: Record<string, string> = { en: 'en-ZA', zu: 'zu-ZA', xh: 'xh-ZA', 
 export default function SimulatorScreen() {
   const { eid, aid } = useLocalSearchParams<{ eid: string; aid: string }>();
   const { t, locale } = useI18n();
-  const q = useQuery({ queryKey: ['learn-scenario', aid, locale], queryFn: () => api<{ data: LearnScenario }>(`/learn/enrolments/${eid}/scenarios/${aid}?locale=${locale}`) });
+  const q = useQuery({ queryKey: ['learn-scenario', aid, locale], queryFn: () => onlineOrPack(eid, () => api<{ data: LearnScenario }>(`/learn/enrolments/${eid}/scenarios/${aid}?locale=${locale}`),
+    (p) => (p.scenarios[aid] ? { data: { ...p.scenarios[aid], results: { practice: null, job: null } } } : undefined)) });
   if (!q.data) return <Screen title={t('lp.simulator')}>{q.isError ? <T tone="muted">{t('sim.notFound')}</T> : null}</Screen>;
   return <Play key={aid} eid={eid} sc={q.data.data} />;
 }
@@ -87,6 +90,20 @@ function Runner({ sc, mode, onMove, onDone, onQuit }: {
   const [s, dispatch] = useReducer((st: SimState, a: SimAction) => simReducer(st, a), content, (x) => startRun(x, mode));
   const [left, setLeft] = useState((content.job?.minutes ?? 0) * 60);
   const reported = useRef(0);
+  // The 3D view comes with the offline pack; without it (or by choice) the step-by-step view is used.
+  const [has3d] = useState(() => runtimeFile().exists);
+  const [view, setView] = useState<'3d' | '2d'>(has3d ? '3d' : '2d');
+  const web = useRef<WebView<object>>(null);
+  const post = (msg: object) => web.current?.postMessage?.(JSON.stringify(msg));
+  useEffect(() => { post({ type: 'state', scene: s.scene, holding: s.holding }); }, [s.scene, s.holding]);
+  useEffect(() => { if (s.feedback?.kind === 'wrong') post({ type: 'flash', kind: s.feedback.effect }); }, [s.feedback]);
+  const onWeb = (e: WebViewMessageEvent) => {
+    try {
+      const m = JSON.parse(e.nativeEvent.data) as { type: string; id?: string };
+      if (m.type === 'ready') post({ type: 'state', scene: s.scene, holding: s.holding });
+      if (m.type === 'tap' && m.id) dispatch({ type: 'tap', object: m.id, t: secondsSince(started.current) });
+    } catch { /* not ours */ }
+  };
   const step = s.steps[s.step];
 
   useEffect(() => {
@@ -139,6 +156,13 @@ function Runner({ sc, mode, onMove, onDone, onQuit }: {
           ))}
         </View>
       ) : (
+        <>
+        {view === '3d' ? (
+          <View style={[styles.scene, { borderColor: c.line }]}>
+            <WebView ref={web} source={{ uri: runtimeFile().uri }} originWhitelist={['*']} allowFileAccess allowingReadAccessToURL={runtimeFile().uri}
+              onMessage={onWeb} scrollEnabled={false} bounces={false} accessibilityLabel={step.prompt} style={{ backgroundColor: 'transparent' }} />
+          </View>
+        ) : null}
         <View style={styles.grid}>
           {touchable(content).map((id) => (
             <Pressable key={id} accessibilityRole="button" accessibilityState={{ selected: s.holding === id }} onPress={() => dispatch({ type: 'tap', object: id, t: at() })}
@@ -148,8 +172,18 @@ function Runner({ sc, mode, onMove, onDone, onQuit }: {
             </Pressable>
           ))}
         </View>
+        </>
       )}
       <T variant="caption" tone="muted" style={{ marginTop: space.md }}>{t('sim.how')}</T>
+      {has3d ? (
+        <View style={[styles.row, { marginTop: space.sm }]}>
+          {(['3d', '2d'] as const).map((v) => (
+            <Pressable key={v} accessibilityRole="button" accessibilityState={{ selected: view === v }} onPress={() => setView(v)} style={[styles.toggle, { borderColor: view === v ? c.brand : c.line }]}>
+              <T style={{ fontWeight: view === v ? '700' : '400' }}>{t(v === '3d' ? 'sim.view3d' : 'sim.view2d')}</T>
+            </Pressable>
+          ))}
+        </View>
+      ) : null}
     </Screen>
   );
 }
@@ -203,6 +237,8 @@ const styles = StyleSheet.create({
   hintBtn: { alignSelf: 'flex-start', marginTop: space.md, paddingHorizontal: space.md, minHeight: 44, borderRadius: radius.md, backgroundColor: 'rgba(255,255,255,0.12)' },
   option: { minHeight: 56, justifyContent: 'center', paddingHorizontal: space.lg, borderRadius: radius.md, borderWidth: 1.5 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
+  scene: { height: 300, borderRadius: radius.lg, borderWidth: 1, overflow: 'hidden', marginBottom: space.md },
+  toggle: { minHeight: 44, paddingHorizontal: space.md, borderRadius: radius.md, borderWidth: 1.5, justifyContent: 'center' },
   tile: { width: '48%', minHeight: 64, padding: space.md, borderRadius: radius.md, borderWidth: 1.5, justifyContent: 'center' },
   stepRow: { flexDirection: 'row', gap: space.md, padding: space.lg },
   mark: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', marginTop: 2 },

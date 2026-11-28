@@ -3,6 +3,8 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import type { LearnActivity } from '@simuwork/core';
 import { api } from '../../../src/lib/api';
+import { onlineOrPack } from '../../../src/lib/packs';
+import { OfflineCard } from '../../../src/learn/OfflineCard';
 import { useI18n } from '../../../src/lib/i18n';
 import { Box, Check, ChevronRight, ListChecks, PlayCircle } from '../../../src/ui/icons';
 import { Card, radius, Screen, space, T, useTheme } from '../../../src/ui';
@@ -12,7 +14,11 @@ export default function ProgrammeScreen() {
   const { eid } = useLocalSearchParams<{ eid: string }>();
   const { t } = useI18n();
   const { c } = useTheme();
-  const data = useQuery({ queryKey: ['learn-activities', eid], queryFn: () => api<{ data: { progress: number; activities: LearnActivity[] } }>(`/learn/enrolments/${eid}/activities`) });
+  const data = useQuery({ queryKey: ['learn-activities', eid], queryFn: () => onlineOrPack(eid, () => api<{ data: { progress: number; activities: LearnActivity[] } }>(`/learn/enrolments/${eid}/activities`), (p) => ({
+    // Offline: the list comes from the pack (statuses show again once back online).
+    data: { progress: 0, activities: [...Object.values(p.lessons).map((l) => ({ id: l.id, kind: 'lesson' as const, code: l.code, title: l.title, minutes: l.minutes })), ...Object.values(p.scenarios).map((s) => ({ id: s.id, kind: 'scenario' as const, code: s.code, title: s.title, minutes: s.minutes }))]
+      .map((a) => ({ ...a, summary: null, required: true, content_version: 1, outcomes: [], status: 'new' as const, best_score: null, attempts: 0 })) },
+  })) });
   const d = data.data?.data;
   return (
     <Screen title={t('lp.title')} refreshing={data.isRefetching} onRefresh={() => void data.refetch()}>
@@ -20,6 +26,7 @@ export default function ProgrammeScreen() {
         <>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}><T style={{ fontWeight: '700' }}>{t('lh.progress')}</T><T tone="muted">{`${d.progress}%`}</T></View>
           <View style={[styles.bar, { backgroundColor: c.line }]}><View style={{ width: `${d.progress}%`, height: '100%', backgroundColor: c.brand }} /></View>
+          <OfflineCard eid={eid} />
           <Pressable accessibilityRole="link" onPress={() => router.push(`/learn/${eid}/checklist`)} style={[styles.row, { marginTop: space.lg, borderRadius: radius.lg, borderWidth: 1, borderColor: c.line, backgroundColor: c.surface }]}>
             <ListChecks size={22} color={c.brand} />
             <View style={{ flex: 1 }}><T style={{ fontWeight: '700' }}>{t('jr.title')}</T><T variant="caption" tone="muted">{t('jr.cardLead')}</T></View>

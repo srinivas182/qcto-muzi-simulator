@@ -19,6 +19,27 @@ jest.mock('expo-haptics', () => ({
 jest.mock('expo-camera', () => ({ CameraView: () => null, useCameraPermissions: () => [{ granted: false }, jest.fn()] }));
 jest.mock('expo-audio', () => ({ useAudioPlayer: () => ({ play: jest.fn(), pause: jest.fn() }), useAudioPlayerStatus: () => ({ playing: false }) }));
 jest.mock('expo-speech', () => ({ speak: jest.fn(), stop: jest.fn() }));
+// expo-file-system: an in-memory disk, so offline packs can be tested.
+jest.mock('expo-file-system', () => {
+  const disk = new Map<string, string>();
+  const join = (parent: { uri: string } | string, name?: string) => `${typeof parent === 'string' ? parent : parent.uri}${name ? `/${name}` : ''}`;
+  class Directory { uri: string; constructor(p: { uri: string } | string, n?: string) { this.uri = join(p, n); } create() {} }
+  class File {
+    uri: string;
+    constructor(p: { uri: string } | string, n?: string) { this.uri = join(p, n); }
+    get exists() { return disk.has(this.uri); }
+    async write(text: string) { disk.set(this.uri, text); }
+    async text() { return disk.get(this.uri) ?? ''; }
+    delete() { disk.delete(this.uri); }
+    static downloadFileAsync = jest.fn(async (url: string, to: File) => { disk.set(to.uri, `downloaded:${url}`); return to; });
+  }
+  return { Directory, File, Paths: { document: { uri: 'file:///docs' }, cache: { uri: 'file:///cache' } }, __disk: disk };
+});
+jest.mock('react-native-webview', () => {
+  const { createElement } = jest.requireActual<typeof import('react')>('react');
+  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
+  return { WebView: (props: object) => createElement(View, { testID: 'webview', ...props }) };
+});
 jest.mock('expo-linear-gradient', () => {
   const { View } = jest.requireActual('react-native');
   return { LinearGradient: View };

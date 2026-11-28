@@ -43,12 +43,13 @@ export const setRequestContext = (next: RequestContext) => {
   context = { ...context, ...next };
 };
 
-export async function api<T>(path: string, options: { method?: string; body?: unknown; tenant?: string | null; signal?: AbortSignal } = {}): Promise<T> {
+export async function api<T>(path: string, options: { method?: string; body?: unknown; tenant?: string | null; signal?: AbortSignal; headers?: Record<string, string> } = {}): Promise<T> {
   const tenant = options.tenant !== undefined ? options.tenant : context.tenant;
   const headers: Record<string, string> = { Accept: 'application/json', 'X-Client': 'mobile' };
   if (tenant) headers['X-Tenant'] = tenant;
   if (context.token) headers.Authorization = `Bearer ${context.token}`;
   if (options.body !== undefined) headers['Content-Type'] = 'application/json';
+  Object.assign(headers, options.headers);
 
   let res: Response;
   try {

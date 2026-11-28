@@ -415,3 +415,44 @@ now checked in CI. The learner language part is at most 5.9 KB.
 | A reply to a WhatsApp reminder goes nowhere | Route replies to the facilitator's inbox | Proposed for later (needs a WhatsApp webhook) |
 | Employers want a printed record | A print or PDF view of the shared checklist with a verification QR code | Proposed for later |
 | Templates need Meta approval | Submit the reminder template in four languages; until then SMS is used | For Srini (operations) |
+
+## Sub-sprint 4.6c notes (offline packs and 3D in the app)
+
+**Built**
+- **Pack endpoint** (`GET /learn/enrolments/{e}/pack?locale=`):
+  - Contents: every published lesson and scenario of the programme in the learner's language (reviewed
+    translations only), the pictures and audio they use, and the address of the app's 3D view.
+  - Personal results are left out; they stay online.
+  - `version` and the ETag change whenever anything changes, so "Check for updates" sends `If-None-Match`
+    and gets `304` when nothing has changed.
+  - The lesson, scenario and pack payloads now come from one service (`LearnContent`), so online and offline
+    content are identical.
+- **Mobile offline packs** (`src/lib/packs.ts`, expo-file-system):
+  - **Download:** an "Use it with no data" card on the programme screen. On mobile data it first says roughly
+    how much data the download uses.
+  - **Progress:** a progress bar while downloading, then "Ready to use offline · 3.1 MB · saved …", with
+    Check for updates and Remove.
+  - **What is saved:** pictures and audio are saved once per id; the 3D view is refreshed with each pack.
+  - **Offline use:** with no connection, the programme list, lessons and simulators open from the pack, and
+    attempts queue and sync later (4.1).
+- **3D in the app:**
+  - The web build now also produces `embed/sim-3d.html`: one self-contained page with the same three.js
+    bench as the web simulator. It is 130.8 KB gzip against a new 160 KB budget, checked in the build.
+  - The app downloads it with the pack and opens it in a WebView from the phone's storage.
+  - The app runs the scenario (the same reducer and scoring) and the page only draws it. The two talk through
+    `postMessage`: state and flash go into the page, ready and tap come back.
+  - Learners can switch between the 3D view and the simple view. The big object buttons stay below the
+    scene.
+- `react-native-webview` 14.0.1 and `expo-file-system` 58 are the versions Expo SDK 58 expects.
+
+**Checks:** API 259 tests, web 100, mobile 37. First load is 146.2 KB of 170. The app 3D view is 130.8 KB of 160.
+
+### Gaps we fill and best recommendations (4.6c)
+| Gap against the leaders | What we did | When |
+|---|---|---|
+| Labster needs a constant connection; Transfr needs a headset and Wi-Fi | Whole programme on the phone, 3D included, no data needed after download | This sprint |
+| Big downloads surprise learners | The size is shown before downloading on mobile data; updates cost almost nothing (304) | This sprint |
+| Offline results get lost or duplicated | Attempts are queued with device ids and synced once (since 4.1) | This sprint |
+| Packs go stale | Check for updates on Wi-Fi automatically, in the background | Proposed for later |
+| Web learners offline | A service worker that caches the same pack in the browser | Proposed for later |
+| Phone storage is tight | Show the space used per programme, with a "free up space" list | Proposed for later |

@@ -1228,6 +1228,21 @@ const xh: Messages = {
   'pg.nudge': "Khumbuza",
   'pg.nudged': "Isikhumbuzo sithunyelwe.",
   'pg.nudgeFailed': "Asithunyelwanga: umfundi akanayo inombolo yefowuni, ucime izikhumbuzo, okanye ukhunjuziwe kule veki.",
+  // Sprint 4.6c: offline packs (learner)
+  'off.title': "Yisebenzise ngaphandle kwedatha",
+  'off.body': "Khuphela le nkqubo nge-Wi-Fi. Izifundo nee-simulator ziya kusebenza ngaphandle kwe-intanethi; iziphumo zakho zihambelaniswa kamva.",
+  'off.download': "Khuphela",
+  'off.update': "Jonga uhlaziyo",
+  'off.remove': "Susa",
+  'off.ready': "Ilungele ukusetyenziswa ngaphandle kwe-intanethi",
+  'off.readyBody': "{size} kule foni · igcinwe nge-{date}",
+  'off.saved': "Igcinwe kule foni. Ngoku ungaziqeqesha ngaphandle kwedatha.",
+  'off.upToDate': "Sele unayo inguqulelo yamva nje.",
+  'off.failed': "Ukukhuphela kumile. Zama kwakhona nge-Wi-Fi.",
+  'off.dataTitle': "Usebenzisa idatha yeselfowuni",
+  'off.dataBody': "Oku kukhuphela kusebenzisa malunga ne-{size} yedatha. I-Wi-Fi ingcono ukuba unako.",
+  'off.sizeUnknown': "ii-MB ezimbalwa",
+  'off.downloadAnyway': "Khuphela noko",
 };
 
 export default xh;
