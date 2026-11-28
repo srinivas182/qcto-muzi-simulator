@@ -481,3 +481,43 @@ now checked in CI. The learner language part is at most 5.9 KB.
 | Quizzes just reveal the answer after a mistake | A hint and a second try ("Fix it"), with the first answer still counting | This sprint |
 | Admin strings slow down every user's language download | Separate HQ part; providers and learners download less | This sprint |
 | Same help for every learner | AI coach "Why?" and "Help" in the learner's language | Proposed for 4.7 |
+
+## Sub-sprint 4.7 plan (split into small parts)
+
+| Part | Scope |
+|---|---|
+| **4.7a** | AI coach in the simulator ("Why?" and "Ask the coach"), web and mobile |
+| **4.7b** | Class mode: the facilitator runs a scenario with the whole class and sees each learner's step live |
+| **4.7c** | Pilot measures: completion, time and tries, help requests, data used, and a 3-question learner rating; then the Sprint 4 report |
+
+## Sub-sprint 4.7a notes (AI coach)
+
+**Built**
+- **`POST /learn/enrolments/{e}/scenarios/{a}/coach`** with `{step, kind: why|help, locale, variant}`, throttled
+  to 20 a minute (`SimCoach`).
+  - **What the coach says:** it answers in the learner's language, in plain words, in at most 60 words. It talks
+    only about that step of that scenario and its QCTO outcome, and never gives the exact answer.
+  - **What is sent to the AI:** only the scenario's own text, never learner data.
+  - **Cost:** answers are cached per step, content version and language for 30 days, so most questions cost
+    nothing.
+  - **Fallback:** without `ANTHROPIC_API_KEY`, offline, or if the AI fails, the coach falls back to the
+    author's "why it matters" and hints.
+- **In the runner** (practice only):
+  - "Why?" appears on the wrong-move message.
+  - "Ask the coach" sits next to Hint.
+  - The answer appears in the instruction card.
+  - **Real-job mode has no coach.**
+- **Scoring** (server and device): asking for help costs like a hint (0.15); asking "why" after a mistake is
+  free. Each question is recorded as a `coach` event, which feeds the pilot measures in 4.7c.
+
+**Checks:** API 262 tests, web 104, mobile 37.
+
+### Gaps we fill and best recommendations (4.7a)
+| Gap against the leaders | What we did | When |
+|---|---|---|
+| AI role-play tools (Bodyswaps) coach conversations, not hands-on tasks | A coach for technical steps, tied to the QCTO outcome | This sprint |
+| AI tutors answer in English only | Answers in isiZulu, isiXhosa, Afrikaans or English | This sprint |
+| AI can just give the answer | Never gives the answer; help costs like a hint; none in real-job mode | This sprint |
+| AI cost grows with learners | Cached per step and language; author fallback | This sprint |
+| Spoken coach | Read the coach's answer aloud (the TTS decision is still open) | Proposed for later |
+| Coach quality review | HQ sees the most-asked steps and improves those hints | Proposed for 4.7c (pilot measures) |

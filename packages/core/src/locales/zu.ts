@@ -1247,6 +1247,10 @@ const zu: Messages = {
   'lv.tryOnce': "Buka futhi bese uzama kanye futhi.",
   'lv.fixedIt': "Ulungisile!",
   'ls.f.hint': "Icebo ngemuva kwempendulo yokuqala engalungile (akuphoqelekile)",
+  // Sprint 4.7a: AI coach in the simulator (learner)
+  'sim.askCoach': "Buza umqeqeshi",
+  'sim.why': "Kungani?",
+  'sim.coachThinking': "Umqeqeshi uyacabanga…",
 };
 
 export default zu;

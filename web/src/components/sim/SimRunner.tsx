@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useReducer, useRef, useState } from 'react';
-import { Box, Clock, Hand, Lightbulb, Rows3, Square, UserRound, Volume2, X } from 'lucide-react';
+import { Box, Clock, Hand, Lightbulb, MessageCircleQuestion, Rows3, Square, UserRound, Volume2, X } from 'lucide-react';
 import { simReducer, startRun, touchable, type ScenarioContent, type SimAction, type SimMode, type SimState } from '@simuwork/core';
 import { Button, cx } from '../ui';
 import { useI18n } from '../../lib/i18n';
@@ -30,8 +30,10 @@ function speak(text: string, locale: string) {
  * One run of a scenario. Every move goes through the shared reducer and is reported to `onMove`, so the
  * attempt is saved on the device as the learner goes; `onDone` fires once the last step is done.
  */
-export function SimRunner({ content, mode, customer, variant, onMove, onDone, onQuit }: {
+export function SimRunner({ content, mode, customer, variant, coach, onMove, onDone, onQuit }: {
   content: ScenarioContent; mode: SimMode; customer: string | null;
+  /** The AI coach (practice only). Falls back to the author's hints and "why it matters" when it fails. */
+  coach?: (stepId: string, kind: 'why' | 'help', variant: string | null) => Promise<string>;
   /** Force a cause (Scenario Studio preview); otherwise one is picked at random. */
   variant?: string | null;
   onMove: (s: SimState, seconds: number) => void; onDone: (s: SimState, seconds: number) => void; onQuit: () => void;
@@ -44,6 +46,17 @@ export function SimRunner({ content, mode, customer, variant, onMove, onDone, on
   const [effect, setEffect] = useState<{ kind: NonNullable<SimState['feedback']>['effect']; key: number } | null>(null);
   const step = s.steps[s.step];
   const reported = useRef(0);
+  const [answer, setAnswer] = useState<{ step: string; text: string | null } | null>(null);
+  const ask = (kind: 'why' | 'help') => {
+    if (!step) return;
+    dispatch({ type: 'coach', ask: kind, t: secondsSince(started.current) });
+    setAnswer({ step: step.id, text: null });
+    const fallback = kind === 'why' ? step.why || step.hints[0] || '' : step.hints.join(' ');
+    (coach ? coach(step.id, kind, s.variant) : Promise.reject(new Error('no coach')))
+      .then((text) => text || fallback, () => fallback)
+      .then((text) => setAnswer((cur) => (cur?.step === step.id ? { step: step.id, text } : cur)));
+  };
+  const coachAnswer = answer && step && answer.step === step.id ? answer : null;
 
   useEffect(() => {
     if (s.events.length === reported.current) return;
@@ -90,14 +103,19 @@ export function SimRunner({ content, mode, customer, variant, onMove, onDone, on
           <button type="button" aria-label={t('sim.readAloud')} title={t('sim.readAloud')} onClick={() => speak(step.prompt, locale)} className="grid size-11 shrink-0 place-items-center rounded-xl bg-white/10 hover:bg-white/20"><Volume2 className="size-5" /></button>
         </div>
         {hintsShown.map((h, i) => <p key={i} className="mt-2 flex gap-2 text-[14px] text-white/85"><Lightbulb className="mt-0.5 size-4 shrink-0 text-[#FCD34D]" />{h}</p>)}
-        {mode === 'practice' && step.hints.length > (s.hints[step.id] ?? 0) && (
-          <button type="button" onClick={() => dispatch({ type: 'hint', t: secondsSince(started.current) })} className="mt-3 inline-flex h-9 items-center gap-1.5 rounded-lg bg-white/10 px-3 text-[13px] font-semibold hover:bg-white/20"><Lightbulb className="size-4" />{t('sim.hint')}</button>
+        {coachAnswer && <p aria-live="polite" className="mt-3 flex gap-2 rounded-xl bg-white/10 px-3 py-2 text-[14px]"><MessageCircleQuestion className="mt-0.5 size-4 shrink-0 text-[#93C5FD]" /><span>{coachAnswer.text ?? t('sim.coachThinking')}</span></p>}
+        {mode === 'practice' && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {step.hints.length > (s.hints[step.id] ?? 0) && <button type="button" onClick={() => dispatch({ type: 'hint', t: secondsSince(started.current) })} className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-white/10 px-3 text-[13px] font-semibold hover:bg-white/20"><Lightbulb className="size-4" />{t('sim.hint')}</button>}
+            <button type="button" onClick={() => ask('help')} className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-white/10 px-3 text-[13px] font-semibold hover:bg-white/20"><MessageCircleQuestion className="size-4" />{t('sim.askCoach')}</button>
+          </div>
         )}
       </div>
 
       {s.feedback?.kind === 'wrong' && (
         <div role="alert" className="flex items-start gap-3 rounded-xl border border-[#F5C2C3] bg-[#FDECEC] p-3 text-[14px] text-[#7F1D1D]">
           <p className="flex-1"><b>{t('sim.wrong')} </b>{s.feedback.message}</p>
+          {mode === 'practice' && <Button size="sm" variant="secondary" onClick={() => { ask('why'); dispatch({ type: 'dismiss' }); }}>{t('sim.why')}</Button>}
           <Button size="sm" variant="secondary" onClick={() => dispatch({ type: 'dismiss' })}>{t('sim.ok')}</Button>
         </div>
       )}

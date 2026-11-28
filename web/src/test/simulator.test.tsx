@@ -74,4 +74,28 @@ describe('Simulator', () => {
     fireEvent.click(screen.getByRole('button', { name: /Memory slot A1/ }));
     expect(await screen.findByText('A safety step went wrong. On a real job that must never happen.')).toBeInTheDocument();
   });
+
+  it('the coach answers "why" after a mistake and helps when stuck; offline it falls back to the author', async () => {
+    const calls = mockApi({
+      '/learn/enrolments/e1/scenarios/s1': { data: scenario },
+      '/learn/enrolments/e1/scenarios/s1/coach': (init?: RequestInit) => ({ data: { answer: JSON.parse(String(init?.body)).kind === 'why' ? 'Electricity can hurt you.' : 'Think about where the power comes from.', source: 'ai' } }),
+    }, learner());
+    renderAt('/learn/enrolments/e1/simulators/s1');
+    fireEvent.click((await screen.findAllByRole('button', { name: 'Start' }))[0]!);
+    fireEvent.click(await screen.findByRole('button', { name: /Side panel of the case/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Why?' }));
+    expect(await screen.findByText('Electricity can hurt you.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Ask the coach' }));
+    expect(await screen.findByText('Think about where the power comes from.')).toBeInTheDocument();
+    const sent = calls.mock.calls.filter(([u]) => String(u).endsWith('/coach')).map(([, i]) => JSON.parse(String((i as RequestInit).body)));
+    expect(sent).toEqual([{ step: 'unplug', kind: 'why', variant: null, locale: 'en' }, { step: 'unplug', kind: 'help', variant: null, locale: 'en' }]);
+  });
+
+  it('real-job mode has no coach', async () => {
+    mockApi({ '/learn/enrolments/e1/scenarios/s1': { data: scenario } }, learner());
+    renderAt('/learn/enrolments/e1/simulators/s1');
+    fireEvent.click((await screen.findAllByRole('button', { name: 'Start' }))[1]!);
+    await screen.findByText('Make the PC safe before you open it.');
+    expect(screen.queryByRole('button', { name: 'Ask the coach' })).not.toBeInTheDocument();
+  });
 });

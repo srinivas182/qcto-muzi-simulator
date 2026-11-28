@@ -1247,6 +1247,10 @@ const xh: Messages = {
   'lv.tryOnce': "Phinda ujonge uzame kwakhona kanye.",
   'lv.fixedIt': "Uyilungisile!",
   'ls.f.hint': "Icebo emva kwempendulo yokuqala engalunganga (akunyanzelekanga)",
+  // Sprint 4.7a: AI coach in the simulator (learner)
+  'sim.askCoach': "Buza umqeqeshi",
+  'sim.why': "Kutheni?",
+  'sim.coachThinking': "Umqeqeshi uyacinga…",
 };
 
 export default xh;

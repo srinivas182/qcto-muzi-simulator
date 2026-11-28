@@ -11,6 +11,7 @@ use App\Learning\AttemptSync;
 use App\Learning\CohortProgress;
 use App\Learning\LearnContent;
 use App\Learning\Progress;
+use App\Learning\SimCoach;
 use App\Models\Activity;
 use App\Models\Enrolment;
 use App\Models\Learner;
@@ -118,6 +119,15 @@ final class LearnController extends Controller
         }
 
         return response()->json(['data' => $pack])->header('ETag', $etag)->header('Cache-Control', 'private, no-cache');
+    }
+
+    /** The AI coach in a simulator (practice mode): "why" after a mistake, "help" when stuck. */
+    public function coach(Request $request, Enrolment $enrolment, Activity $activity, SimCoach $coach): JsonResponse
+    {
+        $this->mineAndPublished($request, $enrolment, $activity, Activity::SCENARIO);
+        $data = $request->validate(['step' => ['required', 'string', 'max:12'], 'kind' => ['required', 'in:why,help'], 'locale' => ['sometimes', 'string'], 'variant' => ['nullable', 'string', 'max:12']]);
+
+        return response()->json(['data' => $coach->ask($activity, $data['step'], $data['kind'], LearnContent::locale($data['locale'] ?? 'en'), $data['variant'] ?? null)]);
     }
 
     private function mineAndPublished(Request $request, Enrolment $e, Activity $a, string $kind): void

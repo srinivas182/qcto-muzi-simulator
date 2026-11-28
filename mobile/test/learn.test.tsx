@@ -94,12 +94,16 @@ describe('simulator', () => {
     expect(await screen.findByText('Make the PC safe.')).toBeOnTheScreen();
     await act(async () => fireEvent.press(screen.getByText('Side panel of the case')));
     expect(screen.getByText(/You opened a live PC\./)).toBeOnTheScreen();
+    // The coach (offline here, so the author's note) explains why.
+    await act(async () => fireEvent.press(screen.getByText('Why?')));
+    await settle();
+    expect(await screen.findByText('Live PCs shock.')).toBeOnTheScreen();
     await act(async () => fireEvent.press(screen.getByText('Wall socket switch')));
     await act(async () => fireEvent.press(screen.getByText('New RAM stick')));
     expect(screen.getByText('Holding the new ram stick. Now tap where it goes.')).toBeOnTheScreen();
     await act(async () => fireEvent.press(screen.getByText('Memory slot A1')));
     await settle();
-    expect(await screen.findByText('Score 88%')).toBeOnTheScreen(); // (0.75 + 1) / 2
+    expect(await screen.findByText('Score 88%')).toBeOnTheScreen(); // (0.75 + 1) / 2; asking "why" is free
     expect(screen.getByText('Review the lesson')).toBeOnTheScreen();
     const sent = JSON.parse(String(calls.find((c) => c.path === '/learn/attempts/sync')!.init.body)).attempts[0];
     expect(sent).toMatchObject({ activity_id: 's1', mode: 'practice', completed: true, score: 88, device: 'mobile' });

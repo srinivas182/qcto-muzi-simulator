@@ -1245,6 +1245,10 @@ const en = {
   'lv.tryOnce': "Have another look and try once more.",
   'lv.fixedIt': "Fixed it!",
   'ls.f.hint': "Hint after a wrong first answer (optional)",
+  // Sprint 4.7a: AI coach in the simulator (learner)
+  'sim.askCoach': "Ask the coach",
+  'sim.why': "Why?",
+  'sim.coachThinking': "The coach is thinking…",
 } as const;
 
 export type MessageKey = keyof typeof en;
