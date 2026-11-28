@@ -346,3 +346,7 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
   marks them active. Deactivating a learner signs them out and cancels open invitations.
 - Excel files are read by a 2 KB built-in reader (the browser's own unzip and XML parser) that loads only
   when someone imports a spreadsheet, instead of an 18 KB library.
+- **Speed budgets changed (Srini, 28 Nov 2026):** the check that added up *all* JavaScript files (every page
+  and every language, 240 KB) was replaced with checks that match what a user actually downloads: first load
+  ≤ 170 KB (unchanged, non-negotiable; now 138.7 KB), each language file ≤ 15 KB (now ≤ 11.7 KB), and each
+  page or on-demand helper ≤ 25 KB (largest now 7.0 KB). CSS stays ≤ 30 KB. See `web/scripts/shell-size.mjs`.
