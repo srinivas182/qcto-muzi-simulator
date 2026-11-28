@@ -1226,6 +1226,21 @@ const en = {
   'pg.nudge': "Nudge",
   'pg.nudged': "Reminder sent.",
   'pg.nudgeFailed': "Not sent: the learner has no phone number, turned reminders off, or was reminded this week.",
+  // Sprint 4.6c: offline packs (learner)
+  'off.title': "Use it with no data",
+  'off.body': "Download this programme on Wi-Fi. Lessons and simulators then work offline; your results sync later.",
+  'off.download': "Download",
+  'off.update': "Check for updates",
+  'off.remove': "Remove",
+  'off.ready': "Ready to use offline",
+  'off.readyBody': "{size} on this phone · saved {date}",
+  'off.saved': "Saved on this phone. You can now train with no data.",
+  'off.upToDate': "You already have the latest version.",
+  'off.failed': "The download stopped. Try again on Wi-Fi.",
+  'off.dataTitle': "You are on mobile data",
+  'off.dataBody': "This download uses about {size} of data. Wi-Fi is better if you can.",
+  'off.sizeUnknown': "a few MB",
+  'off.downloadAnyway': "Download anyway",
 } as const;
 
 export type MessageKey = keyof typeof en;

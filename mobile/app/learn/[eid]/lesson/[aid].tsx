@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { lessonScore, type LearnHomeData, type LearnLesson } from '@simuwork/core';
 import { api } from '../../../../src/lib/api';
 import { attempts, syncAttempts } from '../../../../src/lib/attempts';
+import { onlineOrPack } from '../../../../src/lib/packs';
 import { useI18n } from '../../../../src/lib/i18n';
 import { useSettings } from '../../../../src/lib/settings';
 import { LessonView } from '../../../../src/lesson/LessonView';
@@ -18,7 +19,7 @@ const secondsSince = (t0: number) => Math.max(0, Math.round((now() - t0) / 1000)
 export default function LessonScreen() {
   const { eid, aid } = useLocalSearchParams<{ eid: string; aid: string }>();
   const { t, locale } = useI18n();
-  const lesson = useQuery({ queryKey: ['learn-lesson', aid, locale], queryFn: () => api<{ data: LearnLesson }>(`/learn/enrolments/${eid}/lessons/${aid}?locale=${locale}`), staleTime: 5 * 60_000 });
+  const lesson = useQuery({ queryKey: ['learn-lesson', aid, locale], queryFn: () => onlineOrPack(eid, () => api<{ data: LearnLesson }>(`/learn/enrolments/${eid}/lessons/${aid}?locale=${locale}`), (p) => (p.lessons[aid] ? { data: p.lessons[aid] } : undefined)), staleTime: 5 * 60_000 });
   if (!lesson.data) return <Screen title={t('lp.lesson')}>{lesson.isError ? <T tone="muted">{t('lp.notFound')}</T> : null}</Screen>;
   return <Player key={aid} eid={eid} l={lesson.data.data} />;
 }

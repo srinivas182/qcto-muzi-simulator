@@ -1228,6 +1228,21 @@ const af: Messages = {
   'pg.nudge': "Herinner",
   'pg.nudged': "Herinnering gestuur.",
   'pg.nudgeFailed': "Nie gestuur nie: die leerder het geen foonnommer nie, het herinneringe afgeskakel, of is hierdie week herinner.",
+  // Sprint 4.6c: offline packs (learner)
+  'off.title': "Gebruik dit sonder data",
+  'off.body': "Laai hierdie program op Wi-Fi af. Lesse en simulators werk dan vanlyn; jou uitslae sinkroniseer later.",
+  'off.download': "Laai af",
+  'off.update': "Kyk vir opdaterings",
+  'off.remove': "Verwyder",
+  'off.ready': "Gereed om vanlyn te gebruik",
+  'off.readyBody': "{size} op hierdie foon · gestoor {date}",
+  'off.saved': "Op hierdie foon gestoor. Jy kan nou sonder data oefen.",
+  'off.upToDate': "Jy het reeds die nuutste weergawe.",
+  'off.failed': "Die aflaai het gestop. Probeer weer op Wi-Fi.",
+  'off.dataTitle': "Jy is op mobiele data",
+  'off.dataBody': "Hierdie aflaai gebruik ongeveer {size} data. Wi-Fi is beter as jy kan.",
+  'off.sizeUnknown': "’n paar MB",
+  'off.downloadAnyway': "Laai tog af",
 };
 
 export default af;

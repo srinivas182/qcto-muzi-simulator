@@ -9,18 +9,17 @@ use App\Http\Controllers\Api\V1\Qcto\QctoController;
 use App\Http\Controllers\Controller;
 use App\Learning\AttemptSync;
 use App\Learning\CohortProgress;
-use App\Learning\LessonContent;
+use App\Learning\LearnContent;
 use App\Learning\Progress;
-use App\Learning\ScenarioContent;
 use App\Models\Activity;
-use App\Models\Attempt;
-use App\Models\ContentAsset;
 use App\Models\Enrolment;
 use App\Models\Learner;
 use App\Models\User;
 use App\Qcto\QctoDetails;
+use App\Tenancy\TenantContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /** Learner: their programmes, starting a programme, and their own QCTO details. */
@@ -87,21 +86,9 @@ final class LearnController extends Controller
      */
     public function lesson(Request $request, Enrolment $enrolment, Activity $activity): JsonResponse
     {
-        if ($enrolment->learner_id !== $this->learner($request)->id || $activity->programme_version_id !== $enrolment->programme_version_id
-            || $activity->status !== Activity::PUBLISHED || $activity->kind !== Activity::LESSON) {
-            throw new NotFoundHttpException;
-        }
-        $locale = in_array($request->query('locale'), LessonContent::LOCALES, true) ? (string) $request->query('locale') : 'en';
-        $blocks = LessonContent::localise($activity->content, $locale);
-        $assetIds = collect($blocks)->flatMap(fn ($b) => [$b['asset_id'] ?? null, $b['low_asset_id'] ?? null, $b['audio_asset_id'] ?? null])->filter()->unique();
-        $reviewed = $locale === 'en' || isset($activity->content['review'][$locale]['by']);
+        $this->mineAndPublished($request, $enrolment, $activity, Activity::LESSON);
 
-        return response()->json(['data' => [
-            'id' => $activity->id, 'code' => $activity->code, 'title' => $activity->title, 'minutes' => $activity->minutes,
-            'content_version' => $activity->content_version, 'locale' => $reviewed ? $locale : 'en', 'blocks' => $blocks,
-            'assets' => ContentAsset::query()->whereIn('id', $assetIds->filter(fn ($id) => preg_match('/^[0-9a-f-]{36}$/', (string) $id) === 1))->get()->mapWithKeys(fn (ContentAsset $a) => [$a->id => $a->present()]),
-            'scenarios' => Activity::query()->where('programme_version_id', $activity->programme_version_id)->where('kind', Activity::SCENARIO)->where('status', Activity::PUBLISHED)->get(['id', 'code', 'title'])->keyBy('code'),
-        ]])->header('Cache-Control', 'private, max-age=300');
+        return response()->json(['data' => LearnContent::lesson($activity, LearnContent::locale($request->query('locale')))])->header('Cache-Control', 'private, max-age=300');
     }
 
     /**
@@ -110,23 +97,34 @@ final class LearnController extends Controller
      */
     public function scenario(Request $request, Enrolment $enrolment, Activity $activity): JsonResponse
     {
-        if ($enrolment->learner_id !== $this->learner($request)->id || $activity->programme_version_id !== $enrolment->programme_version_id
-            || $activity->status !== Activity::PUBLISHED || $activity->kind !== Activity::SCENARIO) {
+        $this->mineAndPublished($request, $enrolment, $activity, Activity::SCENARIO);
+
+        return response()->json(['data' => LearnContent::scenario($enrolment, $activity, LearnContent::locale($request->query('locale')))])->header('Cache-Control', 'private, no-cache');
+    }
+
+    /**
+     * The whole programme for offline use (download on Wi-Fi). Send If-None-Match with the pack's version to
+     * learn whether anything changed: 304 means the pack on the phone is up to date.
+     */
+    public function pack(Request $request, Enrolment $enrolment, TenantContext $context): JsonResponse|Response
+    {
+        if ($enrolment->learner_id !== $this->learner($request)->id) {
             throw new NotFoundHttpException;
         }
-        $locale = in_array($request->query('locale'), LessonContent::LOCALES, true) ? (string) $request->query('locale') : 'en';
-        $content = ScenarioContent::localise($activity->content ?? [], $locale);
-        $best = Attempt::query()->where('enrolment_id', $enrolment->id)->where('activity_id', $activity->id)->whereNotNull('finished_at')
-            ->get(['mode', 'score', 'result'])->groupBy('mode')
-            ->map(fn ($list) => ['best' => (int) $list->max('score'), 'tries' => $list->count(), 'passed' => $list->contains(fn (Attempt $a) => (bool) ($a->result['passed'] ?? false))]);
+        $pack = LearnContent::pack($context->tenant() ?? throw new NotFoundHttpException, $enrolment, LearnContent::locale($request->query('locale')));
+        $etag = '"'.$pack['version'].'"';
+        if (trim((string) $request->header('If-None-Match')) === $etag) {
+            return response()->noContent(304)->header('ETag', $etag);
+        }
 
-        return response()->json(['data' => [
-            'id' => $activity->id, 'code' => $activity->code, 'title' => $activity->title, 'summary' => $activity->summary, 'minutes' => $activity->minutes,
-            'content_version' => $activity->content_version, 'locale' => $locale === 'en' || isset($activity->content['review'][$locale]['by']) ? $locale : 'en',
-            'content' => $content,
-            'lessons' => Activity::query()->where('programme_version_id', $activity->programme_version_id)->where('kind', Activity::LESSON)->where('status', Activity::PUBLISHED)->pluck('id', 'code'),
-            'results' => ['practice' => $best->get('practice'), 'job' => $best->get('job')],
-        ]])->header('Cache-Control', 'private, no-cache');
+        return response()->json(['data' => $pack])->header('ETag', $etag)->header('Cache-Control', 'private, no-cache');
+    }
+
+    private function mineAndPublished(Request $request, Enrolment $e, Activity $a, string $kind): void
+    {
+        if ($e->learner_id !== $this->learner($request)->id || $a->programme_version_id !== $e->programme_version_id || $a->status !== Activity::PUBLISHED || $a->kind !== $kind) {
+            throw new NotFoundHttpException;
+        }
     }
 
     /** My job-ready checklist: each QCTO outcome, shown / practised / not yet. */

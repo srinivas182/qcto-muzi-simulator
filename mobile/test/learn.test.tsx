@@ -138,3 +138,46 @@ describe('job-ready checklist', () => {
     expect(spy).toHaveBeenCalledWith({ message: 'Job-ready checklist: https://ubuntu.simuwork.co.za/c/TOKEN' });
   });
 });
+
+describe('offline packs', () => {
+  const lesson = { id: 'l1', code: 'TS-L01', title: 'Working safely', minutes: 4, content_version: 1, locale: 'en', scenarios: {},
+    assets: { a1: { id: 'a1', kind: 'image', url: 'https://cdn.test/a1.webp', mime: 'image/webp', bytes: 2000, name: 'strap' } },
+    blocks: [{ id: 'b1', type: 'narration', script: 'Offline narration works.', audio_asset_id: null }] };
+  const scenario = { id: 's1', code: 'TS-S01', title: 'A PC won’t boot', summary: null, minutes: 12, content_version: 1, locale: 'en', lessons: {},
+    content: { scene: 'pc-bench', pass_mark: 70, job: null, variants: [], steps: [{ id: 'unplug', type: 'tap', target: 'wall-switch', prompt: 'Make it safe.', hints: [], why: '', outcome: null, lesson: null, critical: false, only: [], sets: {}, wrong: [] }] } };
+  const pack = { format: 1, enrolment_id: 'e1', locale: 'en', version: 'v1', built_at: '', bytes: 3_200_000, lessons: { l1: lesson }, scenarios: { s1: scenario },
+    assets: [lesson.assets.a1], runtime: { url: 'https://ubuntu.simuwork.test/embed/sim-3d.html', scenes: ['pc-bench'] } };
+
+  it('downloads a programme, then lessons and the 3D simulator work with no connection', async () => {
+    await seed({ signedIn: true });
+    const calls = mockApi({ '/session': { data: session() }, '/learn/enrolments/e1/activities': { data: { progress: 0, activities: [] } }, '/learn/enrolments/e1/pack?locale=en': { data: pack } });
+    await renderRouter('./app', { initialUrl: '/learn/e1' });
+    const { Alert } = jest.requireActual<typeof import('react-native')>('react-native');
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    await act(async () => fireEvent.press(await screen.findByText('Download')));
+    // On mobile data the learner is told the size first.
+    expect(alert.mock.calls[0]![1]).toBe('This download uses about a few MB of data. Wi-Fi is better if you can.');
+    await act(async () => (alert.mock.calls[0]![2] as { onPress?: () => void }[])[1]!.onPress!());
+    await settle();
+    expect(alert).toHaveBeenCalledWith('Saved on this phone. You can now train with no data.');
+    expect(await screen.findByText('Ready to use offline')).toBeOnTheScreen();
+    expect(screen.getByText(/3.1 MB on this phone/)).toBeOnTheScreen();
+    const { File } = jest.requireMock<{ File: { downloadFileAsync: jest.Mock } }>('expo-file-system');
+    expect(File.downloadFileAsync.mock.calls.map((c) => c[0])).toEqual(['https://cdn.test/a1.webp', 'https://ubuntu.simuwork.test/embed/sim-3d.html']);
+
+    // "Check for updates" sends the version and gets 304: nothing downloaded again.
+    mockApi({ '/session': { data: session() }, '/learn/enrolments/e1/pack?locale=en': () => [304, null] });
+    await act(async () => fireEvent.press(screen.getByText('Check for updates')));
+    await settle();
+
+    // No connection: the app uses the pack.
+    global.fetch = jest.fn(async () => { throw new TypeError('Network request failed'); }) as typeof fetch;
+    expect(calls.length).toBeGreaterThan(0);
+    await renderRouter('./app', { initialUrl: '/learn/e1/lesson/l1' });
+    expect(await screen.findByText('Offline narration works.')).toBeOnTheScreen();
+    await renderRouter('./app', { initialUrl: '/learn/e1/simulator/s1' });
+    await act(async () => fireEvent.press(await screen.findByText('Start: Practice')));
+    expect(await screen.findByTestId('webview')).toBeOnTheScreen();
+    expect(screen.getByText('3D view')).toBeOnTheScreen();
+  });
+});

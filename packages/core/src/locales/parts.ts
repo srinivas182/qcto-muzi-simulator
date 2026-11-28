@@ -5,7 +5,7 @@
  * English ships whole with the app. The source stays one file per language (translators and the mobile app
  * see no change); the split happens when the web app is built.
  */
-export const LEARNER_PREFIXES = ['common', 'nav', 'auth', 'm', 'home', 'lh', 'join', 'consent', 'shell', 'palette', 'section', 'hold', 'qd', 'lv', 'lp', 'sim', 'jr'] as const;
+export const LEARNER_PREFIXES = ['common', 'nav', 'auth', 'm', 'home', 'lh', 'join', 'consent', 'shell', 'palette', 'section', 'hold', 'qd', 'lv', 'lp', 'sim', 'jr', 'off'] as const;
 
 export type LocalePart = 'learner' | 'staff';
 
