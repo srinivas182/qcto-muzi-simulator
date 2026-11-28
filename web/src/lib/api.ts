@@ -37,13 +37,14 @@ export async function api<T>(path: string, { method = 'GET', body, signal }: Opt
   };
   const devTenant = import.meta.env.VITE_DEV_TENANT as string | undefined;
   if (devTenant) headers['X-Tenant'] = devTenant;
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  const form = typeof FormData !== 'undefined' && body instanceof FormData; // file uploads: the browser sets the boundary
+  if (body !== undefined && !form) headers['Content-Type'] = 'application/json';
 
   const res = await fetch(API_BASE + path, {
     method,
     headers,
     credentials: 'same-origin',
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: body === undefined ? undefined : form ? (body as FormData) : JSON.stringify(body),
     signal,
   });
 

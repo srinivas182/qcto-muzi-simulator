@@ -12,6 +12,7 @@ use App\Identity\ConsentService;
 use App\Learners\IdNumbers;
 use App\Learners\LearnerDirectory;
 use App\Learning\ActivityCatalogue;
+use App\Learning\LessonContent;
 use App\Models\Activity;
 use App\Models\BillingSetting;
 use App\Models\Centre;
@@ -154,6 +155,29 @@ final class DemoSeeder extends Seeder
      * The first Technical Support activities (titles and outcome links; lesson and scenario content arrive
      * with Course Studio and Scenario Studio). Published, so the coverage map shows them as linked.
      */
+    /** Demo lesson content (English, reviewed by HQ's content manager). Translations come through Course Studio. */
+    private const DEMO_LESSONS = [
+        'TS-L01' => [
+            ['type' => 'narration', 'script' => 'The phone rings: a user’s printer has stopped working. Before you fix anything, you log it. A good ticket saves everyone time.'],
+            ['type' => 'keypoints', 'items' => ['Who: name, department and contact number', 'What: the problem in the user’s own words', 'When: since when, and how often', 'Impact: how many people are stuck']],
+            ['type' => 'text', 'body' => 'Then set the **priority**. A whole team that cannot work is more urgent than one slow screen. Your service level agreement (SLA) says how fast each priority must be handled.'],
+            ['type' => 'check', 'prompt' => 'Five people in Finance cannot print payslips due today. One person’s mouse is sticky. Which ticket comes first?', 'options' => ['The sticky mouse, because it was logged first', 'Finance printing, because more people are stuck and there is a deadline', 'Whichever is quicker to fix'], 'answer' => 1, 'explain' => 'Impact and urgency set the priority, not the order calls came in.', 'outcome' => 'TS-1.2'],
+        ],
+        'TS-L02' => [
+            ['type' => 'narration', 'script' => 'Inside a PC there is mains power, and parts that a tiny spark of static can kill. Two habits keep you and the PC safe.'],
+            ['type' => 'keypoints', 'items' => ['Shut down, switch off at the wall and unplug', 'Hold the power button for 5 seconds to drain left-over power', 'Wear an antistatic wrist strap clipped to the bare metal of the case', 'Hold memory modules by the edges, never the gold pins']],
+            ['type' => 'text', 'body' => 'Static from your body can be thousands of volts. You will not feel it, but a memory module can be damaged and fail weeks later. That is why the strap matters even when nothing seems to happen.'],
+            ['type' => 'check', 'prompt' => 'You must reseat a RAM module. What do you do first?', 'options' => ['Open the case and pull the module out', 'Shut down, switch off and unplug the PC', 'Put on the strap and start working with the PC on'], 'answer' => 1, 'explain' => 'Power off and unplugged comes first, every time. Then the strap.', 'outcome' => 'TS-2.2'],
+            ['type' => 'check', 'prompt' => 'Where do you clip the antistatic strap?', 'options' => ['To a painted part of the case', 'To bare metal on the case', 'To the RAM module'], 'answer' => 1, 'explain' => 'Paint does not conduct. Bare metal lets the static drain safely.', 'outcome' => 'TS-2.2'],
+            ['type' => 'try', 'activity_code' => 'TS-S01'],
+        ],
+        'TS-L03' => [
+            ['type' => 'narration', 'script' => 'The PC works again. Now tell the user what happened, in words they understand.'],
+            ['type' => 'keypoints', 'items' => ['Say what was wrong, without jargon', 'Say what you did', 'Ask them to try it while you are there', 'Close the ticket with the same words']],
+            ['type' => 'check', 'prompt' => 'Which explanation is best for a non-technical user?', 'options' => ['“The DIMM in slot A2 had a contact fault, so POST failed.”', '“One of the memory parts was loose, so the PC could not start. I put it back firmly and tested it. Can you log in for me?”', '“It is fixed now.”'], 'answer' => 1, 'explain' => 'Plain words, what you did, and a check that it works for them.', 'outcome' => 'TS-6.1'],
+        ],
+    ];
+
     private function demoActivities(TenantContext $context): void
     {
         $context->runAs(null, function (): void {
@@ -168,7 +192,10 @@ final class DemoSeeder extends Seeder
                 ['scenario', 'TS-S01', 'A PC won’t boot', 'Diagnose the fault and replace the faulty RAM safely.', 12, 2, ['TS-2.2', 'TS-3.2']],
                 ['lesson', 'TS-L03', 'Explaining the fix', 'Tell the user what you did, in plain words.', 3, 1, ['TS-6.1', 'TS-6.2']],
             ] as [$kind, $code, $title, $summary, $minutes, $weight, $outcomes]) {
-                $catalogue->publish($catalogue->create($version, ['kind' => $kind, 'code' => $code, 'title' => $title, 'summary' => $summary, 'minutes' => $minutes, 'weight' => $weight], $outcomes));
+                $content = self::DEMO_LESSONS[$code] ?? [];
+                $blocks = array_map(fn (array $b, int $i) => ['id' => strtolower($code).'b'.$i] + $b, $content, array_keys($content));
+                $catalogue->publish($catalogue->create($version, ['kind' => $kind, 'code' => $code, 'title' => $title, 'summary' => $summary, 'minutes' => $minutes, 'weight' => $weight,
+                    'content' => $blocks === [] ? [] : ['blocks' => LessonContent::clean($blocks)[0], 'i18n' => [], 'review' => ['en' => ['by' => 'Zanele Mthembu (HQ)', 'at' => now()->toIso8601String()]]]], $outcomes));
             }
         }, platform: true);
     }

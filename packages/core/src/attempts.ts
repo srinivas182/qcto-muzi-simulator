@@ -148,3 +148,53 @@ export interface LearnActivity {
   best_score: number | null;
   attempts: number;
 }
+
+/** Lesson content (Course Studio, 4.2). Same block shapes as the API's LessonContent. */
+export type LessonBlock =
+  | { id: string; type: 'text'; body: string }
+  | { id: string; type: 'keypoints'; items: string[] }
+  | { id: string; type: 'image'; asset_id: string; alt: string }
+  | { id: string; type: 'narration'; script: string; audio_asset_id: string | null }
+  | { id: string; type: 'video'; asset_id: string; low_asset_id: string | null; text: string }
+  | { id: string; type: 'check'; prompt: string; options: string[]; answer: number; explain: string; outcome: string | null }
+  | { id: string; type: 'try'; activity_code: string };
+
+export type LessonBlockType = LessonBlock['type'];
+export type ContentLocale = 'en' | 'zu' | 'xh' | 'af';
+export type LessonI18n = Partial<Record<'zu' | 'xh' | 'af', Record<string, Record<string, string | string[]>>>>;
+
+export interface ContentAssetItem { id: string; kind: 'image' | 'audio' | 'video'; url: string; bytes: number; name: string | null; mime: string }
+
+export interface StudioActivity {
+  id: string;
+  kind: 'lesson' | 'scenario';
+  code: string;
+  title: string;
+  summary: string | null;
+  minutes: number;
+  weight: number;
+  required: boolean;
+  status: 'draft' | 'published' | 'retired';
+  content_version: number;
+  has_draft: boolean;
+  blocks: number;
+  outcomes: string[];
+  review: Partial<Record<ContentLocale, 'ai' | 'reviewed'>>;
+  published_at: string | null;
+}
+
+export interface StudioActivityDetail extends StudioActivity {
+  draft: { blocks: LessonBlock[]; i18n: LessonI18n; review: Partial<Record<ContentLocale, { by?: string; at?: string; ai?: boolean }>> };
+  problems: string[];
+  outcome_details: { code: string; statement: string }[];
+  scenarios: { code: string; title: string }[];
+  assets: Record<string, ContentAssetItem>;
+  ai_ready: boolean;
+}
+
+/** Apply a language's translation to blocks (fields missing in the translation stay in English). */
+export function localiseBlocks(blocks: LessonBlock[], i18n: LessonI18n, locale: ContentLocale): LessonBlock[] {
+  if (locale === 'en') return blocks;
+  const tr = i18n[locale] ?? {};
+  return blocks.map((b) => ({ ...b, ...(tr[b.id] ?? {}) }) as LessonBlock);
+}

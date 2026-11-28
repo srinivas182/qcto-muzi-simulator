@@ -42,6 +42,7 @@ export const routes: RouteObject[] = [
           { path: 'hq/audit', lazy: page(() => import('../pages/shared/Audit')) },
           { path: 'hq/programmes', lazy: page(() => import('../pages/hq/Programmes')) },
           { path: 'hq/programmes/:code', lazy: page(() => import('../pages/hq/ProgrammeDetail')) },
+          { path: 'hq/programmes/:code/lessons/:id', lazy: page(() => import('../pages/hq/LessonStudio')) },
           { path: 'hq/providers', lazy: page(() => import('../pages/hq/Providers')) },
           { path: 'hq/packages', lazy: page(() => import('../pages/hq/Packages')) },
           { path: 'hq/billing', lazy: page(() => import('../pages/hq/Billing')) },

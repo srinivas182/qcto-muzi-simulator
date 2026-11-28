@@ -27,6 +27,8 @@ use Illuminate\Support\Facades\DB;
  * @property int $content_version
  * @property array<string, mixed> $content
  * @property Carbon|null $published_at
+ * @property array<string, mixed>|null $draft
+ * @property Carbon|null $draft_updated_at
  * @property-read ProgrammeVersion $version
  */
 class Activity extends Model
@@ -39,11 +41,11 @@ class Activity extends Model
 
     public const PUBLISHED = 'published';
 
-    protected $fillable = ['programme_version_id', 'kind', 'code', 'title', 'summary', 'position', 'required', 'weight', 'minutes', 'status', 'content_version', 'content', 'published_at', 'updated_by'];
+    protected $fillable = ['programme_version_id', 'kind', 'code', 'title', 'summary', 'position', 'required', 'weight', 'minutes', 'status', 'content_version', 'content', 'published_at', 'updated_by', 'draft', 'draft_updated_at'];
 
     protected function casts(): array
     {
-        return ['required' => 'boolean', 'weight' => 'integer', 'minutes' => 'integer', 'content_version' => 'integer', 'content' => 'array', 'published_at' => 'datetime'];
+        return ['required' => 'boolean', 'weight' => 'integer', 'minutes' => 'integer', 'content_version' => 'integer', 'content' => 'array', 'published_at' => 'datetime', 'draft' => 'array', 'draft_updated_at' => 'datetime'];
     }
 
     /** @return BelongsTo<ProgrammeVersion, $this> */

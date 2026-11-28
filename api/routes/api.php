@@ -36,6 +36,7 @@ use App\Http\Controllers\Api\V1\Programmes\ReferencePageController;
 use App\Http\Controllers\Api\V1\Providers\AcademyController;
 use App\Http\Controllers\Api\V1\Providers\ProviderController;
 use App\Http\Controllers\Api\V1\Qcto\QctoController;
+use App\Http\Controllers\Api\V1\Studio\LessonStudioController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -215,6 +216,20 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::get('/reference-pages', [ReferencePageController::class, 'index'])->name('reference-pages.index');
                 Route::get('/reference-pages/{page}', [ReferencePageController::class, 'show'])->name('reference-pages.show');
             });
+            // Course Studio (Sprint 4.2).
+            Route::middleware('permission:content.author|content.review|content.publish')->group(function (): void {
+                Route::get('/programmes/{programme}/activities', [LessonStudioController::class, 'index'])->name('programmes.activities');
+                Route::get('/activities/{activity}', [LessonStudioController::class, 'show'])->whereUuid('activity')->name('activities.show');
+            });
+            Route::middleware('permission:content.author')->group(function (): void {
+                Route::post('/programmes/{programme}/activities', [LessonStudioController::class, 'store'])->name('programmes.activities.store');
+                Route::patch('/activities/{activity}', [LessonStudioController::class, 'update'])->whereUuid('activity')->name('activities.update');
+                Route::post('/activities/{activity}/ai-draft', [LessonStudioController::class, 'aiDraft'])->whereUuid('activity')->middleware('throttle:10,1')->name('activities.ai-draft');
+                Route::post('/activities/{activity}/translate', [LessonStudioController::class, 'translate'])->whereUuid('activity')->middleware('throttle:10,1')->name('activities.translate');
+                Route::post('/content-assets', [LessonStudioController::class, 'upload'])->middleware('throttle:60,1')->name('content-assets.store');
+            });
+            Route::post('/activities/{activity}/review', [LessonStudioController::class, 'review'])->whereUuid('activity')->middleware('permission:content.review')->name('activities.review');
+            Route::post('/activities/{activity}/publish', [LessonStudioController::class, 'publish'])->whereUuid('activity')->middleware('permission:content.publish')->name('activities.publish');
             Route::put('/programmes/{programme}/coverage/{code}', [CoverageController::class, 'update'])
                 ->middleware('permission:programmes.manage|content.author')->name('programmes.coverage.update');
 
