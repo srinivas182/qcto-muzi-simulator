@@ -1,6 +1,6 @@
 # Sprint 5: Assessment, evidence and the road to the EISA
 
-**Status:** draft for approval (Srini). Nothing is built until this is approved.
+**Status:** approved by Srini, 28 Nov 2026, with the decisions below.
 
 ## Why this sprint
 Learning is never the end of a QCTO occupational programme. The learner must:
@@ -59,27 +59,36 @@ None of them produces evidence of practical competence by itself.
 - **One-tap mentor confirmation** in the mentor's language. *(5.3)*
 
 **Proposed for later:**
-- Photo-ID check at the start of online summative tests (needs a POPIA impact assessment).
 - Recognition of Prior Learning (RPL) route.
 - A direct upload to the QCTO or AQP portals, if they open an API.
 - An AI first-pass check of written answers, always confirmed by a person.
 
-## Decisions for Srini (see the questions sent with this spec)
-1. **Knowledge summative tests:** our own question bank with timed online tests (recommended), or only record
-   results from tests run elsewhere.
-2. **Practical summative:** a passed real-job simulator run, reviewed by an assessor, counts as practical
-   evidence alongside a short observation (recommended); or observation only.
-3. **Workplace mentors:** a link with a one-time code and no account (recommended), or mentor accounts.
-4. **Online test integrity:** light (time limit, shuffled questions, one sitting, device log) (recommended);
-   or webcam proctoring (heavy on data, plus a POPIA risk).
+## Decisions (Srini, 28 Nov 2026)
+1. **Knowledge tests:** our own question bank in Course Studio, with AI drafting and expert review. Tests are
+   timed, run on web and mobile, and are auto-marked; short answers are marked by a person.
+2. **Practical evidence:** a passed real-job simulator run, reviewed by the assessor through the replay, plus a
+   short observation on the phone.
+3. **Workplace mentors: both options, and the provider chooses.**
+   - The default is a WhatsApp or SMS link with a one-time code, and no account.
+   - A provider can also invite mentors to sign in with their own account (for example large host employers
+     with many learners). Either way a mentor sees only the learners linked to them.
+4. **Test integrity: both levels, and the provider chooses per test.**
+   - **Light (the default):** a server-enforced time limit, shuffled questions, one sitting, and a device log.
+   - **Camera check (optional):** after the learner gives POPIA consent, the phone or browser takes a small,
+     low-resolution photo at the start and a few at random during the test. Not video, so a 40-minute test
+     costs about 200 KB.
+     - Only the assessor or moderator of that test can see the photos.
+     - Photos are deleted automatically 90 days after the result is final.
+     - Learners who refuse consent, or have no camera, are referred to a supervised sitting at the provider.
+     - The provider must enable it and accepts the POPIA impact assessment template we supply.
 
 ## Sub-sprints
 
 | # | Scope | Main deliverables |
 |---|---|---|
-| **5.1** | Assessment model and knowledge tests | Assessment plan per programme version: modules → summative tasks (knowledge test, practical task, workplace task) mapped to outcomes. A question bank in Course Studio (multiple choice, short answer), with AI drafting and expert review. Timed tests on web and mobile that survive a dropped connection. Auto-marking, with short answers marked by a person. |
+| **5.1** | Assessment model and knowledge tests | Assessment plan per programme version: modules → summative tasks (knowledge test, practical task, workplace task) mapped to outcomes. A question bank in Course Studio (multiple choice, short answer), with AI drafting and expert review. Timed tests on web and mobile that survive a dropped connection. Auto-marking, with short answers marked by a person. Integrity level per test: light, or camera check (consent, small photos, 90-day deletion). |
 | **5.2** | Assessor workspace | Review queue. Simulator replay with the step-level evidence and its hash. An observation checklist on the phone that works offline. Decision of competent or not yet competent, with feedback linked to the lesson or step, and a re-assessment limit. Assessor declaration and sign-off; the audit log stores who decided what, when, and which evidence was seen. |
-| **5.3** | Workplace logbook and mentor confirmation | Daily check-in against the workplace module outcomes, with a compressed photo or note. Mentors confirm weekly through a WhatsApp or SMS link with a one-time code. The Statement of Work Experience is built from confirmed entries. Hours and days count towards QCTO minimums. |
+| **5.3** | Workplace logbook and mentor confirmation | Daily check-in against the workplace module outcomes, with a compressed photo or note. Mentors confirm weekly through a WhatsApp or SMS link with a one-time code, or by signing in with a mentor account (the provider chooses). The Statement of Work Experience is built from confirmed entries. Hours and days count towards QCTO minimums. |
 | **5.4** | Internal moderation and appeals | Automatic sampling rules per provider. Moderator review that agrees or sends back to the assessor. Appeals by the learner, with a deadline. Moderation report per cohort for SETA and QCTO visits. |
 | **5.5** | Statement of Results and EISA readiness | SoR PDF on the QCTO template (provider letterhead, qualification and level, learner, achievement per component, the "not an Occupational Certificate" wording, signatures). EISA readiness per learner and per cohort (SoR, work experience, ID copy, QCTO details from Sprint 3). PoE export as a single PDF or ZIP for the AQP or assessment centre. |
 | **5.6** | Pilot hardening and Sprint 5 report | Evidence retention and deletion policy (POPIA); evidence storage limits; performance on a cohort of 200 learners; the report with "Gaps we fill and best recommendations". |
