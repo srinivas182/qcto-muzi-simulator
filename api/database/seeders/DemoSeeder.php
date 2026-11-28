@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Billing\LicenceOrders;
+use App\Billing\Payments;
 use App\Identity\ConsentService;
+use App\Models\BillingSetting;
+use App\Models\LicencePool;
 use App\Models\OutcomeCoverage;
 use App\Models\Package;
 use App\Models\Programme;
@@ -81,8 +85,31 @@ final class DemoSeeder extends Seeder
         app(GuideImporter::class)->import(null, publish: true);
         $this->demoCoverage();
         $this->demoPackages();
+        $this->demoBilling($context);
 
         $this->command?->info('Demo ready. Password for every account: '.self::PASSWORD);
+    }
+
+    /** Placeholder seller details, a paid 60-seat licence and an unpaid monthly order for Ubuntu. */
+    private function demoBilling(TenantContext $context): void
+    {
+        BillingSetting::current()->update([
+            'seller_name' => 'SimuWork Demo (Pty) Ltd', 'registration_number' => '2026/000000/07', 'vat_number' => '4000000000',
+            'address' => ['line1' => '1 Demo Street', 'city' => 'Johannesburg', 'province' => 'Gauteng', 'postal_code' => '2001'],
+            'email' => 'accounts@simuwork.demo', 'bank' => ['bank' => 'Demo Bank', 'account_name' => 'SimuWork Demo (Pty) Ltd', 'account_number' => '1234567890', 'branch_code' => '250655', 'account_type' => 'Cheque'],
+        ]);
+        $tenant = Tenant::query()->where('slug', 'ubuntu')->firstOrFail();
+        if ($context->runAs($tenant, fn () => LicencePool::query()->exists())) {
+            return;
+        }
+        $hq = $context->runAs(null, fn () => User::query()->whereNull('tenant_id')->where('email', 'srini@hq.demo')->firstOrFail(), platform: true);
+        $admin = $context->runAs($tenant, fn () => User::query()->where('email', 'admin@ubuntu.demo')->firstOrFail());
+        $context->runAs($tenant, function () use ($tenant, $admin, $hq): void {
+            $orders = app(LicenceOrders::class);
+            $paid = $orders->buy($tenant, Package::query()->where('code', 'technical-support-12-months')->firstOrFail(), 60, $admin);
+            app(Payments::class)->recordEft($paid['invoice'], $paid['invoice']->total_cents, 'DEMO EFT 0001', today(), $hq);
+            $orders->buy($tenant, Package::query()->where('code', 'data-analytics-courses-monthly')->firstOrFail(), 10, $admin);
+        });
     }
 
     /** Three packages on sale: a fixed-term bundle, a monthly courses-only plan, and a simulator pack. */

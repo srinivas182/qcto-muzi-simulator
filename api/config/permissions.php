@@ -28,6 +28,7 @@ return [
             'packages.manage' => ['scope' => 'platform', 'label' => 'Create and price packages'],
             'billing.view' => ['scope' => 'platform', 'label' => 'See invoices and payments for all providers'],
             'billing.manage' => ['scope' => 'platform', 'label' => 'Manage invoices, payments and overdue accounts'],
+            'billing.settings' => ['scope' => 'platform', 'label' => 'Change the seller details, bank details, VAT and payment gateways on invoices'],
         ],
         'Support & system' => [
             'support.tickets' => ['scope' => 'platform', 'label' => 'Answer provider support requests'],
