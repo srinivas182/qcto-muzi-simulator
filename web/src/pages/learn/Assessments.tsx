@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Briefcase, CircleCheck, ClipboardCheck, Hourglass, PenLine } from 'lucide-react';
+import { ArrowLeft, Briefcase, CircleCheck, ClipboardCheck, Hourglass, MessageSquare, PenLine } from 'lucide-react';
 import type { AssessmentComponent, LearnAssessmentItem } from '@simuwork/core';
 import { Badge, Card, Skeleton } from '../../components/ui';
 import { api } from '../../lib/api';
@@ -48,5 +48,25 @@ function Item({ eid, x }: { eid: string; x: LearnAssessmentItem }) {
     </span>
   );
   const canSit = x.kind === 'test' && x.result !== 'competent' && !x.waiting_for_marking && (x.open_sitting !== null || left > 0);
-  return <li>{canSit ? <Link to={`/learn/enrolments/${eid}/tests/${x.id}`} className="block hover:bg-surface-2" aria-label={`${x.title}: ${t(x.open_sitting ? 'as.resume' : 'as.start')}`}>{body}</Link> : body}</li>;
+  const fb = x.feedback;
+  return (
+    <li>
+      {canSit ? <Link to={`/learn/enrolments/${eid}/tests/${x.id}`} className="block hover:bg-surface-2" aria-label={`${x.title}: ${t(x.open_sitting ? 'as.resume' : 'as.start')}`}>{body}</Link> : body}
+      {fb && (fb.text || fb.links.length > 0) && (
+        <div className="mx-4 mb-3 rounded-xl bg-surface-2 p-3">
+          <p className="flex items-center gap-1.5 text-[12px] font-bold text-muted"><MessageSquare className="size-3.5" />{t('as.fb.title')}</p>
+          {fb.text && <p className="mt-1 text-[14px] text-ink">{fb.text}</p>}
+          {fb.links.length > 0 && (
+            <ul className="mt-2 space-y-1">
+              {fb.links.map((l) => l.activity_id ? (
+                <li key={`${l.type}${l.ref}`}><Link className="text-[14px] font-semibold text-brand hover:underline" to={`/learn/enrolments/${eid}/${l.type === 'lesson' ? 'lessons' : 'simulators'}/${l.activity_id}`}>
+                  {t(l.type === 'lesson' ? 'as.fb.lesson' : 'as.fb.step', { what: l.label })}</Link></li>
+              ) : null)}
+            </ul>
+          )}
+          {x.result === 'not_yet' && (x.attempts_allowed ?? 0) > x.attempts_used && <p className="mt-2 text-[12px] text-muted">{t('as.fb.tries', { n: (x.attempts_allowed ?? 0) - x.attempts_used })}</p>}
+        </div>
+      )}
+    </li>
+  );
 }

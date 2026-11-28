@@ -230,3 +230,44 @@ None of them produces evidence of practical competence by itself.
 | Assessor must eyeball every photo | Show photos as a small strip in the 5.2 replay, beside the answers | 5.2 |
 | Photo of the wrong person is not detected | Optional on-device face-present check (no face matching, no biometrics stored) to flag empty or multiple-face photos | Proposed for later |
 | Phone photo size depends on the camera's smallest size | Add on-device resize (expo-image-manipulator), reused by the 5.3 logbook photos (≤150 KB) | 5.3 |
+
+## 5.2a notes: assessor workspace (done)
+
+**Built**
+- **One review queue** at *To review* (`/assess`), with a cohort filter and four tabs:
+  - *Simulator runs*: the newest real-job run not yet judged, with its score, whether a critical step was missed, and which opportunity it is.
+  - *Observations*: marked *Ready* once the learner is competent on the simulator tasks of the same component.
+  - *Written answers*: tests waiting for marking, flagged *Late* or *Camera check* where that applies.
+  - *Done*: the last 50 decisions.
+  The queue is built with a few set-based queries, so it stays fast for 200 learners.
+- **Run replay**: every step in order, and each move with its time, shown as right ✓, wrong ✗, or hint/coach.
+  - It also shows mistakes and hints per step, steps not done, critical steps, the version played against the current version, and the device used.
+  - **Evidence fingerprint**: a SHA-256 over the moves, the version and the finish time. It is stored with the decision, and the replay shows whether the evidence is unchanged.
+- **Decision form**:
+  - competent or not yet competent;
+  - feedback, which is required for not yet competent;
+  - **links to a simulator step or a programme lesson** (the server only accepts real steps or lessons);
+  - the declaration;
+  - *Sign off*, which needs the `assessments.signoff` permission. Moderators can review but cannot sign off.
+  - The draft is kept on the device.
+- **Observation checklist**: met or not met for each item, with a note. The server refuses *competent* unless every item is met.
+- **Rules**:
+  - one decision per run;
+  - no decision after competent;
+  - **re-assessment limit**: each task's `attempts` setting, 3 by default;
+  - every decision is audited (`assessments.decided` with the round and the hash).
+- **Test marking screen**: the learner's answer beside the model answer or the right answer, marks for each short answer, and small camera-check photos (from 5.1c).
+- **Learner view**: practical tasks show the assessor's feedback, *Practise this step* links (to the simulator) and *Redo the lesson* links, plus how many opportunities are left.
+
+**Tests**: API 277, web 114, mobile 42. First load 150.1 KB.
+
+### Gaps we fill and best recommendations (5.2a)
+| Gap against leaders | What we did / recommend | When |
+|---|---|---|
+| OneFile, Smart Assessor and Aptem judge uploaded files: the assessor never sees *how* the learner worked | Move-by-move replay of the real job, with time, mistakes, hints and critical steps | In this sprint |
+| Evidence can be swapped after sign-off | SHA-256 fingerprint stored at sign-off; the replay warns if the evidence has changed | In this sprint |
+| Feedback is free text, and the learner has to work out what to redo | Feedback links open the exact simulator step or lesson | In this sprint |
+| Unlimited re-submissions blur the QCTO "opportunities" rule | Opportunity counter on every task; the limit is enforced; a development plan is required after the last one | In this sprint |
+| Observation is paper, typed up later | Checklist on screen, saved on the device as you go | In this sprint (full offline send in 5.2b) |
+| Assessor can't watch the 3D run itself | A visual replay in the 3D scene, driven by the stored moves | Proposed for later |
+| Assessors re-type the same feedback | Feedback snippets per step, learned from earlier decisions (AI-suggested, assessor-approved) | Proposed for later |

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Access\RoleController;
 use App\Http\Controllers\Api\V1\Access\SupportSessionController;
 use App\Http\Controllers\Api\V1\Access\UserRoleController;
 use App\Http\Controllers\Api\V1\Assessment\AssessmentSettingsController;
+use App\Http\Controllers\Api\V1\Assessment\AssessorController;
 use App\Http\Controllers\Api\V1\Assessment\TestController;
 use App\Http\Controllers\Api\V1\Auth\AccountController;
 use App\Http\Controllers\Api\V1\Auth\InvitationController;
@@ -155,6 +156,10 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::get('/cohorts/{cohort}/pilot', [CohortController::class, 'pilot'])->whereUuid('cohort')->name('cohorts.pilot');
                 Route::get('/cohorts/{cohort}/class', [CohortController::class, 'liveClass'])->whereUuid('cohort')->middleware('throttle:120,1')->name('cohorts.class');
                 Route::get('/sittings/{sitting}', [TestController::class, 'review'])->whereUuid('sitting')->middleware('permission:assessments.review')->name('sittings.review');
+                Route::get('/assess/queue', [AssessorController::class, 'queue'])->middleware('permission:assessments.review')->name('assess.queue');
+                Route::get('/assess/attempts/{attempt}', [AssessorController::class, 'attempt'])->whereUuid('attempt')->middleware('permission:assessments.review')->name('assess.attempt');
+                Route::get('/assess/enrolments/{enrolment}/tasks/{task}', [AssessorController::class, 'task'])->whereUuid(['enrolment', 'task'])->middleware('permission:assessments.review')->name('assess.task');
+                Route::post('/assess/enrolments/{enrolment}/tasks/{task}/decisions', [AssessorController::class, 'decide'])->whereUuid(['enrolment', 'task'])->middleware(['permission:assessments.signoff', 'throttle:60,1'])->name('assess.decide');
                 Route::get('/sittings/{sitting}/photos/{photo}', [TestController::class, 'showPhoto'])->whereUuid(['sitting', 'photo'])->middleware('permission:assessments.review')->name('sittings.photos.show');
                 Route::post('/sittings/{sitting}/mark', [TestController::class, 'mark'])->whereUuid('sitting')->middleware('permission:assessments.review')->name('sittings.mark');
                 Route::get('/enrolments/{enrolment}/checklist', [CohortController::class, 'checklist'])->whereUuid('enrolment')->name('enrolments.checklist');

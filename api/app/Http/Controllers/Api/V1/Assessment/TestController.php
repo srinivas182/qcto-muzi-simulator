@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\Assessment;
 
+use App\Assessment\AssessorWorkspace;
 use App\Assessment\CameraChecks;
+use App\Assessment\Decisions;
 use App\Assessment\TestSittings;
 use App\Http\Controllers\Controller;
+use App\Models\Activity;
+use App\Models\AssessmentDecision;
 use App\Models\AssessmentTask;
 use App\Models\Enrolment;
 use App\Models\Learner;
@@ -36,8 +40,26 @@ final class TestController extends Controller
         $this->mine($request, $enrolment);
         $tasks = AssessmentTask::query()->where('programme_version_id', $enrolment->programme_version_id)->where('status', 'published')->orderBy('position')->get();
         $sittings = TestSitting::query()->where('enrolment_id', $enrolment->id)->orderBy('attempt')->get()->groupBy('assessment_task_id');
+        $decisions = AssessmentDecision::query()->where('enrolment_id', $enrolment->id)->orderBy('round')->get()->groupBy('assessment_task_id');
 
-        return response()->json(['data' => $tasks->map(function (AssessmentTask $t) use ($sittings): array {
+        $lessonIds = Activity::query()->where('programme_version_id', $enrolment->programme_version_id)->where('kind', Activity::LESSON)->pluck('id', 'code');
+
+        return response()->json(['data' => $tasks->map(function (AssessmentTask $t) use ($sittings, $decisions, $lessonIds): array {
+            if (in_array($t->kind, ['simulator', 'observation'], true)) {
+                // Practical tasks: the assessor's latest decision and feedback, linked to the step or lesson.
+                $mine = $decisions->get($t->id, collect());
+                $last = $mine->last();
+
+                return [
+                    'id' => $t->id, 'code' => $t->code, 'title' => $t->title, 'component' => $t->component, 'kind' => $t->kind, 'outcomes' => $t->outcomeCodes(),
+                    'minutes' => null, 'questions' => null, 'pass_mark' => null, 'camera' => false, 'simulator_id' => $t->activity_id,
+                    'attempts_allowed' => Decisions::roundsAllowed($t), 'attempts_used' => $mine->count(), 'open_sitting' => null, 'waiting_for_marking' => false,
+                    'result' => AssessorWorkspace::resultOf($mine), 'best_score' => null,
+                    'feedback' => $last === null ? null : ['text' => $last->feedback, 'at' => $last->created_at->toIso8601String(),
+                        // where each link opens: the simulator (to practise that step) or the lesson
+                        'links' => array_map(fn (array $l) => $l + ['activity_id' => $l['type'] === 'lesson' ? $lessonIds->get($l['ref']) : $t->activity_id], $last->links)],
+                ];
+            }
             $mine = $sittings->get($t->id, collect());
             $open = $mine->firstWhere('status', 'open');
 
