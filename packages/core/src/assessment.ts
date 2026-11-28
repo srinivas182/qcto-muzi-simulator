@@ -38,3 +38,22 @@ export interface AssessmentPlan {
   coverage: { code: string; statement: string; components: AssessmentComponent[] }[];
   uncovered: number;
 }
+
+/** A learner's view of their summative tasks (5.1b). */
+export interface LearnAssessmentItem {
+  id: string; code: string; title: string; component: AssessmentComponent; kind: AssessmentKind; outcomes: string[];
+  minutes: number | null; questions: number | null; pass_mark: number | null; attempts_allowed: number | null; attempts_used: number;
+  open_sitting: string | null; waiting_for_marking: boolean; result: 'competent' | 'not_yet' | null; best_score: number | null;
+}
+
+/** The paper a learner's device gets: questions and shuffled options, never answers. */
+export interface TestPaper {
+  id: string; task: { id: string; code: string; title: string; pass_mark: number }; attempt: number; locale: string; status: 'open';
+  started_at: string; deadline_at: string; seconds_left: number; answers: Record<string, number | number[] | string>;
+  questions: { id: string; type: 'single' | 'multi' | 'short'; prompt: string; marks: number; options: string[] }[];
+}
+
+export interface TestResult {
+  id: string; status: 'submitted' | 'marked'; attempt: number; score: number | null; result: 'competent' | 'not_yet' | null; late: boolean;
+  submitted_at: string | null; revise: { code: string; statement: string }[];
+}

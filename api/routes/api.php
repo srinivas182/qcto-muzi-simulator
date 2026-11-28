@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Access\BrandingController;
 use App\Http\Controllers\Api\V1\Access\RoleController;
 use App\Http\Controllers\Api\V1\Access\SupportSessionController;
 use App\Http\Controllers\Api\V1\Access\UserRoleController;
+use App\Http\Controllers\Api\V1\Assessment\TestController;
 use App\Http\Controllers\Api\V1\Auth\AccountController;
 use App\Http\Controllers\Api\V1\Auth\InvitationController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
@@ -152,6 +153,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::get('/cohorts/{cohort}/progress', [CohortController::class, 'progress'])->whereUuid('cohort')->name('cohorts.progress');
                 Route::get('/cohorts/{cohort}/pilot', [CohortController::class, 'pilot'])->whereUuid('cohort')->name('cohorts.pilot');
                 Route::get('/cohorts/{cohort}/class', [CohortController::class, 'liveClass'])->whereUuid('cohort')->middleware('throttle:120,1')->name('cohorts.class');
+                Route::get('/sittings/{sitting}', [TestController::class, 'review'])->whereUuid('sitting')->middleware('permission:assessments.review')->name('sittings.review');
+                Route::post('/sittings/{sitting}/mark', [TestController::class, 'mark'])->whereUuid('sitting')->middleware('permission:assessments.review')->name('sittings.mark');
                 Route::get('/enrolments/{enrolment}/checklist', [CohortController::class, 'checklist'])->whereUuid('enrolment')->name('enrolments.checklist');
             });
             Route::middleware('permission:live_classroom.run')->group(function (): void {
@@ -180,6 +183,10 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::post('/learn/enrolments/{enrolment}/start', [LearnController::class, 'start'])->whereUuid('enrolment')->name('learn.start');
                 Route::get('/learn/enrolments/{enrolment}/activities', [LearnController::class, 'activities'])->whereUuid('enrolment')->name('learn.activities');
                 Route::get('/learn/enrolments/{enrolment}/lessons/{activity}', [LearnController::class, 'lesson'])->whereUuid(['enrolment', 'activity'])->name('learn.lesson');
+                Route::get('/learn/enrolments/{enrolment}/assessments', [TestController::class, 'index'])->whereUuid('enrolment')->name('learn.assessments');
+                Route::post('/learn/enrolments/{enrolment}/tests/{task}/start', [TestController::class, 'start'])->whereUuid(['enrolment', 'task'])->middleware('throttle:10,1')->name('learn.tests.start');
+                Route::get('/learn/sittings/{sitting}', [TestController::class, 'show'])->whereUuid('sitting')->name('learn.sittings.show');
+                Route::put('/learn/sittings/{sitting}', [TestController::class, 'save'])->whereUuid('sitting')->middleware('throttle:120,1')->name('learn.sittings.save');
                 Route::get('/learn/enrolments/{enrolment}/pack', [LearnController::class, 'pack'])->whereUuid('enrolment')->middleware('throttle:20,1')->name('learn.pack');
                 Route::get('/learn/enrolments/{enrolment}/checklist', [LearnController::class, 'checklist'])->whereUuid('enrolment')->name('learn.checklist');
                 Route::get('/learn/enrolments/{enrolment}/shares', [ShareController::class, 'index'])->whereUuid('enrolment')->name('learn.shares');

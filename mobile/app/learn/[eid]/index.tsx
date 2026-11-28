@@ -6,7 +6,7 @@ import { api } from '../../../src/lib/api';
 import { onlineOrPack } from '../../../src/lib/packs';
 import { OfflineCard } from '../../../src/learn/OfflineCard';
 import { useI18n } from '../../../src/lib/i18n';
-import { Box, Check, ChevronRight, ListChecks, PlayCircle } from '../../../src/ui/icons';
+import { Box, Check, ChevronRight, ClipboardCheck, ListChecks, PlayCircle } from '../../../src/ui/icons';
 import { Card, radius, Screen, space, T, useTheme } from '../../../src/ui';
 
 /** Learner: everything in my programme, in order, with what I have done. */
@@ -30,6 +30,11 @@ export default function ProgrammeScreen() {
           <Pressable accessibilityRole="link" onPress={() => router.push(`/learn/${eid}/checklist`)} style={[styles.row, { marginTop: space.lg, borderRadius: radius.lg, borderWidth: 1, borderColor: c.line, backgroundColor: c.surface }]}>
             <ListChecks size={22} color={c.brand} />
             <View style={{ flex: 1 }}><T style={{ fontWeight: '700' }}>{t('jr.title')}</T><T variant="caption" tone="muted">{t('jr.cardLead')}</T></View>
+            <ChevronRight size={18} color={c.muted} />
+          </Pressable>
+          <Pressable accessibilityRole="link" onPress={() => router.push(`/learn/${eid}/assessments`)} style={[styles.row, { marginTop: space.sm, borderRadius: radius.lg, borderWidth: 1, borderColor: c.line, backgroundColor: c.surface }]}>
+            <ClipboardCheck size={22} color={c.brand} />
+            <View style={{ flex: 1 }}><T style={{ fontWeight: '700' }}>{t('as.title')}</T><T variant="caption" tone="muted">{t('as.cardLead')}</T></View>
             <ChevronRight size={18} color={c.muted} />
           </Pressable>
           <Card style={{ padding: 0, marginTop: space.lg }}>

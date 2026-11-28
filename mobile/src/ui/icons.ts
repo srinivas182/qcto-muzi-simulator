@@ -46,3 +46,4 @@ export { default as BellRing } from 'lucide-react-native/icons/bell-ring';
 export { default as Share2 } from 'lucide-react-native/icons/share-2';
 export { default as MessageCircleQuestion } from 'lucide-react-native/icons/message-circle-question';
 export { default as Radio } from 'lucide-react-native/icons/radio';
+export { default as ClipboardCheck } from 'lucide-react-native/icons/clipboard-check';
