@@ -74,28 +74,34 @@ function Block({ b, assets, scenarios, dataSaver, onAnswer, onTry }: {
 
 function Check({ b, onAnswer }: { b: Extract<LessonBlock, { type: 'check' }>; onAnswer?: (blockId: string, correct: boolean) => void }) {
   const { t } = useI18n();
-  const [picked, setPicked] = useState<number | null>(null);
-  const done = picked !== null;
+  // "Fix it": a wrong first answer gets a hint and one more try before the answer is shown.
+  // Only the first answer counts towards the score.
+  const [picks, setPicks] = useState<number[]>([]);
+  const picked = picks[picks.length - 1] ?? null;
+  const done = picked === b.answer || picks.length >= 2;
   const right = picked === b.answer;
+  const retrying = picks.length === 1 && !done;
   return (
     <fieldset className="rounded-2xl border border-line p-4">
       <legend className="px-1 text-[12px] font-semibold uppercase tracking-wide text-muted">{t('lv.quickCheck')}</legend>
       <p className="text-[16px] font-semibold text-ink">{b.prompt}</p>
       <div className="mt-3 space-y-2">
         {b.options.map((o, i) => (
-          <button key={i} type="button" disabled={done} aria-pressed={picked === i}
-            onClick={() => { setPicked(i); onAnswer?.(b.id, i === b.answer); }}
+          <button key={i} type="button" disabled={done || picks.includes(i)} aria-pressed={picked === i}
+            onClick={() => { if (picks.length === 0) onAnswer?.(b.id, i === b.answer); setPicks((p) => [...p, i]); }}
             className={cx('flex min-h-12 w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-left text-[15px] transition',
-              !done && 'border-line hover:border-brand hover:bg-surface-2',
+              !done && !picks.includes(i) && 'border-line hover:border-brand hover:bg-surface-2',
+              retrying && picks.includes(i) && 'border-[#C92A2F] bg-[#FDECEC] text-[#8A1C20] line-through opacity-70 dark:bg-[#B42328]/20 dark:text-[#FF9A9E]',
               done && i === b.answer && 'border-[#1E7A46] bg-[#E6F4EC] text-[#14532D] dark:bg-[#1E7A46]/20 dark:text-[#6FD49A]',
               done && picked === i && i !== b.answer && 'border-[#C92A2F] bg-[#FDECEC] text-[#8A1C20] dark:bg-[#B42328]/20 dark:text-[#FF9A9E]',
               done && picked !== i && i !== b.answer && 'border-line opacity-60')}>
-            {done && i === b.answer ? <CheckCircle2 className="size-5 shrink-0" /> : done && picked === i ? <XCircle className="size-5 shrink-0" /> : <span className="size-5 shrink-0 rounded-full border-2 border-line" />}
+            {done && i === b.answer ? <CheckCircle2 className="size-5 shrink-0" /> : picks.includes(i) ? <XCircle className="size-5 shrink-0" /> : <span className="size-5 shrink-0 rounded-full border-2 border-line" />}
             {o}
           </button>
         ))}
       </div>
-      {done && <p role="status" className="mt-3 text-[14px] text-ink"><span className="font-semibold">{t(right ? 'lv.right' : 'lv.notQuite')}</span> {b.explain}</p>}
+      {retrying && <p role="status" className="mt-3 text-[14px] text-ink"><span className="font-semibold">{t('lv.notQuite')}</span> {b.hint || t('lv.tryOnce')}</p>}
+      {done && <p role="status" className="mt-3 text-[14px] text-ink"><span className="font-semibold">{t(right ? (picks.length > 1 ? 'lv.fixedIt' : 'lv.right') : 'lv.notQuite')}</span> {b.explain}</p>}
     </fieldset>
   );
 }

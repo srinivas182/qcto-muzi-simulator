@@ -14,7 +14,7 @@ const LANGUAGE_KB = 15;
 const CHUNK_KB = 25;
 const ENGINE_KB = 150;
 const ENGINE = /^assets\/three-[\w-]+\.js$/;
-const LANGUAGE = /^assets\/lang-(zu|af|xh)-(learner|staff)-[\w-]+\.js$/;
+const LANGUAGE = /^assets\/lang-(zu|af|xh)-(learner|staff|hq)-[\w-]+\.js$/;
 
 const kb = (f) => gzipSync(readFileSync(join(dist, f))).length / 1024;
 const html = readFileSync(join(dist, 'index.html'), 'utf8');

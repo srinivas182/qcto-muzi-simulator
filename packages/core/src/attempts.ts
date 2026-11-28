@@ -156,7 +156,7 @@ export type LessonBlock =
   | { id: string; type: 'image'; asset_id: string; alt: string }
   | { id: string; type: 'narration'; script: string; audio_asset_id: string | null }
   | { id: string; type: 'video'; asset_id: string; low_asset_id: string | null; text: string }
-  | { id: string; type: 'check'; prompt: string; options: string[]; answer: number; explain: string; outcome: string | null }
+  | { id: string; type: 'check'; prompt: string; options: string[]; answer: number; explain: string; outcome: string | null; /** Shown after a wrong first answer ("Fix it"). */ hint?: string }
   | { id: string; type: 'try'; activity_code: string };
 
 export type LessonBlockType = LessonBlock['type'];

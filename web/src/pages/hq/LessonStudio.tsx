@@ -237,6 +237,7 @@ function BlockEditor({ b, onChange, readOnly, assets, onAsset, scenarios, outcom
           ))}
           {!readOnly && b.options.length < 5 && <Button size="sm" variant="ghost" icon={<Plus className="size-4" />} onClick={() => onChange({ ...b, options: [...b.options, ''] })}>{t('ls.addAnswer')}</Button>}
         </fieldset>
+        <Text label={t('ls.f.hint')} rows={1} value={b.hint ?? ''} readOnly={readOnly} onChange={(hint) => onChange({ ...b, hint })} />
         <Text label={t('ls.f.explain')} rows={2} value={b.explain} readOnly={readOnly} onChange={(explain) => onChange({ ...b, explain })} />
         <label className="block">
           <span className="mb-1 block text-[12px] font-semibold text-ink">{t('ls.f.outcome')}</span>
@@ -259,7 +260,7 @@ function BlockEditor({ b, onChange, readOnly, assets, onAsset, scenarios, outcom
   }
 }
 
-const FIELDS: Record<LessonBlockType, string[]> = { text: ['body'], keypoints: ['items'], image: ['alt'], narration: ['script'], video: ['text'], check: ['prompt', 'options', 'explain'], try: [] };
+const FIELDS: Record<LessonBlockType, string[]> = { text: ['body'], keypoints: ['items'], image: ['alt'], narration: ['script'], video: ['text'], check: ['prompt', 'options', 'hint', 'explain'], try: [] };
 
 function TranslationEditor({ b, tr, onChange, readOnly }: { b: LessonBlock; tr: Record<string, string | string[]>; onChange: (field: string, v: string | string[]) => void; readOnly: boolean }) {
   const { t } = useI18n();
@@ -269,7 +270,8 @@ function TranslationEditor({ b, tr, onChange, readOnly }: { b: LessonBlock; tr: 
   return (
     <div className="space-y-3">
       {fields.map((f) => {
-        const source = src[f]!;
+        const source = src[f];
+        if (source === undefined || source === '') return null; // optional field left empty in English (e.g. a check's hint)
         if (Array.isArray(source)) {
           const cur = (tr[f] as string[] | undefined) ?? [];
           return source.map((s, i) => (

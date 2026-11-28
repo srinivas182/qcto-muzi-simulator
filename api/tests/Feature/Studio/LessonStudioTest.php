@@ -171,4 +171,12 @@ final class LessonStudioTest extends AccessTestCase
         [, $admin] = $this->person($this->ubuntu, 'tp_admin');
         $this->fresh()->getJson($this->url('/platform/programmes/technical-support/activities'), $this->bearer($admin))->assertStatus(404);
     }
+
+    public function test_a_check_can_carry_a_fix_it_hint_that_is_translatable(): void
+    {
+        [$blocks, $problems] = LessonContent::clean([['type' => 'check', 'prompt' => 'First?', 'options' => ['Open it', 'Unplug it'], 'answer' => 1, 'explain' => 'Power first.', 'hint' => str_repeat('x', 300)]]);
+        $this->assertSame([], $problems);
+        $this->assertSame(200, mb_strlen($blocks[0]['hint']));
+        $this->assertContains('hint', LessonContent::TEXT_FIELDS['check']);
+    }
 }

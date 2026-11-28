@@ -83,8 +83,11 @@ function Listen({ url }: { url: string }) {
 function CheckBlock({ b, onAnswer }: { b: Extract<LessonBlock, { type: 'check' }>; onAnswer: (blockId: string, correct: boolean) => void }) {
   const { t } = useI18n();
   const { c } = useTheme();
-  const [picked, setPicked] = useState<number | null>(null);
-  const done = picked !== null;
+  // "Fix it": a wrong first answer gets a hint and one more try; only the first answer counts.
+  const [picks, setPicks] = useState<number[]>([]);
+  const picked = picks[picks.length - 1] ?? null;
+  const done = picked === b.answer || picks.length >= 2;
+  const retrying = picks.length === 1 && !done;
   return (
     <View style={[styles.check, { borderColor: c.line }]}>
       <T variant="overline" tone="muted">{t('lv.quickCheck')}</T>
@@ -92,10 +95,10 @@ function CheckBlock({ b, onAnswer }: { b: Extract<LessonBlock, { type: 'check' }
       <View style={{ gap: space.sm, marginTop: space.md }}>
         {b.options.map((o, i) => {
           const right = done && i === b.answer;
-          const wrong = done && picked === i && i !== b.answer;
+          const wrong = picks.includes(i) && i !== b.answer;
           return (
-            <Pressable key={i} accessibilityRole="button" accessibilityState={{ disabled: done, selected: picked === i }} disabled={done}
-              onPress={() => { setPicked(i); (i === b.answer ? haptics.success : haptics.warn)(); onAnswer(b.id, i === b.answer); }}
+            <Pressable key={i} accessibilityRole="button" accessibilityState={{ disabled: done || wrong, selected: picked === i }} disabled={done || wrong}
+              onPress={() => { if (picks.length === 0) onAnswer(b.id, i === b.answer); setPicks((p) => [...p, i]); (i === b.answer ? haptics.success : haptics.warn)(); }}
               style={[styles.option, { borderColor: right ? c.success : wrong ? c.danger : c.line, backgroundColor: c.surface, opacity: done && !right && !wrong ? 0.6 : 1 }]}>
               {right ? <Check size={18} color={c.success} /> : wrong ? <X size={18} color={c.danger} /> : <View style={[styles.dot, { borderColor: c.line }]} />}
               <T style={{ flex: 1 }}>{o}</T>
@@ -103,7 +106,8 @@ function CheckBlock({ b, onAnswer }: { b: Extract<LessonBlock, { type: 'check' }
           );
         })}
       </View>
-      {done && <T accessibilityLiveRegion="polite" style={{ marginTop: space.md }}><T style={{ fontWeight: '700' }}>{t(picked === b.answer ? 'lv.right' : 'lv.notQuite')} </T>{b.explain}</T>}
+      {retrying && <T accessibilityLiveRegion="polite" style={{ marginTop: space.md }}><T style={{ fontWeight: '700' }}>{`${t('lv.notQuite')} `}</T>{b.hint || t('lv.tryOnce')}</T>}
+      {done && <T accessibilityLiveRegion="polite" style={{ marginTop: space.md }}><T style={{ fontWeight: '700' }}>{`${t(picked === b.answer ? (picks.length > 1 ? 'lv.fixedIt' : 'lv.right') : 'lv.notQuite')} `}</T>{b.explain}</T>}
     </View>
   );
 }

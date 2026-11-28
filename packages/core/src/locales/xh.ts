@@ -1243,6 +1243,10 @@ const xh: Messages = {
   'off.dataBody': "Oku kukhuphela kusebenzisa malunga ne-{size} yedatha. I-Wi-Fi ingcono ukuba unako.",
   'off.sizeUnknown': "ii-MB ezimbalwa",
   'off.downloadAnyway': "Khuphela noko",
+  // Sprint 4.6d: "Fix it" retry in lessons
+  'lv.tryOnce': "Phinda ujonge uzame kwakhona kanye.",
+  'lv.fixedIt': "Uyilungisile!",
+  'ls.f.hint': "Icebo emva kwempendulo yokuqala engalunganga (akunyanzelekanga)",
 };
 
 export default xh;

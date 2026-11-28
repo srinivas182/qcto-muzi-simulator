@@ -14,7 +14,8 @@ use Illuminate\Support\Str;
  *   image      {asset_id, alt}              picture with a description (read aloud for low-literacy learners)
  *   narration  {script, audio_asset_id?}    what the narrator says; audio is optional
  *   video      {asset_id, low_asset_id?, text}  optional avatar or demo video; text is the alternative on data saver
- *   check      {prompt, options[], answer, explain, outcome?}  a quick question that feeds progress
+ *   check      {prompt, options[], answer, explain, hint?, outcome?}  a quick question that feeds progress; a wrong
+ *                                       first answer gets the hint and one more try ("Fix it")
  *   try        {activity_code}              "try it in the simulator"
  *
  * Translations are stored per language as {blockId: {field: text}}; only text fields can be translated.
@@ -26,7 +27,7 @@ final class LessonContent
     /** Translatable fields per block type. */
     public const TEXT_FIELDS = [
         'text' => ['body'], 'keypoints' => ['items'], 'image' => ['alt'], 'narration' => ['script'],
-        'video' => ['text'], 'check' => ['prompt', 'options', 'explain'], 'try' => [],
+        'video' => ['text'], 'check' => ['prompt', 'options', 'explain', 'hint'], 'try' => [],
     ];
 
     public const LOCALES = ['zu', 'xh', 'af'];
@@ -82,6 +83,7 @@ final class LessonContent
                     $block['options'] = array_values(array_map(fn ($x) => mb_substr(trim((string) $x), 0, 200), array_slice((array) ($b['options'] ?? []), 0, 5)));
                     $block['answer'] = (int) ($b['answer'] ?? -1);
                     $block['explain'] = $s('explain', 500);
+                    $block['hint'] = $s('hint', 200); // optional: shown after a wrong first answer, before one more try
                     $block['outcome'] = isset($b['outcome']) && $b['outcome'] !== '' ? (string) $b['outcome'] : null;
                     if ($block['prompt'] === '' || count(array_filter($block['options'], fn ($o) => $o !== '')) < 2 || ! array_key_exists($block['answer'], $block['options']) || $block['options'][$block['answer']] === '' || $block['explain'] === '') {
                         $problems[] = "Block {$n}: a check needs a question, at least two answers, the right one marked, and why it is right.";

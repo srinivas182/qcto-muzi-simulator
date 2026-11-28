@@ -88,4 +88,17 @@ describe('Course player', () => {
     expect(screen.getByText(/best 100%/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /A PC won’t boot/ })).toHaveAttribute('href', '/learn/enrolments/e1/simulators/s1');
   });
+
+  it('"Fix it": a wrong first answer gets the hint and one more try; only the first answer counts', async () => {
+    const fix = { ...lesson, blocks: [{ id: 'b2', type: 'check' as const, prompt: 'What do you do first?', options: ['Open the case', 'Switch off and unplug', 'Call the user'], answer: 1, explain: 'Power first.', outcome: null, hint: 'Think about electricity.' }] };
+    mockApi({ '/learn/enrolments/e1/lessons/a1': { data: fix } }, learner());
+    renderAt('/learn/enrolments/e1/lessons/a1');
+    fireEvent.click(await screen.findByRole('button', { name: /Open the case/ }));
+    expect(screen.getByRole('status')).toHaveTextContent('Not quite. Think about electricity.');
+    expect(screen.getByRole('button', { name: /Open the case/ })).toBeDisabled();
+    expect(screen.getByText('1 of 1 quick checks done')).toBeInTheDocument(); // the first answer is recorded
+    fireEvent.click(screen.getByRole('button', { name: /Switch off and unplug/ }));
+    expect(screen.getByRole('status')).toHaveTextContent('Fixed it! Power first.');
+    expect(screen.getByRole('button', { name: /Call the user/ })).toBeDisabled();
+  });
 });
