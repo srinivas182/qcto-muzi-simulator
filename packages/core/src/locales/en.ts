@@ -1461,6 +1461,23 @@ const en = {
   'as.fb.lesson': "Redo the lesson: {what}",
   'as.fb.step': "Practise this step: {what}",
   'as.fb.tries': "{n} more opportunities on this task.",
+  // Sprint 5.2b: offline sign-off, accommodations
+  'rv.queued': "No signal. The decision is saved on this device and will be sent when you are back online.",
+  'rv.outbox': "{n} decisions are waiting on this device and will be sent when you are online.",
+  'rv.refused': "These could not be recorded (the learner was already judged, or the task changed): {list}. Please check them again.",
+  'rv.acc.button': "Accommodations",
+  'rv.acc.title': "Accommodations for {name}",
+  'rv.acc.lead': "For learners who need them on tests, as agreed with the provider.",
+  'rv.acc.extra': "Extra time on tests",
+  'rv.acc.none': "No extra time",
+  'rv.acc.more': "+{n}% time",
+  'rv.acc.read': "Read aloud",
+  'rv.acc.readLead': "A button reads each question and its choices aloud.",
+  'rv.acc.popia': "Only the setting is kept, not the reason. Keep any supporting documents in the learner’s file with the provider.",
+  'rv.acc.save': "Save",
+  'as.acc.extra': "You have {n}% extra time on this test.",
+  'as.acc.read': "Read aloud",
+  'as.acc.readQ': "Read question {n} aloud",
 } as const;
 
 export type MessageKey = keyof typeof en;

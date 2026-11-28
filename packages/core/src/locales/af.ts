@@ -1463,6 +1463,23 @@ const af: Messages = {
   'as.fb.lesson': "Doen die les oor: {what}",
   'as.fb.step': "Oefen hierdie stap: {what}",
   'as.fb.tries': "Nog {n} geleenthede op hierdie taak.",
+  // Sprint 5.2b: offline sign-off, accommodations
+  'rv.queued': "Geen sein nie. Die besluit is op hierdie toestel gestoor en sal gestuur word wanneer jy weer aanlyn is.",
+  'rv.outbox': "{n} besluite wag op hierdie toestel en sal gestuur word wanneer jy aanlyn is.",
+  'rv.refused': "Hierdie kon nie aangeteken word nie (die leerder is reeds beoordeel, of die taak het verander): {list}. Gaan dit asseblief weer na.",
+  'rv.acc.button': "Akkommodasies",
+  'rv.acc.title': "Akkommodasies vir {name}",
+  'rv.acc.lead': "Vir leerders wat dit by toetse nodig het, soos met die verskaffer ooreengekom.",
+  'rv.acc.extra': "Ekstra tyd by toetse",
+  'rv.acc.none': "Geen ekstra tyd nie",
+  'rv.acc.more': "+{n}% tyd",
+  'rv.acc.read': "Lees hardop",
+  'rv.acc.readLead': "’n Knoppie lees elke vraag en sy keuses hardop.",
+  'rv.acc.popia': "Net die instelling word gehou, nie die rede nie. Hou enige stawende dokumente in die leerder se lêer by die verskaffer.",
+  'rv.acc.save': "Stoor",
+  'as.acc.extra': "Jy het {n}% ekstra tyd vir hierdie toets.",
+  'as.acc.read': "Lees hardop",
+  'as.acc.readQ': "Lees vraag {n} hardop",
 };
 
 export default af;

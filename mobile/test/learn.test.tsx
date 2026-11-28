@@ -255,4 +255,26 @@ describe('knowledge tests', () => {
     const start = calls.find((c) => c.path.endsWith('/start'))!;
     expect(JSON.parse(String(start.init.body))).toMatchObject({ camera_consent: true });
   });
+
+  it('shows the assessor’s feedback with links, and reads questions aloud for a learner who needs it', async () => {
+    await seed({ signedIn: true });
+    const Speech = jest.requireMock<{ speak: jest.Mock }>('expo-speech');
+    Speech.speak.mockClear();
+    const item = { id: 't9', code: 'TS-P01', title: 'Fix the slow PC', component: 'practical', kind: 'simulator', outcomes: [], minutes: null, questions: null, pass_mark: null, attempts_allowed: 3, attempts_used: 1,
+      open_sitting: null, waiting_for_marking: false, result: 'not_yet', best_score: null, simulator_id: 'a2',
+      feedback: { text: 'Switch off at the wall first.', at: '', links: [{ type: 'step', ref: 'unplug', label: 'Make it safe.', activity_id: 'a2' }] } };
+    const paper = { id: 's3', task: { id: 't1', code: 'TS-A01', title: 'Knowledge test', pass_mark: 70 }, attempt: 1, locale: 'zu', status: 'open', started_at: '', deadline_at: '', seconds_left: 1800, answers: {}, read_aloud: true, extra_time: 50,
+      questions: [{ id: 'q1', type: 'single', prompt: 'What do you do first?', marks: 1, options: ['Call the user', 'Switch off'] }] };
+    mockApi({ '/session': { data: session() }, '/learn/enrolments/e1/assessments': { data: [item] }, '/learn/enrolments/e1/tests/t1/start': { data: paper } });
+    await renderRouter('./app', { initialUrl: '/learn/e1/assessments' });
+    expect(await screen.findByText('Switch off at the wall first.')).toBeOnTheScreen();
+    expect(screen.getByText('Practise this step: Make it safe.')).toBeOnTheScreen();
+    expect(screen.getByText('2 more opportunities on this task.')).toBeOnTheScreen();
+
+    await renderRouter('./app', { initialUrl: '/learn/e1/test/t1' });
+    await act(async () => fireEvent.press(await screen.findByText('Start the test')));
+    expect(await screen.findByText('You have 50% extra time on this test.')).toBeOnTheScreen();
+    await act(async () => fireEvent.press(screen.getByLabelText('Read question 1 aloud')));
+    expect(Speech.speak).toHaveBeenCalledWith('What do you do first?. 1. Call the user. 2. Switch off', expect.objectContaining({ language: 'zu-ZA' }));
+  });
 });

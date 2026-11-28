@@ -38,6 +38,18 @@ export default function AssessmentsScreen() {
                       <T style={{ fontWeight: '700' }}>{x.title}</T>
                       <T variant="caption" tone="muted">{x.kind === 'test' ? t('as.testMeta', { n: x.questions ?? 0, min: x.minutes ?? 0, pass: x.pass_mark ?? 0, left: Math.max(0, left) }) : t('as.withAssessor')}</T>
                       {status ? <T variant="caption" tone="brand" style={{ fontWeight: '700' }}>{status}</T> : null}
+                      {x.feedback && (x.feedback.text || x.feedback.links.length > 0) ? (
+                        <View style={[styles.fb, { backgroundColor: c.surface2 }]}>
+                          <T variant="caption" tone="muted" style={{ fontWeight: '700' }}>{t('as.fb.title')}</T>
+                          {x.feedback.text ? <T>{x.feedback.text}</T> : null}
+                          {x.feedback.links.map((l) => l.activity_id ? (
+                            <Pressable key={`${l.type}${l.ref}`} accessibilityRole="link" onPress={() => router.push(`/learn/${eid}/${l.type === 'lesson' ? 'lesson' : 'simulator'}/${l.activity_id}`)}>
+                              <T tone="brand" style={{ fontWeight: '700' }}>{t(l.type === 'lesson' ? 'as.fb.lesson' : 'as.fb.step', { what: l.label })}</T>
+                            </Pressable>
+                          ) : null)}
+                          {x.result === 'not_yet' && left > 0 ? <T variant="caption" tone="muted">{t('as.fb.tries', { n: left })}</T> : null}
+                        </View>
+                      ) : null}
                     </View>
                     {canSit ? <ChevronRight size={18} color={c.muted} /> : null}
                   </Pressable>
@@ -53,5 +65,6 @@ export default function AssessmentsScreen() {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.lg, minHeight: 64 },
+  fb: { marginTop: space.sm, padding: space.md, borderRadius: radius.md, gap: 4 },
   icon: { width: 36, height: 36, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
 });

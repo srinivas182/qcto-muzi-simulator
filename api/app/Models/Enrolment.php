@@ -36,6 +36,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $last_activity_at
  * @property Carbon|null $reminded_at
  * @property int $reminders_sent
+ * @property array{extra_time?: int, read_aloud?: bool}|null $accommodations
  * @property int $pack_downloads
  * @property int $pack_bytes
  * @property-read Programme $programme
@@ -63,11 +64,11 @@ class Enrolment extends Model
 
     public const FREE_WITHDRAWAL_BELOW = 10;
 
-    protected $fillable = ['learner_id', 'cohort_id', 'programme_id', 'programme_version_id', 'licence_pool_id', 'holds_seat', 'status', 'progress', 'seat_taken_at', 'started_at', 'ended_at', 'reason', 'created_by', 'sor_issued_on', 'last_activity_at', 'reminded_at', 'reminders_sent', 'pack_downloads', 'pack_bytes'];
+    protected $fillable = ['learner_id', 'cohort_id', 'programme_id', 'programme_version_id', 'licence_pool_id', 'holds_seat', 'status', 'progress', 'seat_taken_at', 'started_at', 'ended_at', 'reason', 'created_by', 'sor_issued_on', 'last_activity_at', 'reminded_at', 'reminders_sent', 'pack_downloads', 'pack_bytes', 'accommodations'];
 
     protected function casts(): array
     {
-        return ['holds_seat' => 'boolean', 'progress' => 'integer', 'seat_taken_at' => 'datetime', 'started_at' => 'datetime', 'ended_at' => 'datetime', 'sor_issued_on' => 'date', 'last_activity_at' => 'datetime', 'reminded_at' => 'datetime', 'reminders_sent' => 'integer'];
+        return ['holds_seat' => 'boolean', 'progress' => 'integer', 'seat_taken_at' => 'datetime', 'started_at' => 'datetime', 'ended_at' => 'datetime', 'sor_issued_on' => 'date', 'last_activity_at' => 'datetime', 'reminded_at' => 'datetime', 'reminders_sent' => 'integer', 'accommodations' => 'array'];
     }
 
     /** @return BelongsTo<Programme, $this> */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\Assessment;
 
+use App\Assessment\Accommodations;
 use App\Assessment\AssessorWorkspace;
 use App\Assessment\Decisions;
 use App\Http\Controllers\Controller;
@@ -40,6 +41,20 @@ final class AssessorController extends Controller
         return response()->json(['data' => ['enrolment_id' => $enrolment->id, 'learner' => $enrolment->learner->fullName()] + $this->workspace->taskFor($enrolment, $task)]);
     }
 
+    public function accommodations(Enrolment $enrolment): JsonResponse
+    {
+        return response()->json(['data' => Accommodations::of($enrolment)]);
+    }
+
+    public function setAccommodations(Request $request, Enrolment $enrolment, Accommodations $accommodations): JsonResponse
+    {
+        $data = $request->validate(['extra_time' => ['required', 'integer', Rule::in(Accommodations::EXTRA_TIME)], 'read_aloud' => ['required', 'boolean']]);
+        /** @var User $actor */
+        $actor = $request->user();
+
+        return response()->json(['data' => $accommodations->set($enrolment, ['extra_time' => (int) $data['extra_time'], 'read_aloud' => (bool) $data['read_aloud']], $actor)]);
+    }
+
     public function decide(Request $request, Enrolment $enrolment, AssessmentTask $task): JsonResponse
     {
         $data = $request->validate([
@@ -49,6 +64,7 @@ final class AssessorController extends Controller
             'attempt_id' => ['nullable', 'string', 'max:40'],
             'observation' => ['nullable', 'array', 'max:30'], 'observation.*.met' => ['required', 'boolean'], 'observation.*.note' => ['nullable', 'string', 'max:300'],
             'declaration' => ['accepted'],
+            'client_id' => ['nullable', 'uuid'], 'declared_at' => ['nullable', 'date'], // offline sign-off: sent once, with the time it was signed
         ]);
         /** @var User $assessor */
         $assessor = $request->user();

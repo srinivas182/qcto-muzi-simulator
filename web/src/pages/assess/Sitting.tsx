@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import type { SittingReview } from '@simuwork/core';
+import { AccommodationsButton } from '../../components/assessment/Accommodations';
 import { Badge, Button, Card, cx, inputClass, PageHeader, Skeleton, useToast } from '../../components/ui';
 import { API_BASE, api } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
@@ -27,10 +28,12 @@ export default function SittingMark() {
   return (
     <div className="sw-in max-w-4xl space-y-4">
       <Link to="/assess" className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand"><ArrowLeft className="size-4" />{t('rv.back')}</Link>
-      <PageHeader title={s.learner} lead={s.task.title} />
+      <PageHeader title={s.learner} lead={s.task.title} actions={<AccommodationsButton enrolmentId={s.enrolment_id} learner={s.learner} />} />
       <Card className="flex flex-wrap items-center gap-3 p-4">
         {s.status === 'marked' ? <Badge tone={s.result === 'competent' ? 'success' : 'warning'}>{t(s.result === 'competent' ? 'rv.competent' : 'rv.notYet')} · {s.score}%</Badge> : <Badge>{t('rv.toMark')}</Badge>}
         {s.late && <Badge tone="warning">{t('rv.late')}</Badge>}
+        {s.accommodations && s.accommodations.extra_time > 0 && <Badge>{t('rv.acc.more', { n: s.accommodations.extra_time })}</Badge>}
+        {s.accommodations?.read_aloud && <Badge>{t('rv.acc.read')}</Badge>}
         {s.camera && (
           <div className="ml-auto flex items-center gap-2" aria-label={t('rv.photos')}>
             {s.photos.length === 0 ? <span className="text-[12px] text-muted">{t('rv.noPhotos')}</span> : s.photos.map((p) => (

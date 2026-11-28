@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AssessQueue, LearnAssessmentItem, PracticalTask, RunReplay } from '@simuwork/core';
 import { mockApi, nav, renderAt, session } from './harness';
 
@@ -66,5 +66,43 @@ describe('Assessor workspace', () => {
     expect(screen.getByRole('link', { name: 'Practise this step: Make it safe.' })).toHaveAttribute('href', '/learn/enrolments/e1/simulators/s1');
     expect(screen.getByRole('link', { name: 'Redo the lesson: Working safely' })).toHaveAttribute('href', '/learn/enrolments/e1/lessons/l1');
     expect(screen.getByText('2 more opportunities on this task.')).toBeInTheDocument();
+  });
+
+  it('an observation signed off with no signal waits on the device and is sent once from the queue when back online', async () => {
+    const obs: PracticalTask & { learner: string; enrolment_id: string } = { ...task, id: 't2', kind: 'observation', title: 'Observed repair', items: ['Works safely'], link_options: { steps: [], lessons: [] }, learner: 'Sipho Ndlovu', enrolment_id: 'e1' };
+    let online = false;
+    const calls = mockApi({
+      '/assess/enrolments/e1/tasks/t2': { data: obs }, '/cohorts': { data: [] }, '/assess/queue': { data: { mark: [], runs: [], observe: [], done: [] } },
+      '/assess/enrolments/e1/tasks/t2/decisions': () => { if (!online) throw new TypeError('Failed to fetch'); return { data: { id: 'd1' } }; },
+    }, assessor());
+    renderAt('/assess/observe/e1/t2');
+    fireEvent.click(within(await screen.findByRole('radiogroup', { name: 'Works safely' })).getByRole('radio', { name: 'Met' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Competent' }));
+    fireEvent.click(screen.getByLabelText(/I declare that this evidence/));
+    fireEvent.click(screen.getByRole('button', { name: 'Sign off decision' }));
+    expect(await screen.findByText(/No signal. The decision is saved on this device/)).toBeInTheDocument();
+    const queued = JSON.parse(localStorage.getItem('sw.decision.outbox')!) as { body: { client_id: string } }[];
+    expect(queued).toHaveLength(1);
+
+    online = true;
+    renderAt('/assess');
+    await waitFor(() => expect(localStorage.getItem('sw.decision.outbox')).toBe('[]'));
+    const sent = calls.mock.calls.filter(([u]) => String(u).endsWith('/decisions')).map(([, i]) => JSON.parse(String((i as RequestInit).body)).client_id);
+    expect(new Set(sent)).toEqual(new Set([queued[0]!.body.client_id])); // the same id every time: recorded once
+  });
+
+  it('a learner with read-aloud can hear each question', async () => {
+    const speakSpy = vi.fn();
+    vi.stubGlobal('speechSynthesis', { speak: speakSpy, cancel: vi.fn() });
+    vi.stubGlobal('SpeechSynthesisUtterance', class { text: string; lang = ''; rate = 1; constructor(t: string) { this.text = t; } });
+    const paper = { id: 's1', task: { id: 'tt', code: 'TS-A01', title: 'Knowledge test', pass_mark: 70 }, attempt: 1, locale: 'zu', status: 'open', started_at: '', deadline_at: '', seconds_left: 1800, answers: {}, read_aloud: true, extra_time: 50,
+      questions: [{ id: 'q1', type: 'single', prompt: 'What do you do first?', marks: 1, options: ['Call the user', 'Switch off'] }] };
+    mockApi({ '/learn/enrolments/e1/assessments': { data: [] }, '/learn/enrolments/e1/tests/tt/start': { data: paper } }, session({ permissions: ['learning.use'], navigation: nav('learn') }));
+    renderAt('/learn/enrolments/e1/tests/tt');
+    fireEvent.click(await screen.findByRole('button', { name: 'Start the test' }));
+    expect(await screen.findByText('You have 50% extra time on this test.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Read question 1 aloud' }));
+    expect(speakSpy.mock.calls[0]![0]).toMatchObject({ text: 'What do you do first?. 1. Call the user. 2. Switch off', lang: 'zu-ZA' });
+    vi.unstubAllGlobals();
   });
 });

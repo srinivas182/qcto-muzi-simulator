@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import type { PracticalTask } from '@simuwork/core';
+import { AccommodationsButton } from '../../components/assessment/Accommodations';
 import { DecisionForm, DecisionHistory } from '../../components/assessment/DecisionForm';
 import { PageHeader, Skeleton } from '../../components/ui';
 import { api } from '../../lib/api';
@@ -18,8 +19,8 @@ export default function ObserveTask() {
   return (
     <div className="sw-in max-w-3xl space-y-4">
       <Link to="/assess" className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand"><ArrowLeft className="size-4" />{t('rv.back')}</Link>
-      <PageHeader title={task.learner} lead={task.title} />
-      <DecisionForm task={task} enrolmentId={eid} onDone={() => void qc.invalidateQueries({ queryKey: ['assess-task', eid, tid] })} />
+      <PageHeader title={task.learner} lead={task.title} actions={<AccommodationsButton enrolmentId={eid} learner={task.learner} />} />
+      <DecisionForm task={task} enrolmentId={eid} learner={task.learner} onDone={() => void qc.invalidateQueries({ queryKey: ['assess-task', eid, tid] })} />
       <DecisionHistory history={task.history} />
     </div>
   );

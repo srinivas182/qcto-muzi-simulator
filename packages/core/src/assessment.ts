@@ -52,6 +52,8 @@ export interface LearnAssessmentItem {
 export interface TestPaper {
   id: string; task: { id: string; code: string; title: string; pass_mark: number }; attempt: number; locale: string; status: 'open';
   started_at: string; deadline_at: string; seconds_left: number; answers: Record<string, number | number[] | string>;
+  /** Accommodations (Sprint 5.2b): read the questions aloud; extra time already in the clock. */
+  read_aloud?: boolean; extra_time?: number;
   /** Camera check: send up to photos_max small photos during the sitting. */
   camera?: boolean; photos_max?: number;
   questions: { id: string; type: 'single' | 'multi' | 'short'; prompt: string; marks: number; options: string[] }[];
@@ -88,7 +90,8 @@ export interface RunReplay {
   task: PracticalTask | null; decision: (DecisionOut & { hash_matches: boolean }) | null;
 }
 export interface SittingReview {
-  id: string; status: string; score: number | null; result: AssessResult | null; late: boolean; learner: string; task: { code: string; title: string };
+  id: string; enrolment_id: string; status: string; score: number | null; result: AssessResult | null; late: boolean; learner: string; task: { code: string; title: string };
+  accommodations: { extra_time: number; read_aloud: boolean } | null;
   camera: boolean; photos: { id: string; taken_at: string }[];
   questions: { id: string; type: 'single' | 'multi' | 'short'; prompt: string; marks: number; outcome: string | null; answer: string | string[] | null; key: string | string[]; awarded: number | null }[];
 }

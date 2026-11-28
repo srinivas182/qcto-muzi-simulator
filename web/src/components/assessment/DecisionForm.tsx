@@ -3,10 +3,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AssessResult, DecisionOut, PracticalTask } from '@simuwork/core';
 import { Badge, Button, Card, cx, inputClass, useToast } from '../ui';
 import { api, ApiError } from '../../lib/api';
+import { enqueue, isOffline } from '../../lib/decisionOutbox';
 import { useI18n } from '../../lib/i18n';
 
 type Row = { met: boolean | null; note: string };
-type Draft = { result: AssessResult | null; feedback: string; links: string[]; rows: Row[] };
+type Draft = { result: AssessResult | null; feedback: string; links: string[]; rows: Row[]; client_id?: string };
 
 const load = (key: string, n: number): Draft => {
   try {
@@ -20,7 +21,7 @@ const load = (key: string, n: number): Draft => {
  * The assessor's decision on a practical task: competent or not yet, feedback linked to a step or a lesson, the
  * observation checklist when there is one, and the declaration. Work in progress is kept on this device.
  */
-export function DecisionForm({ task, enrolmentId, attemptId, onDone }: { task: PracticalTask; enrolmentId: string; attemptId?: string; onDone: (d: DecisionOut) => void }) {
+export function DecisionForm({ task, enrolmentId, learner, attemptId, onDone }: { task: PracticalTask; enrolmentId: string; learner: string; attemptId?: string; onDone: (d: DecisionOut) => void }) {
   const { t } = useI18n();
   const toast = useToast();
   const qc = useQueryClient();
@@ -29,26 +30,47 @@ export function DecisionForm({ task, enrolmentId, attemptId, onDone }: { task: P
   const [d, setD] = useState<Draft>(() => load(key, observe ? task.items.length : 0));
   const [declared, setDeclared] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [queued, setQueued] = useState(false);
   const put = (next: Draft) => { setD(next); try { localStorage.setItem(key, JSON.stringify(next)); } catch { /* full */ } };
   const allMet = d.rows.every((r) => r.met === true);
   const allTicked = d.rows.every((r) => r.met !== null);
   const toggle = (ref: string) => put({ ...d, links: d.links.includes(ref) ? d.links.filter((x) => x !== ref) : [...d.links, ref] });
 
+  const url = `/assess/enrolments/${enrolmentId}/tasks/${task.id}/decisions`;
+  const body = () => ({
+    result: d.result, feedback: d.feedback || null, attempt_id: attemptId ?? null, declaration: true,
+    client_id: d.client_id ?? crypto.randomUUID(), declared_at: new Date().toISOString(),
+    links: d.links.map((ref) => (ref.startsWith('lesson:') ? { type: 'lesson', ref: ref.slice(7) } : { type: 'step', ref: ref.slice(5) })),
+    observation: observe ? d.rows.map((r) => ({ met: r.met === true, note: r.note || null })) : null,
+  });
   const save = useMutation({
-    mutationFn: () => api<{ data: DecisionOut }>(`/assess/enrolments/${enrolmentId}/tasks/${task.id}/decisions`, { method: 'POST', body: {
-      result: d.result, feedback: d.feedback || null, attempt_id: attemptId ?? null, declaration: true,
-      links: d.links.map((ref) => (ref.startsWith('lesson:') ? { type: 'lesson', ref: ref.slice(7) } : { type: 'step', ref: ref.slice(5) })),
-      observation: observe ? d.rows.map((r) => ({ met: r.met === true, note: r.note || null })) : null,
-    } }),
+    mutationFn: async () => {
+      const b = body();
+      put({ ...d, client_id: b.client_id as string });
+      try {
+        return await api<{ data: DecisionOut }>(url, { method: 'POST', body: b });
+      } catch (e) {
+        if (isOffline(e)) enqueue({ url, body: b, learner, task: task.title });
+        throw e;
+      }
+    },
     onSuccess: (r) => {
       try { localStorage.removeItem(key); } catch { /* ignore */ }
       void qc.invalidateQueries({ queryKey: ['assess-queue'] });
       toast(t('rv.saved'));
       onDone(r.data);
     },
-    onError: (e) => setError(e instanceof ApiError ? Object.values(e.errors)[0]?.[0] ?? e.message : t('common.error')),
+    onError: (e) => {
+      if (isOffline(e)) {
+        try { localStorage.removeItem(key); } catch { /* ignore */ }
+        setQueued(true);
+        return;
+      }
+      setError(e instanceof ApiError ? Object.values(e.errors)[0]?.[0] ?? e.message : t('common.error'));
+    },
   });
 
+  if (queued) return <Card role="status" className="p-5 text-[14px] font-medium text-ink">{t('rv.queued')}</Card>;
   if (task.competent) return <Card className="p-5"><Badge tone="success">{t('rv.competent')}</Badge><p className="mt-2 text-[14px] text-muted">{t('rv.alreadyCompetent')}</p></Card>;
   if (task.rounds_used >= task.rounds_allowed) return <Card className="p-5"><p className="text-[14px] font-medium text-ink">{t('rv.noRoundsLeft')}</p></Card>;
 
