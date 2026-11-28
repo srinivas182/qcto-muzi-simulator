@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useReducer, useRef, useState } from 'react';
 import { Box, Clock, Hand, Lightbulb, Rows3, Square, UserRound, Volume2, X } from 'lucide-react';
-import { simReducer, startRun, touchable, type ScenarioContent, type SimMode, type SimState } from '@simuwork/core';
+import { simReducer, startRun, touchable, type ScenarioContent, type SimAction, type SimMode, type SimState } from '@simuwork/core';
 import { Button, cx } from '../ui';
 import { useI18n } from '../../lib/i18n';
 import { canWebGL } from '../../lib/webgl';
@@ -30,17 +30,19 @@ function speak(text: string, locale: string) {
  * One run of a scenario. Every move goes through the shared reducer and is reported to `onMove`, so the
  * attempt is saved on the device as the learner goes; `onDone` fires once the last step is done.
  */
-export function SimRunner({ content, mode, customer, onMove, onDone, onQuit }: {
+export function SimRunner({ content, mode, customer, variant, onMove, onDone, onQuit }: {
   content: ScenarioContent; mode: SimMode; customer: string | null;
+  /** Force a cause (Scenario Studio preview); otherwise one is picked at random. */
+  variant?: string | null;
   onMove: (s: SimState, seconds: number) => void; onDone: (s: SimState, seconds: number) => void; onQuit: () => void;
 }) {
   const { t, tx, locale } = useI18n();
   const started = useRef(now());
-  const [s, dispatch] = useReducer((st: SimState, a: Parameters<typeof simReducer>[2]) => simReducer(content, st, a), content, (c) => startRun(c, mode));
+  const [s, dispatch] = useReducer((st: SimState, a: SimAction) => simReducer(st, a), content, (c) => (variant === undefined ? startRun(c, mode) : startRun(c, mode, variant)));
   const [view, setView] = useState<'3d' | '2d'>(() => (canWebGL() ? savedView() : '2d'));
   const [left, setLeft] = useState(() => (content.job?.minutes ?? 0) * 60);
   const [effect, setEffect] = useState<{ kind: NonNullable<SimState['feedback']>['effect']; key: number } | null>(null);
-  const step = content.steps[s.step];
+  const step = s.steps[s.step];
   const reported = useRef(0);
 
   useEffect(() => {
@@ -57,7 +59,7 @@ export function SimRunner({ content, mode, customer, onMove, onDone, onQuit }: {
   }, [mode, content.job?.minutes]);
 
   const act = (object: string) => {
-    const next = simReducer(content, s, { type: 'tap', object, t: secondsSince(started.current) });
+    const next = simReducer(s, { type: 'tap', object, t: secondsSince(started.current) });
     if (next.feedback?.kind === 'wrong') setEffect({ kind: next.feedback.effect, key: now() });
     dispatch({ type: 'tap', object, t: secondsSince(started.current) });
   };
@@ -74,8 +76,8 @@ export function SimRunner({ content, mode, customer, onMove, onDone, onQuit }: {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2 text-[13px] text-muted">
-        <span className="font-semibold text-ink">{t('sim.step', { n: s.step + 1, total: content.steps.length })}</span>
-        <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-line"><span className="block h-full bg-brand transition-[width]" style={{ width: `${(100 * s.step) / content.steps.length}%` }} /></span>
+        <span className="font-semibold text-ink">{t('sim.step', { n: s.step + 1, total: s.steps.length })}</span>
+        <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-line"><span className="block h-full bg-brand transition-[width]" style={{ width: `${(100 * s.step) / s.steps.length}%` }} /></span>
         {mode === 'job' && <span className={cx('flex items-center gap-1 font-semibold tabular-nums', left < 0 ? 'text-[#C92A2F]' : 'text-ink')}><Clock className="size-4" />{left < 0 ? t('sim.overTime') : t('sim.timeLeft', { time: clock(left) })}</span>}
         <Button size="sm" variant="ghost" icon={<X className="size-4" />} onClick={onQuit}>{t('sim.quit')}</Button>
       </div>

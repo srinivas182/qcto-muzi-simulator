@@ -6,6 +6,8 @@
  * which re-scores every attempt from its events: the device never decides a score on its own.
  */
 
+import type { ContentLocale, StudioActivity } from './attempts';
+
 export type SimMode = 'practice' | 'job';
 export type SimEffect = 'none' | 'spark' | 'static' | 'beep' | 'customer';
 
@@ -19,6 +21,8 @@ interface StepBase {
   outcome: string | null;
   lesson: { code: string; block: string | null } | null;
   critical: boolean;
+  /** Branching: the causes this step belongs to (empty = every cause). */
+  only: string[];
   sets: Record<string, string>;
   wrong: SimWrong[];
 }
@@ -31,6 +35,8 @@ export interface ScenarioContent {
   scene: string;
   pass_mark: number;
   job: { minutes: number; customer: string } | null;
+  /** Different causes of the same symptom; each run plays one. Learners see only ids, never the labels. */
+  variants: { id: string; label?: string; start: Record<string, string> }[];
   steps: ScenarioStep[];
 }
 
@@ -55,7 +61,7 @@ export interface SimEvent { step: string; action: 'tap' | 'choose' | 'place' | '
 export const SCENES: Record<string, Record<string, string>> = {
   'pc-bench': {
     'pc-power': 'idle', 'wall-switch': 'on', strap: 'off', 'case-panel': 'closed', 'ram-old': 'in', 'ram-new': 'bench',
-    'slot-a1': 'full', monitor: 'off', screwdriver: 'bench',
+    'slot-a1': 'full', monitor: 'off', screwdriver: 'bench', 'psu-cable': 'in',
   },
 };
 
@@ -63,6 +69,10 @@ export interface SimFeedback { kind: 'right' | 'wrong'; message: string; effect:
 
 export interface SimState {
   mode: SimMode;
+  /** The cause being played (branching scenarios), or null. */
+  variant: string | null;
+  /** The steps of this run. */
+  steps: ScenarioStep[];
   step: number;
   events: SimEvent[];
   /** How many hints have been shown on each step (practice only). */
@@ -83,8 +93,21 @@ export type SimAction =
   | { type: 'hint'; t: number }
   | { type: 'dismiss' };
 
-export function startRun(content: ScenarioContent, mode: SimMode): SimState {
-  return { mode, step: 0, events: [], hints: {}, mistakes: {}, scene: { ...(SCENES[content.scene] ?? {}) }, holding: null, feedback: null, critical: false, done: content.steps.length === 0 };
+/** The steps of one run: all of them, or those of the chosen cause. */
+export function stepsFor(content: ScenarioContent, variant: string | null): ScenarioStep[] {
+  return content.steps.filter((st) => !st.only?.length || (variant !== null && st.only.includes(variant)));
+}
+
+/** Pick the cause for a run at random (`rand` is injectable for tests). */
+export function pickVariant(content: ScenarioContent, rand: () => number = Math.random): string | null {
+  const v = content.variants ?? [];
+  return v.length ? v[Math.floor(rand() * v.length) % v.length]!.id : null;
+}
+
+export function startRun(content: ScenarioContent, mode: SimMode, variant: string | null = pickVariant(content)): SimState {
+  const steps = stepsFor(content, variant);
+  const start = content.variants?.find((v) => v.id === variant)?.start ?? {};
+  return { mode, variant, steps, step: 0, events: [], hints: {}, mistakes: {}, scene: { ...(SCENES[content.scene] ?? {}), ...start }, holding: null, feedback: null, critical: false, done: steps.length === 0 };
 }
 
 function isRight(step: ScenarioStep, action: SimEvent['action'], value: string): boolean {
@@ -99,9 +122,9 @@ export function wrongFor(step: ScenarioStep, on: string): SimWrong | null {
 }
 
 /** One learner action → the next state. Pure, so it can be replayed, tested and run offline. */
-export function simReducer(content: ScenarioContent, s: SimState, a: SimAction): SimState {
+export function simReducer(s: SimState, a: SimAction): SimState {
   if (a.type === 'dismiss') return { ...s, feedback: null };
-  const step = content.steps[s.step];
+  const step = s.steps[s.step];
   if (s.done || !step) return s;
 
   if (a.type === 'hint') {
@@ -127,7 +150,7 @@ export function simReducer(content: ScenarioContent, s: SimState, a: SimAction):
     const next = s.step + 1;
     return {
       ...s, step: next, events: [...s.events, event], scene: { ...s.scene, ...step.sets }, holding: null,
-      feedback: { kind: 'right', message: '', effect: 'none' }, done: next >= content.steps.length,
+      feedback: { kind: 'right', message: '', effect: 'none' }, done: next >= s.steps.length,
     };
   }
   const w = wrongFor(step, on);
@@ -146,24 +169,63 @@ export interface SimScore {
 }
 
 /** Same rules as the server: 1 per step, less 0.25 per mistake and 0.15 per hint; safety mistakes fail real-job mode. */
-export function scoreRun(content: ScenarioContent, events: SimEvent[], mode: SimMode): SimScore {
-  const steps: SimScore['steps'] = Object.fromEntries(content.steps.map((st) => [st.id, { mistakes: 0, hints: 0, done: false }]));
+export function scoreRun(content: ScenarioContent, events: SimEvent[], mode: SimMode, variant: string | null = null): SimScore {
+  const ids = (content.variants ?? []).map((v) => v.id);
+  const list = ids.length === 0 ? stepsFor(content, null) : variant !== null && ids.includes(variant) ? stepsFor(content, variant) : [];
+  const steps: SimScore['steps'] = Object.fromEntries(list.map((st) => [st.id, { mistakes: 0, hints: 0, done: false }]));
   let i = 0;
   let critical = false;
   for (const e of events) {
-    const st = content.steps[i];
+    const st = list[i];
     const p = st && steps[st.id];
     if (!st || !p || e.step !== st.id) continue;
     if (e.action === 'hint') { p.hints++; continue; }
     if (isRight(st, e.action, e.value ?? '')) { p.done = true; i++; } else { p.mistakes++; critical ||= st.critical; }
   }
-  const completed = content.steps.length > 0 && i === content.steps.length;
+  const completed = list.length > 0 && i === list.length;
   const points = Object.values(steps).reduce((sum, p) => sum + (p.done ? Math.max(0, 1 - 0.25 * p.mistakes - 0.15 * p.hints) : 0), 0);
-  const score = content.steps.length ? Math.round((100 * points) / content.steps.length) : 0;
+  const score = list.length ? Math.round((100 * points) / list.length) : 0;
   return { completed, score, passed: completed && score >= content.pass_mark && !(mode === 'job' && critical), critical, steps };
 }
 
 /** The objects a step can involve, for the 2D view: everything in the scene except the monitor (it only shows). */
 export function touchable(content: ScenarioContent): string[] {
   return Object.keys(SCENES[content.scene] ?? {}).filter((id) => id !== 'monitor');
+}
+
+/** Scenario translations, per language: the customer brief and each step's words (wrong-move messages in order). */
+export type ScenarioI18n = Partial<Record<'zu' | 'xh' | 'af', {
+  job?: { customer?: string };
+  steps?: Record<string, { prompt?: string; why?: string; hints?: string[]; options?: string[]; wrong?: string[] }>;
+}>>;
+
+/** HQ Scenario Studio: a scenario's draft with everything the editor needs. */
+export interface StudioScenarioDetail extends StudioActivity {
+  steps: number;
+  draft: { scenario: ScenarioContent; i18n: ScenarioI18n; review: Partial<Record<ContentLocale, { by?: string; at?: string; ai?: boolean }>> };
+  problems: string[];
+  outcome_details: { code: string; statement: string }[];
+  lessons: { code: string; title: string }[];
+  /** Ready-made scenes and their objects. */
+  scenes: Record<string, string[]>;
+  ai_ready: boolean;
+}
+
+/** A scenario in one language, for the studio preview (missing translations stay in English). */
+export function localiseScenario(content: ScenarioContent, i18n: ScenarioI18n, locale: ContentLocale): ScenarioContent {
+  if (locale === 'en') return content;
+  const tr = i18n[locale] ?? {};
+  return {
+    ...content,
+    job: content.job ? { ...content.job, customer: tr.job?.customer || content.job.customer } : null,
+    steps: content.steps.map((st) => {
+      const x = tr.steps?.[st.id] ?? {};
+      const same = (a: string[] | undefined, b: string[]) => (a && a.length === b.length ? a : b);
+      return {
+        ...st, prompt: x.prompt || st.prompt, why: x.why || st.why, hints: same(x.hints, st.hints),
+        wrong: st.wrong.map((w, i) => ({ ...w, message: x.wrong?.[i] || w.message })),
+        ...(st.type === 'choose' ? { options: same(x.options, st.options) } : {}),
+      } as ScenarioStep;
+    }),
+  };
 }

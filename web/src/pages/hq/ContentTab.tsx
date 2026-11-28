@@ -39,11 +39,11 @@ export function ContentTab({ code, published }: { code: string; published: boole
           <ul className="divide-y divide-line">
             {items.map((a) => (
               <li key={a.id}>
-                <Link to={a.kind === 'lesson' ? `/hq/programmes/${code}/lessons/${a.id}` : '#'} className={cx('flex flex-wrap items-center gap-3 px-5 py-4', a.kind === 'lesson' ? 'hover:bg-surface-2' : 'cursor-default')}>
+                <Link to={`/hq/programmes/${code}/${a.kind === 'lesson' ? 'lessons' : 'scenarios'}/${a.id}`} className="flex flex-wrap items-center gap-3 px-5 py-4 hover:bg-surface-2">
                   <span className={cx('flex size-10 shrink-0 items-center justify-center rounded-xl', a.kind === 'lesson' ? 'bg-brand-soft text-brand' : 'bg-nav text-white')}>{a.kind === 'lesson' ? <BookOpen className="size-5" /> : <Box className="size-5" />}</span>
                   <span className="min-w-0 flex-1">
                     <span className="block font-semibold text-ink">{a.title}</span>
-                    <span className="block text-[12px] text-muted">{a.code} · {t('cs.minutes', { n: a.minutes })} · {a.outcomes.join(', ')}{a.kind === 'scenario' ? ` · ${t('cs.scenarioLater')}` : ''}</span>
+                    <span className="block text-[12px] text-muted">{a.code} · {t('cs.minutes', { n: a.minutes })} · {a.outcomes.join(', ')}</span>
                   </span>
                   <span className="flex gap-1">
                     {LOCALES.map((l) => <span key={l} title={t(`cs.review.${a.review[l] ?? 'none'}` as 'cs.review.none')} className={cx('rounded-md px-1.5 py-0.5 font-mono text-[11px] font-bold uppercase', a.review[l] === 'reviewed' ? 'bg-[#E6F4EC] text-[#1E7A46]' : a.review[l] === 'ai' ? 'bg-[#FFF4E0] text-[#9A5B00]' : 'bg-surface-2 text-muted')}>{l}</span>)}
@@ -73,8 +73,7 @@ function NewActivity({ code, kind, outcomes, onClose }: { code: string; kind: 'l
     mutationFn: () => api<{ data: StudioActivity }>(`/platform/programmes/${code}/activities`, { method: 'POST', body: { kind, title, summary: summary || null, minutes: Number(minutes) || 5, outcomes: picked } }),
     onSuccess: (r) => {
       toast(t('cs.created'));
-      if (kind === 'lesson') void navigate(`/hq/programmes/${code}/lessons/${r.data.id}`);
-      else onClose();
+      void navigate(`/hq/programmes/${code}/${kind === 'lesson' ? 'lessons' : 'scenarios'}/${r.data.id}`);
     },
     onError: (e) => {
       if (e instanceof ApiError && Object.keys(e.errors).length) setErrors(Object.fromEntries(Object.entries(e.errors).map(([k, v]) => [k.split('.')[0]!, v[0] ?? ''])));

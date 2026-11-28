@@ -20,6 +20,10 @@ use Illuminate\Support\Str;
  * real-job mode: safety), sets {object: state} (how the scene changes once the step is done) and
  * wrong[] {on, effect, message} (what happens when you do the wrong thing: mistakes have consequences).
  *
+ * Branching: a scenario may list `variants` (different causes of the same symptom, each with its own starting
+ * scene). Each run picks one at random, so learners diagnose instead of memorising; a step with `only` appears
+ * only in those variants.
+ *
  * Scoring is done on the server from the learner's events, never trusted from the device. The same rules run
  * on the device (packages/core/src/scenario.ts) so the learner sees the same result offline.
  */
@@ -27,7 +31,7 @@ final class ScenarioContent
 {
     /** Ready-made scenes and the objects in them. New scenes are added here and in the web scene library. */
     public const SCENES = [
-        'pc-bench' => ['pc-power', 'wall-switch', 'strap', 'case-panel', 'ram-old', 'ram-new', 'slot-a1', 'monitor', 'screwdriver'],
+        'pc-bench' => ['pc-power', 'wall-switch', 'strap', 'case-panel', 'ram-old', 'ram-new', 'slot-a1', 'monitor', 'screwdriver', 'psu-cable'],
     ];
 
     public const TYPES = ['tap', 'choose', 'place'];
@@ -35,6 +39,8 @@ final class ScenarioContent
     public const EFFECTS = ['none', 'spark', 'static', 'beep', 'customer'];
 
     public const MAX_STEPS = 40;
+
+    public const MAX_VARIANTS = 4;
 
     /** Translatable fields per step. Wrong-move messages are translated as wrong[i]. */
     public const TEXT_FIELDS = ['prompt', 'hints', 'why', 'options', 'wrong'];
@@ -50,10 +56,28 @@ final class ScenarioContent
         $problems = [];
         $scene = (string) ($c['scene'] ?? '');
         if (! isset(self::SCENES[$scene])) {
-            return [['scene' => '', 'pass_mark' => 70, 'job' => null, 'steps' => []], ['Choose a scene.']];
+            return [['scene' => '', 'pass_mark' => 70, 'job' => null, 'variants' => [], 'steps' => []], ['Choose a scene.']];
         }
         $objects = self::SCENES[$scene];
         $s = fn (array $a, string $k, int $max) => mb_substr(trim((string) ($a[$k] ?? '')), 0, $max);
+        $variants = [];
+        foreach (array_slice(is_array($c['variants'] ?? null) ? array_values($c['variants']) : [], 0, self::MAX_VARIANTS) as $i => $v) {
+            if (! is_array($v) || preg_match('/^[a-z0-9]{2,12}$/', (string) ($v['id'] ?? '')) !== 1 || isset($variants[$v['id']])) {
+                $problems[] = 'Cause '.($i + 1).' needs a short id (letters and numbers).';
+
+                continue;
+            }
+            $start = [];
+            foreach ((array) ($v['start'] ?? []) as $obj => $state) {
+                if (in_array($obj, $objects, true) && preg_match('/^[a-z-]{1,16}$/', (string) $state) === 1) {
+                    $start[$obj] = (string) $state;
+                }
+            }
+            $variants[$v['id']] = ['id' => (string) $v['id'], 'label' => $s($v, 'label', 80), 'start' => $start];
+        }
+        $variants = array_values($variants);
+        $variantIds = array_column($variants, 'id');
+        count($variants) === 1 && $problems[] = 'Add a second cause, or remove the only one: one cause is the same as none.';
         $steps = [];
         foreach (array_slice(is_array($c['steps'] ?? null) ? array_values($c['steps']) : [], 0, self::MAX_STEPS) as $i => $st) {
             $n = $i + 1;
@@ -69,6 +93,7 @@ final class ScenarioContent
                 'why' => $s($st, 'why', 400), 'outcome' => ($st['outcome'] ?? null) ? mb_substr((string) $st['outcome'], 0, 20) : null,
                 'lesson' => is_array($st['lesson'] ?? null) && ($st['lesson']['code'] ?? '') !== '' ? ['code' => mb_substr((string) $st['lesson']['code'], 0, 20), 'block' => ($st['lesson']['block'] ?? null) ? (string) $st['lesson']['block'] : null] : null,
                 'critical' => (bool) ($st['critical'] ?? false),
+                'only' => array_values(array_intersect(array_map('strval', (array) ($st['only'] ?? [])), $variantIds)),
                 'sets' => [],
                 'wrong' => [],
             ];
@@ -99,9 +124,23 @@ final class ScenarioContent
             $steps[] = $step;
         }
         $steps === [] && $problems[] = 'Add at least one step.';
+        foreach ($variantIds as $vid) {
+            self::stepsFor(['steps' => $steps], $vid) === [] && $problems[] = "The cause \"{$vid}\" has no steps.";
+        }
         $job = is_array($c['job'] ?? null) ? ['minutes' => max(1, min(60, (int) ($c['job']['minutes'] ?? 15))), 'customer' => $s($c['job'], 'customer', 300)] : null;
 
-        return [['scene' => $scene, 'pass_mark' => max(0, min(100, (int) ($c['pass_mark'] ?? 70))), 'job' => $job, 'steps' => $steps], $problems];
+        return [['scene' => $scene, 'pass_mark' => max(0, min(100, (int) ($c['pass_mark'] ?? 70))), 'job' => $job, 'variants' => $variants, 'steps' => $steps], $problems];
+    }
+
+    /**
+     * The steps of one run: all of them, or for a branching scenario those of the chosen cause.
+     *
+     * @param  array<string, mixed>  $content
+     * @return list<array<string, mixed>>
+     */
+    public static function stepsFor(array $content, ?string $variant): array
+    {
+        return array_values(array_filter((array) ($content['steps'] ?? []), fn ($st) => ($st['only'] ?? []) === [] || in_array($variant, $st['only'], true)));
     }
 
     /**
@@ -113,7 +152,9 @@ final class ScenarioContent
     public static function localise(array $content, string $locale): array
     {
         $tr = isset($content['review'][$locale]['by']) ? (array) ($content['i18n'][$locale] ?? []) : [];
-        $out = array_intersect_key($content, array_flip(['scene', 'pass_mark', 'job', 'steps']));
+        $out = array_intersect_key($content, array_flip(['scene', 'pass_mark', 'job', 'variants', 'steps']));
+        // Learners never see what each cause is called: that would give the answer away.
+        $out['variants'] = array_map(fn (array $v) => ['id' => $v['id'], 'start' => $v['start']], (array) ($out['variants'] ?? []));
         if (isset($tr['job']['customer'], $out['job'])) {
             $out['job']['customer'] = (string) $tr['job']['customer'];
         }
@@ -145,11 +186,14 @@ final class ScenarioContent
      *
      * @param  array<string, mixed>  $content
      * @param  mixed  $events  list of {step, action: tap|choose|place|hint, value}
+     * @param  string|null  $variant  the cause played, for branching scenarios
      * @return array{completed: bool, score: int, passed: bool, critical: bool, steps: array<string, array{mistakes: int, hints: int, done: bool}>}
      */
-    public static function score(array $content, mixed $events, string $mode): array
+    public static function score(array $content, mixed $events, string $mode, ?string $variant = null): array
     {
-        $steps = array_values((array) ($content['steps'] ?? []));
+        $ids = array_column((array) ($content['variants'] ?? []), 'id');
+        // A branching scenario must say which cause was played; an unknown cause scores nothing.
+        $steps = $ids === [] ? self::stepsFor($content, null) : (in_array($variant, $ids, true) ? self::stepsFor($content, $variant) : []);
         $per = [];
         foreach ($steps as $st) {
             $per[$st['id']] = ['mistakes' => 0, 'hints' => 0, 'done' => false];

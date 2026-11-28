@@ -24,7 +24,7 @@ export default function ProgrammeDetail() {
   const { t } = useI18n();
   const toast = useToast();
   const studio = useStudioMutation(code);
-  const [tab, setTab] = useState<Tab>('outcomes');
+  const [tab, setTab] = useState<Tab>(() => (new URLSearchParams(window.location.search).get('tab') === 'content' ? 'content' : 'outcomes'));
   const [viewPublished, setViewPublished] = useState(false);
   const [dialog, setDialog] = useState<'submit' | 'approve' | 'sendBack' | null>(null);
 

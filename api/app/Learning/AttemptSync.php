@@ -66,10 +66,11 @@ final class AttemptSync
                 $score = isset($item['score']) ? max(0, min(100, (int) $item['score'])) : null;
                 if ($activity->kind === Activity::SCENARIO) {
                     // Simulator results are worked out here from the learner's moves, never taken from the device.
-                    $scored = ScenarioContent::score($activity->content ?? [], $result['events'] ?? [], (string) $item['mode']);
+                    $variant = isset($result['variant']) ? (string) $result['variant'] : null;
+                    $scored = ScenarioContent::score($activity->content ?? [], $result['events'] ?? [], (string) $item['mode'], $variant);
                     $completed = $finished !== null && $scored['completed'];
                     $score = $finished !== null ? $scored['score'] : null;
-                    $result = ['events' => array_slice(array_values(array_filter((array) ($result['events'] ?? []), 'is_array')), 0, 2000)]
+                    $result = ['events' => array_slice(array_values(array_filter((array) ($result['events'] ?? []), 'is_array')), 0, 2000), 'variant' => $variant]
                         + ($finished !== null ? ['passed' => $scored['passed'], 'critical' => $scored['critical'], 'steps' => $scored['steps']] : []);
                 }
                 $values = [

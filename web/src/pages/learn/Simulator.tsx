@@ -35,13 +35,13 @@ function Play({ eid, sc }: { eid: string; sc: LearnScenario }) {
     setRun((r) => ({ mode, n: (r?.n ?? 0) + 1 }));
   };
   const onMove = useCallback((s: SimState, seconds: number) => {
-    void attempt.current?.then((id) => attempts.update(id, { result: { events: s.events }, duration_seconds: seconds }));
+    void attempt.current?.then((id) => attempts.update(id, { result: { events: s.events, variant: s.variant }, duration_seconds: seconds }));
   }, []);
   const onDone = useCallback((s: SimState, seconds: number) => {
-    const score = scoreRun(sc.content, s.events, s.mode);
+    const score = scoreRun(sc.content, s.events, s.mode, s.variant);
     void (async () => {
       const id = await attempt.current!;
-      await attempts.finish(id, { completed: score.completed, score: score.score, duration_seconds: seconds, result: { events: s.events } });
+      await attempts.finish(id, { completed: score.completed, score: score.score, duration_seconds: seconds, result: { events: s.events, variant: s.variant } });
       const progress = await syncAttempts();
       setFinished({ mode: s.mode, state: s, score, seconds, synced: eid in progress });
       setRun(null);
@@ -115,7 +115,7 @@ function Debrief({ eid, sc, f, onAgain, back }: { eid: string; sc: LearnScenario
       <Card className="p-0">
         <h2 className="border-b border-line px-5 py-3 text-[15px] font-bold text-ink">{t('sim.replay')}</h2>
         <ol>
-          {sc.content.steps.map((st, i) => {
+          {f.state.steps.map((st, i) => {
             const r = score.steps[st.id] ?? { mistakes: 0, hints: 0, done: false };
             const clean = r.done && r.mistakes === 0 && r.hints === 0;
             const lessonId = st.lesson ? sc.lessons[st.lesson.code] : undefined;

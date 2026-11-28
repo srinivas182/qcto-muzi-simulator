@@ -221,6 +221,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
             // Course Studio (Sprint 4.2).
             Route::middleware('permission:content.author|content.review|content.publish')->group(function (): void {
                 Route::get('/programmes/{programme}/activities', [LessonStudioController::class, 'index'])->name('programmes.activities');
+                Route::get('/activities', [LessonStudioController::class, 'all'])->name('activities.index');
                 Route::get('/activities/{activity}', [LessonStudioController::class, 'show'])->whereUuid('activity')->name('activities.show');
             });
             Route::middleware('permission:content.author')->group(function (): void {

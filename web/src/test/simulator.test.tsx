@@ -6,12 +6,12 @@ import { mockApi, nav, renderAt, session } from './harness';
 beforeEach(() => localStorage.clear());
 
 const learner = () => session({ permissions: ['learning.use'], navigation: nav('learn') });
-const base = { hints: [], why: '', outcome: null, lesson: null, critical: false, sets: {}, wrong: [] };
+const base = { hints: [], why: '', outcome: null, lesson: null, critical: false, only: [] as string[], sets: {}, wrong: [] };
 const scenario: LearnScenario = {
   id: 's1', code: 'TS-S01', title: 'A PC won’t boot', summary: 'Diagnose the fault and replace the faulty RAM safely.', minutes: 12, content_version: 1, locale: 'en',
   lessons: { 'TS-L02': 'l2' }, results: { practice: null, job: null },
   content: {
-    scene: 'pc-bench', pass_mark: 70, job: { minutes: 12, customer: 'Thandi needs her PC before payroll.' },
+    scene: 'pc-bench', pass_mark: 70, variants: [], job: { minutes: 12, customer: 'Thandi needs her PC before payroll.' },
     steps: [
       { ...base, id: 'unplug', type: 'tap', target: 'wall-switch', prompt: 'Make the PC safe before you open it.', critical: true, hints: ['Switch off at the wall socket.'],
         why: 'Opening a live PC can shock you.', lesson: { code: 'TS-L02', block: null }, sets: { 'wall-switch': 'off' },
