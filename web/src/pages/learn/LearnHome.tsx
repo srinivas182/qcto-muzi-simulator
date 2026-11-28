@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, Box, CalendarClock, ClipboardList, MapPin, PlayCircle, QrCode, Sparkles, Users, Wifi } from 'lucide-react';
+import { ArrowRight, Box, CalendarClock, ClipboardList, MapPin, PlayCircle, QrCode, Radio, Sparkles, Users, Wifi } from 'lucide-react';
 import type { LearnEnrolment, LearnHomeData } from '@simuwork/core';
 import { useSignedIn } from '../../app/access';
 import { Button, Card, inputClass, Skeleton, useToast } from '../../components/ui';
@@ -71,6 +71,13 @@ function ProgrammeCard({ e }: { e: LearnEnrolment }) {
           <div className="flex justify-between text-[13px]"><span className="font-semibold text-ink">{t('lh.progress')}</span><span className="text-muted">{e.progress}%</span></div>
           <div className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-brand transition-all" style={{ width: `${e.progress}%` }} /></div>
         </div>
+        {e.class && (
+          <Link to={`/learn/enrolments/${e.id}/simulators/${e.class.activity_id}?class=${e.class.id}&mode=${e.class.mode}`} className="mt-4 flex items-center gap-3 rounded-2xl border-2 border-[#16A34A] bg-[#ECFDF3] px-4 py-3 text-[#14532D] hover:brightness-95">
+            <Radio className="size-6 shrink-0 animate-pulse" />
+            <span className="flex-1"><span className="block text-[12px] font-bold uppercase tracking-wide">{t('sim.classNow')}</span><span className="block font-semibold">{e.class.title}</span></span>
+            <span className="font-bold">{t('sim.joinClass')}</span>
+          </Link>
+        )}
         {e.next ? (
           <Link to={`/learn/enrolments/${e.id}/${e.next.kind === 'lesson' ? 'lessons' : 'simulators'}/${e.next.id}`}
             className="mt-5 flex items-center gap-4 rounded-2xl bg-brand px-5 py-4 text-white shadow-md transition hover:brightness-110">

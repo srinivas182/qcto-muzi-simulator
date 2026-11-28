@@ -1251,6 +1251,26 @@ const xh: Messages = {
   'sim.askCoach': "Buza umqeqeshi",
   'sim.why': "Kutheni?",
   'sim.coachThinking': "Umqeqeshi uyacinga…",
+  // Sprint 4.7b: class mode
+  'sim.classNow': "Iklasi yakho yenza oku ngoku",
+  'sim.joinClass': "Joyina",
+  'cm.title': "Imowudi yeklasi",
+  'cm.lead': "Qhuba i-simulator enye neklasi yonke. Abafundi bayibona kwisikrini sabo sasekhaya baze bajoyine; ubona inyathelo ngalinye ngoku nokuba ngubani obambekileyo.",
+  'cm.noScenarios': "Le nkqubo ayinazo ii-simulator ezipapashiweyo okwangoku.",
+  'cm.which': "I-simulator",
+  'cm.mode': "Imowudi",
+  'cm.start': "Qala neklasi",
+  'cm.liveNow': "Ngoku ngqo",
+  'cm.end': "Gqiba iklasi",
+  'cm.ended': "Iklasi igqityiwe.",
+  'cm.joined': "Bajoyinile",
+  'cm.finished': "Bagqibile",
+  'cm.stuck': "Babambekile",
+  'cm.notJoined': "Akakajoyini",
+  'cm.step': "Inyathelo {n} kwangu-{total}",
+  'cm.counts': "iimpazamo ezi-{mistakes} · uncedo olu-{help}",
+  'cm.stuckBadge': "Ubambekile",
+  'cm.working': "Uyasebenza",
 };
 
 export default xh;

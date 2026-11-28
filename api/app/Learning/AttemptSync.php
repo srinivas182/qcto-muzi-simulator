@@ -70,7 +70,9 @@ final class AttemptSync
                     $scored = ScenarioContent::score($activity->content ?? [], $result['events'] ?? [], (string) $item['mode'], $variant);
                     $completed = $finished !== null && $scored['completed'];
                     $score = $finished !== null ? $scored['score'] : null;
+                    $class = isset($result['class_session']) && preg_match('/^[0-9a-f-]{36}$/', (string) $result['class_session']) === 1 ? (string) $result['class_session'] : null;
                     $result = ['events' => array_slice(array_values(array_filter((array) ($result['events'] ?? []), 'is_array')), 0, 2000), 'variant' => $variant]
+                        + ($class !== null ? ['class_session' => $class] : [])
                         + ($finished !== null ? ['passed' => $scored['passed'], 'critical' => $scored['critical'], 'steps' => $scored['steps']] : []);
                 }
                 $values = [

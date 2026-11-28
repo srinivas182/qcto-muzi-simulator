@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRightLeft, Clock, LayoutGrid, Printer, RefreshCw, Search, UserPlus } from 'lucide-react';
+import { ArrowLeft, ArrowRightLeft, Clock, LayoutGrid, Printer, Radio, RefreshCw, Search, UserPlus } from 'lucide-react';
 import type { CohortDetail as Detail, CohortItem, EnrolmentItem, EnrolmentStatus, LearnerItem } from '@simuwork/core';
 import type { MessageKey } from '@simuwork/core/locales/en';
 import { QrCode } from '../../components/cohorts/QrCode';
@@ -61,6 +61,7 @@ export default function CohortDetail() {
           <p className="mt-1 text-[14px] text-muted">{c.centre.name} · {date(c.starts_on)}{c.ends_on ? ` – ${date(c.ends_on)}` : ''}{c.facilitators.length > 0 && ` · ${c.facilitators.map((f) => f.name).join(', ')}`}</p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Link to={`/admin/cohorts/${c.id}/class`} className="inline-flex h-10 items-center gap-2 rounded-xl border border-line bg-surface px-4 text-sm font-semibold text-ink hover:bg-surface-2"><Radio className="size-4" />{t('cm.title')}</Link>
           <Link to={`/admin/cohorts/${c.id}/progress`} className="inline-flex h-10 items-center gap-2 rounded-xl border border-line bg-surface px-4 text-sm font-semibold text-ink hover:bg-surface-2"><LayoutGrid className="size-4" />{t('pg.open')}</Link>
           {enrolRight && !c.archived && <Button icon={<UserPlus className="size-4" />} onClick={() => setAdding(true)}>{t('coh.addLearners')}</Button>}
         </div>

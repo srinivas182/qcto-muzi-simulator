@@ -1249,6 +1249,26 @@ const en = {
   'sim.askCoach': "Ask the coach",
   'sim.why': "Why?",
   'sim.coachThinking': "The coach is thinking…",
+  // Sprint 4.7b: class mode
+  'sim.classNow': "Your class is doing this now",
+  'sim.joinClass': "Join",
+  'cm.title': "Class mode",
+  'cm.lead': "Run one simulator with the whole class. Learners see it on their home screen and join; you see each step live and who is stuck.",
+  'cm.noScenarios': "This programme has no published simulators yet.",
+  'cm.which': "Simulator",
+  'cm.mode': "Mode",
+  'cm.start': "Start with the class",
+  'cm.liveNow': "Live now",
+  'cm.end': "End class",
+  'cm.ended': "Class ended.",
+  'cm.joined': "Joined",
+  'cm.finished': "Finished",
+  'cm.stuck': "Stuck",
+  'cm.notJoined': "Not joined yet",
+  'cm.step': "Step {n} of {total}",
+  'cm.counts': "{mistakes} mistakes · {help} help",
+  'cm.stuckBadge': "Stuck",
+  'cm.working': "Working",
 } as const;
 
 export type MessageKey = keyof typeof en;

@@ -33,6 +33,7 @@ export const routes: RouteObject[] = [
           { path: 'admin/cohorts', lazy: page(() => import('../pages/admin/Cohorts')) },
           { path: 'admin/cohorts/:id', lazy: page(() => import('../pages/admin/CohortDetail')) },
           { path: 'admin/cohorts/:id/progress', lazy: page(() => import('../pages/admin/CohortProgress')) },
+          { path: 'admin/cohorts/:id/class', lazy: page(() => import('../pages/admin/ClassMode')) },
           { path: 'admin/licences', lazy: page(() => import('../pages/admin/Licences')) },
           { path: 'admin/billing', lazy: page(() => import('../pages/admin/Billing')) },
           { path: 'admin/programmes', lazy: page(() => import('../pages/provider/Programmes')) },

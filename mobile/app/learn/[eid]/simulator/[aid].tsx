@@ -9,7 +9,7 @@ import { api } from '../../../../src/lib/api';
 import { attempts, syncAttempts } from '../../../../src/lib/attempts';
 import { onlineOrPack, runtimeFile } from '../../../../src/lib/packs';
 import { useI18n } from '../../../../src/lib/i18n';
-import { BookOpen, Briefcase, Check, Clock, Dumbbell, Hand, Lightbulb, MessageCircleQuestion, ShieldAlert, UserRound, Volume2, Wifi, WifiOff, X } from '../../../../src/ui/icons';
+import { BookOpen, Briefcase, Check, Clock, Dumbbell, Hand, Lightbulb, MessageCircleQuestion, Radio, ShieldAlert, UserRound, Volume2, Wifi, WifiOff, X } from '../../../../src/ui/icons';
 import { Button, Card, haptics, radius, Screen, space, T, useTheme } from '../../../../src/ui';
 
 const now = () => Date.now();
@@ -22,17 +22,17 @@ const VOICES: Record<string, string> = { en: 'en-ZA', zu: 'zu-ZA', xh: 'xh-ZA', 
  * The 3D view comes to the app with the offline pack in 4.6; this view needs no download beyond the scenario.
  */
 export default function SimulatorScreen() {
-  const { eid, aid } = useLocalSearchParams<{ eid: string; aid: string }>();
+  const { eid, aid, class: classId, mode } = useLocalSearchParams<{ eid: string; aid: string; class?: string; mode?: string }>();
   const { t, locale } = useI18n();
   const q = useQuery({ queryKey: ['learn-scenario', aid, locale], queryFn: () => onlineOrPack(eid, () => api<{ data: LearnScenario }>(`/learn/enrolments/${eid}/scenarios/${aid}?locale=${locale}`),
     (p) => (p.scenarios[aid] ? { data: { ...p.scenarios[aid], results: { practice: null, job: null } } } : undefined)) });
   if (!q.data) return <Screen title={t('lp.simulator')}>{q.isError ? <T tone="muted">{t('sim.notFound')}</T> : null}</Screen>;
-  return <Play key={aid} eid={eid} sc={q.data.data} />;
+  return <Play key={aid} eid={eid} sc={q.data.data} classId={classId ?? null} classMode={mode === 'job' ? 'job' : 'practice'} />;
 }
 
 type Finished = { mode: SimMode; score: SimScore; synced: boolean; steps: SimState['steps'] };
 
-function Play({ eid, sc }: { eid: string; sc: LearnScenario }) {
+function Play({ eid, sc, classId, classMode }: { eid: string; sc: LearnScenario; classId: string | null; classMode: SimMode }) {
   const { t } = useI18n();
   const { c } = useTheme();
   const qc = useQueryClient();
@@ -45,11 +45,19 @@ function Play({ eid, sc }: { eid: string; sc: LearnScenario }) {
     setFinished(null);
     setRun((r) => ({ mode, n: (r?.n ?? 0) + 1 }));
   };
-  const onMove = (s: SimState, seconds: number) => { void attempt.current?.then((id) => attempts.update(id, { result: { events: s.events, variant: s.variant }, duration_seconds: seconds })); };
+  // Class mode: every move is sent straight away (at most every 2 seconds) so the facilitator sees it live.
+  const lastSync = useRef(0);
+  const tag = classId ? { class_session: classId } : {};
+  const onMove = (s: SimState, seconds: number) => {
+    void attempt.current?.then(async (id) => {
+      await attempts.update(id, { result: { events: s.events, variant: s.variant, ...tag }, duration_seconds: seconds });
+      if (classId && Date.now() - lastSync.current > 2000) { lastSync.current = Date.now(); void syncAttempts(); }
+    });
+  };
   const onDone = async (s: SimState, seconds: number) => {
     const score = scoreRun(sc.content, s.events, s.mode, s.variant);
     const id = await attempt.current!;
-    await attempts.finish(id, { completed: score.completed, score: score.score, duration_seconds: seconds, result: { events: s.events, variant: s.variant } });
+    await attempts.finish(id, { completed: score.completed, score: score.score, duration_seconds: seconds, result: { events: s.events, variant: s.variant, ...tag } });
     const progress = await syncAttempts();
     (score.passed ? haptics.success : haptics.warn)();
     setFinished({ mode: s.mode, score, synced: eid in progress, steps: s.steps });
@@ -61,6 +69,19 @@ function Play({ eid, sc }: { eid: string; sc: LearnScenario }) {
 
   if (run) return <Runner key={run.n} eid={eid} sc={sc} mode={run.mode} onMove={onMove} onDone={(s, sec) => void onDone(s, sec)} onQuit={() => setRun(null)} />;
   if (finished) return <Debrief eid={eid} sc={sc} f={finished} onAgain={start} />;
+  if (classId) {
+    return (
+      <Screen center>
+        <Card style={{ alignItems: 'center', gap: space.sm }}>
+          <Radio size={36} color={c.success} />
+          <T variant="overline" tone="muted">{t('sim.classNow')}</T>
+          <T style={{ fontSize: 20, fontWeight: '700', textAlign: 'center' }}>{sc.title}</T>
+          <T tone="muted" style={{ textAlign: 'center' }}>{t(classMode === 'job' ? 'sim.jobBody' : 'sim.practiceBody')}</T>
+        </Card>
+        <View style={{ marginTop: space.lg }}><Button title={t('sim.joinClass')} onPress={() => start(classMode)} /></View>
+      </Screen>
+    );
+  }
 
   return (
     <Screen title={sc.title} subtitle={sc.summary ?? undefined}>

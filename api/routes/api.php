@@ -149,7 +149,12 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::get('/cohorts/options', [CohortController::class, 'options'])->name('cohorts.options');
                 Route::get('/cohorts/{cohort}', [CohortController::class, 'show'])->whereUuid('cohort')->name('cohorts.show');
                 Route::get('/cohorts/{cohort}/progress', [CohortController::class, 'progress'])->whereUuid('cohort')->name('cohorts.progress');
+                Route::get('/cohorts/{cohort}/class', [CohortController::class, 'liveClass'])->whereUuid('cohort')->middleware('throttle:120,1')->name('cohorts.class');
                 Route::get('/enrolments/{enrolment}/checklist', [CohortController::class, 'checklist'])->whereUuid('enrolment')->name('enrolments.checklist');
+            });
+            Route::middleware('permission:live_classroom.run')->group(function (): void {
+                Route::post('/cohorts/{cohort}/class', [CohortController::class, 'startClass'])->whereUuid('cohort')->name('cohorts.class.start');
+                Route::post('/class-sessions/{session}/end', [CohortController::class, 'endClass'])->whereUuid('session')->name('class-sessions.end');
             });
             Route::middleware('permission:classes.manage')->group(function (): void {
                 Route::post('/cohorts', [CohortController::class, 'store'])->name('cohorts.store');

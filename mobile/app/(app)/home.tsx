@@ -3,7 +3,7 @@ import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
-import { Box, CalendarClock, ClipboardList, Download, MapPin, Monitor, PlayCircle, QrCode, Sparkles, Users, Wifi } from '../../src/ui/icons';
+import { Box, CalendarClock, ClipboardList, Download, MapPin, Monitor, PlayCircle, QrCode, Radio, Sparkles, Users, Wifi } from '../../src/ui/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { LearnEnrolment, LearnHomeData } from '@simuwork/core';
 import { api, ApiError } from '../../src/lib/api';
@@ -89,6 +89,16 @@ function ProgrammeCard({ e }: { e: LearnEnrolment }) {
             <View style={{ width: `${e.progress}%`, height: '100%', backgroundColor: c.brand, borderRadius: 4 }} />
           </View>
         </View>
+        {e.class ? (
+          <Pressable accessibilityRole="button" onPress={() => router.push(`/learn/${e.id}/simulator/${e.class!.activity_id}?class=${e.class!.id}&mode=${e.class!.mode}`)} style={[styles.continue, { backgroundColor: '#ECFDF3', borderWidth: 2, borderColor: '#16A34A' }]}>
+            <Radio size={26} color="#14532D" />
+            <View style={{ flex: 1 }}>
+              <T variant="caption" style={{ color: '#14532D', fontWeight: '700' }}>{t('sim.classNow')}</T>
+              <T style={{ fontWeight: '700', fontSize: 17, color: '#14532D' }} numberOfLines={1}>{e.class.title}</T>
+            </View>
+            <T style={{ fontWeight: '700', color: '#14532D' }}>{t('sim.joinClass')}</T>
+          </Pressable>
+        ) : null}
         {e.next ? (
           <Pressable accessibilityRole="button" onPress={() => router.push(`/learn/${e.id}/${e.next!.kind === 'lesson' ? 'lesson' : 'simulator'}/${e.next!.id}`)} style={[styles.continue, { backgroundColor: c.brand }]}>
             <PlayCircle size={26} color="#FFFFFF" />

@@ -92,9 +92,23 @@ export interface LearnEnrolment {
   seat_returns_on: string | null;
   /** The "Continue" card: the first required activity not done yet; null when everything is done. */
   next: { id: string; kind: 'lesson' | 'scenario'; title: string; minutes: number; started: boolean } | null;
+  /** The class is running this simulator together right now (class mode). */
+  class?: ClassSessionItem | null;
 }
 
 export interface LearnHomeData {
   learner: { name: string; qcto_missing: number; reminders?: boolean } | null;
   enrolments: LearnEnrolment[];
+}
+
+/** Class mode: a simulator the facilitator runs with the whole class. */
+export interface ClassSessionItem { id: string; cohort_id: string; activity_id: string; title: string; code: string; mode: 'practice' | 'job'; started_at: string; live: boolean }
+
+export interface ClassBoard {
+  session: ClassSessionItem;
+  learners: ({ id: string; name: string; joined: false } | {
+    id: string; name: string; joined: true; step: number; steps: number; finished: boolean; score: number | null; passed: boolean | null;
+    mistakes: number; help: number; last_move_at: string; stuck: boolean;
+  })[];
+  summary: { learners: number; joined: number; finished: number; stuck: number };
 }

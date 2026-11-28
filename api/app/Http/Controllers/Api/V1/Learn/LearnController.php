@@ -8,11 +8,13 @@ use App\Cohorts\Enrolments;
 use App\Http\Controllers\Api\V1\Qcto\QctoController;
 use App\Http\Controllers\Controller;
 use App\Learning\AttemptSync;
+use App\Learning\ClassMode;
 use App\Learning\CohortProgress;
 use App\Learning\LearnContent;
 use App\Learning\Progress;
 use App\Learning\SimCoach;
 use App\Models\Activity;
+use App\Models\ClassSession;
 use App\Models\Enrolment;
 use App\Models\Learner;
 use App\Models\User;
@@ -54,6 +56,7 @@ final class LearnController extends Controller
                     'days_left' => $end === null ? null : max(0, (int) today()->diffInDays($end, false)),
                     'seat_returns_on' => $e->started_at === null && $e->status === Enrolment::ENROLLED ? $e->noShowDate($c)->toDateString() : null,
                     'next' => Progress::next($e), // the "Continue" card: the first required activity not done yet
+                    'class' => ($live = ClassSession::liveFor($e->cohort_id)) === null ? null : ClassMode::present($live), // "Your class is doing this now"
                 ];
             })->all(),
         ]]);
