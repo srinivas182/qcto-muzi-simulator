@@ -13,3 +13,4 @@ export * from './qcto';
 export * from './attempts';
 export * from './scenario';
 export * from './assessment';
+export * from './logbook';

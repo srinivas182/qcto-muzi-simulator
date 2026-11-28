@@ -296,3 +296,34 @@ None of them produces evidence of practical competence by itself.
 | Read-aloud quality in isiZulu and isiXhosa depends on the phone's voices | Use the chosen TTS voice provider (open item) for pre-recorded question audio | Proposed for later |
 | Accommodations can't be applied to a whole group | Set accommodations for a group of learners from the cohort page | Proposed for later |
 | Assessor app for observation on a phone | Observation checklist in the mobile app, for assessors working on site | Proposed for later |
+
+## 5.3a notes: workplace placement and daily check-in (done)
+
+**Built**
+- **Placement**: staff with `learners.manage` add the learner's employer, town or branch, mentor name and mentor cell number from the cohort page (*Workplace*), with start and end dates. This is audited.
+  - **POPIA minimal data**: a town or branch, not a street address.
+  - The mentor's number is shown to staff only, never in the learner's view.
+- **Daily check-in** (web and phone):
+  - pick the day and the hours, tick the **workplace outcomes worked on** (the logbook task's outcomes, or else the programme's), add a short note and an optional photo;
+  - the photo is **compressed on the device to 150 KB or less** before anything is sent (canvas on web; `expo-image-manipulator` on the phone).
+- **Server rules**:
+  - only days within the placement, up to 14 days late (no signal on site), never in the future;
+  - half an hour to 12 hours;
+  - one entry per day, safe to resend (client id);
+  - a day the mentor has confirmed can't be changed, while a queried day can be corrected and sent again;
+  - photos: JPEG/WebP only, stored privately, visible to the learner and to staff with `learners.view`.
+- **Offline**: with no signal the check-in (and its photo) waits on the phone and is sent when back online, with the same id.
+- **Progress**: confirmed days against the task's minimum days, hours, and how often each outcome was practised.
+
+**Tests**: API 281, web 118, mobile 45. Web first load 151.0 KB. Mobile bundle 3.32 MB (limit 3.5 MB).
+
+### Gaps we fill and best recommendations (5.3a)
+| Gap against leaders | What we did / recommend | When |
+|---|---|---|
+| Paper logbooks are signed weeks later and often filled in from memory | A daily check-in on the phone, at most 14 days late | In this sprint |
+| Learners don't link their work to the QCTO workplace outcomes | Each day is ticked against the outcomes, with counts per outcome | In this sprint |
+| Photo evidence costs learners data (3–5 MB photos) | Compressed on the device to 150 KB or less before upload | In this sprint |
+| Site has no signal | Saved on the phone and sent later, once | In this sprint |
+| The mentor has to log in to a portal | WhatsApp/SMS link and one-time code | 5.3b |
+| A missed day isn't noticed | A gentle reminder if no check-in for 3 workplace days | Proposed for later |
+| Outcomes never practised at work go unseen | "Not yet practised" outcome list for the learner and the facilitator | Proposed for later |

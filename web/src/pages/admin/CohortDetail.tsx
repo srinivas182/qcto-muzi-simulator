@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRightLeft, Clock, LayoutGrid, Printer, Radio, RefreshCw, Search, UserPlus } from 'lucide-react';
+import { ArrowLeft, ArrowRightLeft, Briefcase, Clock, LayoutGrid, Printer, Radio, RefreshCw, Search, UserPlus } from 'lucide-react';
 import type { CohortDetail as Detail, CohortItem, EnrolmentItem, EnrolmentStatus, LearnerItem } from '@simuwork/core';
 import type { MessageKey } from '@simuwork/core/locales/en';
 import { QrCode } from '../../components/cohorts/QrCode';
@@ -10,6 +10,7 @@ import { Badge, Button, Card, cx, Drawer, inputClass, Skeleton, Switch, useToast
 import { api, ApiError } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
 import { can, useSession } from '../../lib/session';
+import { WorkplaceDrawer } from '../../components/WorkplaceDrawer';
 
 const TONE: Record<EnrolmentStatus, 'success' | 'warning' | 'neutral' | 'danger'> = { enrolled: 'warning', active: 'success', completed: 'success', withdrawn: 'neutral', no_show: 'neutral' };
 const firstError = (e: unknown, fallback: string) => (e instanceof ApiError ? Object.values(e.errors)[0]?.[0] ?? e.message : fallback);
@@ -25,6 +26,7 @@ export default function CohortDetail() {
   const enrolRight = can(session, 'learners.manage');
   const [adding, setAdding] = useState(false);
   const [moving, setMoving] = useState<EnrolmentItem | null>(null);
+  const [placing, setPlacing] = useState<EnrolmentItem | null>(null);
   const cohort = useQuery({ queryKey: ['cohort', id], queryFn: () => api<{ data: Detail }>(`/cohorts/${id}`) });
   const refresh = () => { void qc.invalidateQueries({ queryKey: ['cohort', id] }); void qc.invalidateQueries({ queryKey: ['cohorts'] }); };
   const date = (d: string) => new Date(d).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
@@ -85,6 +87,7 @@ export default function CohortDetail() {
                   <Badge tone={TONE[e.status]}>{t(`coh.status.${e.status}` as MessageKey)}</Badge>
                   {enrolRight && (
                     <div className="flex gap-1">
+                      <Button size="sm" variant="ghost" icon={<Briefcase className="size-4" />} onClick={() => setPlacing(e)}>{t('wp.button')}</Button>
                       <Button size="sm" variant="ghost" icon={<ArrowRightLeft className="size-4" />} onClick={() => setMoving(e)}>{t('coh.transfer')}</Button>
                       <Button size="sm" variant="ghost" onClick={() => { const reason = window.prompt(t('coh.withdrawWhy', { name: e.learner.name })); if (reason?.trim()) withdraw.mutate({ e: e.id, reason: reason.trim() }); }}>{t('coh.withdraw')}</Button>
                     </div>
@@ -130,6 +133,7 @@ export default function CohortDetail() {
 
       <AddLearners cohort={c} open={adding} onClose={() => setAdding(false)} onDone={refresh} />
       <Transfer cohort={c} enrolment={moving} onClose={() => setMoving(null)} onDone={refresh} />
+      {placing && <WorkplaceDrawer enrolmentId={placing.id} learner={placing.learner.name} onClose={() => setPlacing(null)} />}
     </div>
   );
 }

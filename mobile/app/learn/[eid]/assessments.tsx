@@ -29,14 +29,15 @@ export default function AssessmentsScreen() {
               {list.map((x, i) => {
                 const left = (x.attempts_allowed ?? 0) - x.attempts_used;
                 const canSit = x.kind === 'test' && x.result !== 'competent' && !x.waiting_for_marking && (x.open_sitting !== null || left > 0);
+                const logbook = x.kind === 'logbook';
                 const status = x.result === 'competent' ? t('as.competent') : x.waiting_for_marking ? t('as.waiting') : x.result === 'not_yet' ? t('as.notYet') : '';
                 return (
-                  <Pressable key={x.id} disabled={!canSit} accessibilityRole={canSit ? 'button' : 'text'} onPress={() => router.push(`/learn/${eid}/test/${x.id}`)}
+                  <Pressable key={x.id} disabled={!canSit && !logbook} accessibilityRole={canSit || logbook ? 'button' : 'text'} onPress={() => router.push(logbook ? `/learn/${eid}/logbook` : `/learn/${eid}/test/${x.id}`)}
                     style={[styles.row, i > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.line }]}>
                     <View style={[styles.icon, { backgroundColor: c.brandSoft }]}><ClipboardCheck size={18} color={c.brand} /></View>
                     <View style={{ flex: 1 }}>
                       <T style={{ fontWeight: '700' }}>{x.title}</T>
-                      <T variant="caption" tone="muted">{x.kind === 'test' ? t('as.testMeta', { n: x.questions ?? 0, min: x.minutes ?? 0, pass: x.pass_mark ?? 0, left: Math.max(0, left) }) : t('as.withAssessor')}</T>
+                      <T variant="caption" tone="muted">{x.kind === 'test' ? t('as.testMeta', { n: x.questions ?? 0, min: x.minutes ?? 0, pass: x.pass_mark ?? 0, left: Math.max(0, left) }) : t(logbook ? 'as.lb.meta' : 'as.withAssessor')}</T>
                       {status ? <T variant="caption" tone="brand" style={{ fontWeight: '700' }}>{status}</T> : null}
                       {x.feedback && (x.feedback.text || x.feedback.links.length > 0) ? (
                         <View style={[styles.fb, { backgroundColor: c.surface2 }]}>
@@ -51,7 +52,7 @@ export default function AssessmentsScreen() {
                         </View>
                       ) : null}
                     </View>
-                    {canSit ? <ChevronRight size={18} color={c.muted} /> : null}
+                    {canSit || logbook ? <ChevronRight size={18} color={c.muted} /> : null}
                   </Pressable>
                 );
               })}

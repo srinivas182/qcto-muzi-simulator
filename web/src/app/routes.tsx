@@ -64,6 +64,7 @@ export const routes: RouteObject[] = [
           { path: 'learn/enrolments/:eid', lazy: page(() => import('../pages/learn/Programme')) },
           { path: 'learn/enrolments/:eid/checklist', lazy: page(() => import('../pages/learn/Checklist')) },
           { path: 'learn/enrolments/:eid/assessments', lazy: page(() => import('../pages/learn/Assessments')) },
+          { path: 'learn/enrolments/:eid/logbook', lazy: page(() => import('../pages/learn/Logbook')) },
           { path: 'learn/enrolments/:eid/tests/:tid', lazy: page(() => import('../pages/learn/Test')) },
           { path: 'learn/enrolments/:eid/lessons/:aid', lazy: page(() => import('../pages/learn/Lesson')) },
           { path: 'learn/enrolments/:eid/simulators/:aid', lazy: page(() => import('../pages/learn/Simulator')) },

@@ -277,4 +277,22 @@ describe('knowledge tests', () => {
     await act(async () => fireEvent.press(screen.getByLabelText('Read question 1 aloud')));
     expect(Speech.speak).toHaveBeenCalledWith('What do you do first?. 1. Call the user. 2. Switch off', expect.objectContaining({ language: 'zu-ZA' }));
   });
+
+  it('checks in a workplace day on the phone and keeps it when there is no signal', async () => {
+    await seed({ signedIn: true });
+    await AsyncStorage.removeItem('sw.logbook.e1');
+    const view = { workplace: { id: 'w1', employer: 'Khanya IT Repairs', site: null, mentor_name: 'Thabo Mokoena', confirm_by: 'link', starts_on: '2027-03-01', ends_on: null },
+      outcomes: [{ code: 'TS-1.1', statement: 'Set up a workstation safely' }], summary: { days: 0, confirmed_days: 0, hours: 0, confirmed_hours: 0, min_days: 20, outcomes: {} }, entries: [], late_days: 14 };
+    const calls = mockApi({ '/session': { data: session() }, '/learn/enrolments/e1/logbook': ((b: unknown) => (b === undefined ? [200, { data: view }] : [0, null])) as never });
+    await renderRouter('./app', { initialUrl: '/learn/e1/logbook' });
+    expect(await screen.findByText('Khanya IT Repairs')).toBeOnTheScreen();
+    expect(screen.getByText('0/20')).toBeOnTheScreen();
+    await act(async () => fireEvent.press(screen.getByLabelText('Set up a workstation safely')));
+    await act(async () => fireEvent.press(screen.getByText('Send check-in')));
+    await settle();
+    const saved = JSON.parse((await AsyncStorage.getItem('sw.logbook.e1'))!) as { outcomes: string[]; hours: number }[];
+    expect(saved).toHaveLength(1);
+    expect(saved[0]).toMatchObject({ outcomes: ['TS-1.1'], hours: 8 });
+    expect(calls.some((c) => c.path === '/learn/enrolments/e1/logbook' && c.init.method === 'POST')).toBe(true);
+  });
 });
