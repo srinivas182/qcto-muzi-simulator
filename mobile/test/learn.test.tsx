@@ -72,10 +72,10 @@ describe('lesson player', () => {
 });
 
 describe('simulator', () => {
-  const base = { hints: [], why: '', outcome: null, lesson: null, critical: false, sets: {}, wrong: [] };
+  const base = { hints: [], why: '', outcome: null, lesson: null, critical: false, only: [], sets: {}, wrong: [] };
   const scenario = {
     id: 's1', code: 'TS-S01', title: 'A PC won’t boot', summary: null, minutes: 12, content_version: 1, locale: 'en', lessons: { 'TS-L02': 'l2' }, results: { practice: null, job: null },
-    content: { scene: 'pc-bench', pass_mark: 70, job: { minutes: 12, customer: 'Thandi' }, steps: [
+    content: { scene: 'pc-bench', pass_mark: 70, variants: [], job: { minutes: 12, customer: 'Thandi' }, steps: [
       { ...base, id: 'unplug', type: 'tap', target: 'wall-switch', prompt: 'Make the PC safe.', critical: true, why: 'Live PCs shock.', lesson: { code: 'TS-L02', block: null },
         sets: { 'wall-switch': 'off' }, wrong: [{ on: 'case-panel', effect: 'spark', message: 'You opened a live PC.' }] },
       { ...base, id: 'fitram', type: 'place', target: 'ram-new', slot: 'slot-a1', prompt: 'Fit the new RAM.', sets: { 'ram-new': 'in' } },

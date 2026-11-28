@@ -27,7 +27,7 @@ export default function SimulatorScreen() {
   return <Play key={aid} eid={eid} sc={q.data.data} />;
 }
 
-type Finished = { mode: SimMode; score: SimScore; synced: boolean };
+type Finished = { mode: SimMode; score: SimScore; synced: boolean; steps: SimState['steps'] };
 
 function Play({ eid, sc }: { eid: string; sc: LearnScenario }) {
   const { t } = useI18n();
@@ -42,14 +42,14 @@ function Play({ eid, sc }: { eid: string; sc: LearnScenario }) {
     setFinished(null);
     setRun((r) => ({ mode, n: (r?.n ?? 0) + 1 }));
   };
-  const onMove = (s: SimState, seconds: number) => { void attempt.current?.then((id) => attempts.update(id, { result: { events: s.events }, duration_seconds: seconds })); };
+  const onMove = (s: SimState, seconds: number) => { void attempt.current?.then((id) => attempts.update(id, { result: { events: s.events, variant: s.variant }, duration_seconds: seconds })); };
   const onDone = async (s: SimState, seconds: number) => {
-    const score = scoreRun(sc.content, s.events, s.mode);
+    const score = scoreRun(sc.content, s.events, s.mode, s.variant);
     const id = await attempt.current!;
-    await attempts.finish(id, { completed: score.completed, score: score.score, duration_seconds: seconds, result: { events: s.events } });
+    await attempts.finish(id, { completed: score.completed, score: score.score, duration_seconds: seconds, result: { events: s.events, variant: s.variant } });
     const progress = await syncAttempts();
     (score.passed ? haptics.success : haptics.warn)();
-    setFinished({ mode: s.mode, score, synced: eid in progress });
+    setFinished({ mode: s.mode, score, synced: eid in progress, steps: s.steps });
     setRun(null);
     void qc.invalidateQueries({ queryKey: ['learn-home'] });
     void qc.invalidateQueries({ queryKey: ['learn-activities', eid] });
@@ -84,10 +84,10 @@ function Runner({ sc, mode, onMove, onDone, onQuit }: {
   const { c } = useTheme();
   const content = sc.content;
   const started = useRef(now());
-  const [s, dispatch] = useReducer((st: SimState, a: SimAction) => simReducer(content, st, a), content, (x) => startRun(x, mode));
+  const [s, dispatch] = useReducer((st: SimState, a: SimAction) => simReducer(st, a), content, (x) => startRun(x, mode));
   const [left, setLeft] = useState((content.job?.minutes ?? 0) * 60);
   const reported = useRef(0);
-  const step = content.steps[s.step];
+  const step = s.steps[s.step];
 
   useEffect(() => {
     if (s.events.length === reported.current) return;
@@ -107,7 +107,7 @@ function Runner({ sc, mode, onMove, onDone, onQuit }: {
   const at = () => secondsSince(started.current);
 
   return (
-    <Screen title={sc.title} subtitle={t('sim.step', { n: s.step + 1, total: content.steps.length })}>
+    <Screen title={sc.title} subtitle={t('sim.step', { n: s.step + 1, total: s.steps.length })}>
       <View style={[styles.row, { justifyContent: 'space-between', marginBottom: space.sm }]}>
         {mode === 'job' ? <View style={styles.row}><Clock size={16} color={left < 0 ? c.danger : c.text} /><T style={{ fontWeight: '700', color: left < 0 ? c.danger : c.text }}>{left < 0 ? t('sim.overTime') : t('sim.timeLeft', { time: clock(left) })}</T></View> : <View />}
         <Pressable accessibilityRole="button" onPress={onQuit} style={[styles.row, { minHeight: 44 }]}><X size={18} color={c.muted} /><T tone="muted">{t('sim.quit')}</T></Pressable>
@@ -172,7 +172,7 @@ function Debrief({ eid, sc, f, onAgain }: { eid: string; sc: LearnScenario; f: F
       </View>
       <T style={{ fontWeight: '700', marginBottom: space.sm }}>{t('sim.replay')}</T>
       <Card style={{ padding: 0 }}>
-        {sc.content.steps.map((st, i) => {
+        {f.steps.map((st, i) => {
           const r = score.steps[st.id] ?? { mistakes: 0, hints: 0, done: false };
           const clean = r.done && !r.mistakes && !r.hints;
           const lessonId = st.lesson ? sc.lessons[st.lesson.code] : undefined;

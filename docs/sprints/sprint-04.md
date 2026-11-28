@@ -280,3 +280,53 @@ now checked in CI. The learner language part is at most 5.9 KB.
 | Isolated practice | AI coach ("Why?" / "Help") inside the run | Proposed for 4.7 |
 | 3D in the app offline | WebView runtime shipped in the offline pack | Proposed for 4.6 |
 | Pinch to zoom on phones | Add pinch zoom to the 3D view | Proposed for later |
+
+## Sub-sprint 4.5 notes (Scenario Studio and the first simulator)
+
+**Built**
+- **Scenario Studio (HQ)** at `/hq/programmes/:code/scenarios/:id`. The "Scenario Studio" and "Course Studio" menu items
+  now open a list of every scenario or lesson, grouped by programme (`GET /platform/activities?kind=`).
+  - **Settings:** scene, pass mark, real-job time and the customer brief.
+  - **Steps are built with forms.** Choose the step type (touch, decide, move), then fill in:
+    - the instruction;
+    - the right object or answer, picked from the scene's objects;
+    - up to 3 hints;
+    - "why it matters";
+    - the QCTO outcome;
+    - the lesson for the debrief;
+    - whether it is a safety step;
+    - how the scene changes;
+    - the wrong moves, each with what the learner sees and the message.
+  - Steps can be reordered and removed.
+  - **Live preview:** the real runtime (3D or simple view) beside the editor. Any edit restarts it. You can
+    choose the cause and the mode to preview.
+  - **Translations side by side**, AI draft translation, and review per language. The same rules as Course
+    Studio apply, with one refinement: changing only the steps or answers clears the English review, while
+    changing the words clears every review.
+  - **Publishing** needs a reviewed English version and lesson links that exist in the programme.
+- **Branching:** a scenario can list up to 4 causes of the same symptom, each with its own starting scene.
+  - A step can belong to some causes only.
+  - Each run picks a cause at random, so learners diagnose instead of memorising.
+  - Learners never see the cause names, since those would give the answer away.
+  - The attempt records which cause was played, and the server scores the run against that cause. Without
+    it, the run scores nothing.
+- **The first simulator, "A PC won't boot",** now has two causes:
+  - **faulty RAM:** beeps, then strap, open, swap the RAM and test;
+  - **loose power cable:** dead, then check the cable first, reseat it and test.
+  - Both share the safety steps (switch off at the wall) and the final test.
+  - The scene gained a power cable at the back of the PC.
+
+**Checks:** API 253 tests, web 96, mobile 33. First load is 145.1 KB of 170. Staff language files are at most
+12.5 KB of 15. The 3D engine is 127.8 KB of 150.
+
+### Gaps we fill and best recommendations (4.5)
+| Gap against the leaders | What we did | When |
+|---|---|---|
+| Transfr and Labster scenarios are built by the vendor only; providers wait months for changes | HQ builds and edits scenarios with forms, no code, with a live preview | This sprint |
+| The same fault has the same answer every time, so learners memorise | Branching causes picked at random; learners diagnose | This sprint |
+| Translations are bolted on | Side-by-side translation, AI draft, expert review per language | This sprint |
+| Editing a live scenario breaks running attempts | Drafts are separate; publishing raises the content version; attempts keep their version | This sprint |
+| Only HQ can author | Let large providers suggest scenario changes for HQ review | Proposed for later |
+| One scene | More ready-made scenes for the other 12 programmes (a call-centre desk, a retail till, a reception counter) | Proposed with content production |
+| "Fix it" retry after a wrong answer in lessons | A retry with a hint before the answer is shown | Proposed for 4.6 |
+| Staff language files are nearing 15 KB (12.5 KB) | Split the staff part into HQ and provider parts | Proposed for 4.6 |

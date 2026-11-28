@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { scoreRun, simReducer, startRun, type ScenarioContent, type SimAction, type SimState } from '@simuwork/core';
+import { pickVariant, scoreRun, simReducer, startRun, type ScenarioContent, type SimAction, type SimState } from '@simuwork/core';
 
-const base = { hints: [], why: '', outcome: null, lesson: null, critical: false, sets: {}, wrong: [] };
+const base = { hints: [], why: '', outcome: null, lesson: null, critical: false, only: [] as string[], sets: {}, wrong: [] };
 const content: ScenarioContent = {
-  scene: 'pc-bench', pass_mark: 70, job: { minutes: 10, customer: 'Thandi' },
+  scene: 'pc-bench', pass_mark: 70, variants: [], job: { minutes: 10, customer: 'Thandi' },
   steps: [
     { ...base, id: 'unplug', type: 'tap', target: 'wall-switch', prompt: 'Make it safe.', critical: true, hints: ['At the wall.'], sets: { 'wall-switch': 'off' },
       wrong: [{ on: 'case-panel', effect: 'spark', message: 'You opened a live PC.' }] },
@@ -11,7 +11,7 @@ const content: ScenarioContent = {
     { ...base, id: 'fitram', type: 'place', target: 'ram-new', slot: 'slot-a1', prompt: 'Fit it.', sets: { 'ram-new': 'in' } },
   ],
 };
-const play = (mode: 'practice' | 'job', actions: SimAction[]): SimState => actions.reduce((s, a) => simReducer(content, s, a), startRun(content, mode));
+const play = (mode: 'practice' | 'job', actions: SimAction[]): SimState => actions.reduce((s, a) => simReducer(s, a), startRun(content, mode));
 
 describe('simulator runtime', () => {
   it('walks the steps, changes the scene and records every move', () => {
@@ -43,5 +43,22 @@ describe('simulator runtime', () => {
     expect(scoreRun(content, [right[2]], 'practice')).toMatchObject({ completed: false, score: 0 });
     expect(scoreRun(content, [{ step: 'unplug', action: 'hint', t: 0 }, right[0], { step: 'cause', action: 'choose', value: '0', t: 0 }, right[1], right[2]], 'practice')).toMatchObject({ score: 87, passed: true });
     expect(scoreRun(content, [{ step: 'unplug', action: 'tap', value: 'case-panel', t: 0 }, ...right], 'job')).toMatchObject({ score: 92, passed: false, critical: true });
+  });
+
+  it('branches: each run plays one cause, with its own start and steps, and is scored against it', () => {
+    const branching: ScenarioContent = {
+      ...content,
+      variants: [{ id: 'ram', start: {} }, { id: 'cable', start: { 'psu-cable': 'loose' } }],
+      steps: [content.steps[0]!, { ...content.steps[2]!, only: ['ram'] }, { ...base, id: 'reseat', type: 'tap', target: 'psu-cable', prompt: 'Reseat it.', only: ['cable'] }],
+    };
+    expect(pickVariant(branching, () => 0.9)).toBe('cable');
+    const run = startRun(branching, 'practice', 'cable');
+    expect(run.scene['psu-cable']).toBe('loose');
+    expect(run.steps.map((s) => s.id)).toEqual(['unplug', 'reseat']);
+    const done = [{ type: 'tap', object: 'wall-switch', t: 1 }, { type: 'tap', object: 'psu-cable', t: 2 }].reduce((s, a) => simReducer(s, a as SimAction), run);
+    expect(done.done).toBe(true);
+    expect(scoreRun(branching, done.events, 'practice', 'cable')).toMatchObject({ completed: true, score: 100 });
+    expect(scoreRun(branching, done.events, 'practice', 'ram').completed).toBe(false);
+    expect(scoreRun(branching, done.events, 'practice', null).completed).toBe(false);
   });
 });

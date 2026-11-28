@@ -43,7 +43,7 @@ class Bench {
   private renderer: WebGLRenderer;
   private camera = new PerspectiveCamera(42, 1, 0.1, 20);
   private scene = new Scene();
-  private obj = {} as Record<'wall-switch' | 'case-panel' | 'ram-old' | 'ram-fitted' | 'ram-new' | 'strap' | 'monitor' | 'pc-power' | 'slot-a1' | 'screwdriver', Object3D>;
+  private obj = {} as Record<'wall-switch' | 'case-panel' | 'ram-old' | 'ram-fitted' | 'ram-new' | 'strap' | 'monitor' | 'pc-power' | 'slot-a1' | 'screwdriver' | 'psu-cable', Object3D>;
   private screen: Mesh;
   private flashLight = new PointLight(0xffa040, 0, 3);
   private yaw = 0;
@@ -109,9 +109,17 @@ class Bench {
     button.userData.id = 'pc-power';
     const panel = box(0.01, 0.5, 0.53, 0x3a424b, 'case-panel');
     panel.position.set(0.215, 0, 0);
-    pc.add(button, panel);
+    // The power cable's plug at the back of the case (pulled out a little when "loose").
+    const plug = box(0.08, 0.06, 0.06, 0x111418, 'psu-cable');
+    plug.position.set(0.1, -0.17, -0.3);
+    const cord = new Mesh(new CylinderGeometry(0.012, 0.012, 0.5, 8), mat(0x111418));
+    cord.rotation.x = Math.PI / 2;
+    cord.position.set(0, 0, -0.27);
+    cord.userData.id = 'psu-cable';
+    plug.add(cord);
+    pc.add(button, panel, plug);
     this.scene.add(pc);
-    Object.assign(this.obj, { 'pc-power': button, 'case-panel': panel, 'ram-old': ramOld, 'slot-a1': slot });
+    Object.assign(this.obj, { 'pc-power': button, 'case-panel': panel, 'ram-old': ramOld, 'slot-a1': slot, 'psu-cable': plug });
 
     // Monitor.
     const monitor = new Group();
@@ -174,6 +182,7 @@ class Bench {
     o['ram-old'].visible = s['ram-old'] !== 'out';
     o['ram-new'].visible = s['ram-new'] !== 'in';
     o['ram-fitted'].visible = s['ram-new'] === 'in';
+    o['psu-cable'].position.z = s['psu-cable'] === 'loose' ? -0.36 : -0.3;
     o.strap.position.set(0.85, s.strap === 'on' ? 0.9 : 0.8, 0.25);
     colour(o.strap, s.strap === 'on' ? 0x16a34a : 0x2563eb);
     colour(this.screen, s.monitor === 'ok' ? 0x1d6fe0 : s.monitor === 'beeps' ? 0x5a0d10 : 0x050608);
