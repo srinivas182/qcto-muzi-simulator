@@ -8,3 +8,4 @@ export * from './tokens';
 export type { MessageKey, Messages } from './locales/en';
 export * from './pricing';
 export * from './learners';
+export * from './cohorts';
