@@ -9,6 +9,7 @@ use App\Models\Cohort;
 use App\Models\Enrolment;
 use App\Models\Learner;
 use App\Models\ProgrammeVersion;
+use App\Models\QualificationRef;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -38,6 +39,9 @@ final class Cohorts
                 'name' => $input['name'], 'centre_id' => $input['centre_id'], 'programme_id' => $version->programme_id,
                 'programme_version_id' => $version->id, 'starts_on' => $input['starts_on'], 'ends_on' => $input['ends_on'] ?? null,
                 'qcto_type' => $input['qcto_type'] ?? 'qualification', 'join_code' => self::newCode(), 'created_by' => $actor->id,
+                // QCTO column B: the occupational qualification (or skills programme) this version is aligned to.
+                'qcto_qualification_id' => QualificationRef::query()->where('programme_version_id', $version->id)
+                    ->whereIn('kind', ['occupational', 'skills_programme', 'part_qualification'])->orderBy('position')->value('saqa_id'),
             ]);
             $this->setFacilitators($cohort, $input['facilitator_ids'] ?? []);
             $this->audit->record('cohorts.created', $cohort, null, ['name' => $cohort->name, 'version' => $version->number], $actor);
@@ -54,12 +58,15 @@ final class Cohorts
     public function update(Cohort $cohort, array $input, User $actor): Cohort
     {
         DB::transaction(function () use ($cohort, $input, $actor): void {
-            $cohort->fill(array_intersect_key($input, array_flip(['name', 'centre_id', 'starts_on', 'ends_on', 'qcto_type', 'join_open'])));
+            $cohort->fill(array_intersect_key($input, array_flip(['name', 'centre_id', 'starts_on', 'ends_on', 'qcto_type', 'join_open', 'qcto_qualification_id', 'readiness_type'])));
             if (array_key_exists('qcto_submitted', $input)) {
                 $cohort->qcto_submitted_at = $input['qcto_submitted'] ? ($cohort->qcto_submitted_at ?? now()) : null;
             }
             if ($cohort->ends_on !== null && $cohort->ends_on->lt($cohort->starts_on)) {
                 throw ValidationException::withMessages(['ends_on' => 'The end date must be on or after the start date.']);
+            }
+            if ($cohort->isDirty(['starts_on', 'qcto_type'])) {
+                $cohort->qcto_reminder_level = 0;
             }
             $changed = array_keys($cohort->getDirty());
             $cohort->save();

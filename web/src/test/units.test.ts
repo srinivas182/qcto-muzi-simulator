@@ -8,6 +8,11 @@ import af from '@simuwork/core/locales/af';
 import xh from '@simuwork/core/locales/xh';
 import zu from '@simuwork/core/locales/zu';
 import { KNOWN_PATHS } from '../app/access';
+import { QCTO_CODES } from '@simuwork/core';
+import qctoEn from '@simuwork/core/locales/qcto-en';
+import qctoAf from '@simuwork/core/locales/qcto-af';
+import qctoXh from '@simuwork/core/locales/qcto-xh';
+import qctoZu from '@simuwork/core/locales/qcto-zu';
 
 const placeholders = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
 
@@ -21,6 +26,11 @@ describe('translations', () => {
       }
     });
   }
+
+  it('has a QCTO label for every code in every language', () => {
+    const codes = Object.entries(QCTO_CODES).filter(([list]) => list !== 'titles').flatMap(([list, values]) => values.map((v) => `${list}.${v}`)).sort();
+    for (const labels of [qctoEn, qctoAf, qctoXh, qctoZu]) expect(Object.keys(labels).sort()).toEqual(codes);
+  });
 
   it('fills placeholders', () => {
     expect(format('Hello {name}', { name: 'Sipho' })).toBe('Hello Sipho');

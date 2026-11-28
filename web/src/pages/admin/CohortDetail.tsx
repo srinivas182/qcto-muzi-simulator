@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRightLeft, Printer, RefreshCw, Search, UserPlus } from 
 import type { CohortDetail as Detail, CohortItem, EnrolmentItem, EnrolmentStatus, LearnerItem } from '@simuwork/core';
 import type { MessageKey } from '@simuwork/core/locales/en';
 import { QrCode } from '../../components/cohorts/QrCode';
+import { QctoCohortCard } from '../../components/qcto/QctoCohortCard';
 import { Badge, Button, Card, cx, Drawer, inputClass, Skeleton, Switch, useToast } from '../../components/ui';
 import { api, ApiError } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
@@ -30,7 +31,7 @@ export default function CohortDetail() {
 
   const patch = useMutation({
     mutationFn: (body: Record<string, unknown>) => api(`/cohorts/${id}`, { method: 'PATCH', body }),
-    onSuccess: refresh,
+    onSuccess: () => { refresh(); void qc.invalidateQueries({ queryKey: ['qcto-check', id] }); },
     onError: (e) => toast(firstError(e, t('common.error')), 'error'),
   });
   const action = useMutation({
@@ -96,6 +97,7 @@ export default function CohortDetail() {
         </Card>
 
         <div className="space-y-5">
+          <QctoCohortCard cohort={c} manage={manage && !c.archived} download={can(session, 'learners.reveal_id')} onPatch={(body) => patch.mutate(body)} />
           <Card className="p-5 text-center print:shadow-none">
             <h2 className="text-[15px] font-bold text-ink">{t('coh.joinTitle')}</h2>
             <p className="mt-1 text-[13px] text-muted">{t('coh.joinLead')}</p>

@@ -57,4 +57,4 @@ export interface ImportReport {
   created: number;
 }
 
-export const HOME_LANGUAGES = ['en', 'af', 'zu', 'xh', 'st', 'tn', 'nso', 'ts', 'ss', 've', 'nr', 'other'] as const;
+export const HOME_LANGUAGES = ['en', 'af', 'zu', 'xh', 'st', 'tn', 'nso', 'ts', 'ss', 've', 'nr', 'sasl', 'other'] as const;

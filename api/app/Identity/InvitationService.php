@@ -10,8 +10,8 @@ use App\Learners\LearnerDirectory;
 use App\Models\Invitation;
 use App\Models\Role;
 use App\Models\Tenant;
-use App\Models\TenantDomain;
 use App\Models\User;
+use App\Tenancy\DomainService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -125,10 +125,6 @@ final class InvitationService
 
     private function url(Tenant $tenant, string $token): string
     {
-        $host = $tenant->domains()->whereNotNull('verified_at')->orderByDesc('is_primary')
-            ->orderByRaw('case when type = ? then 0 else 1 end', [TenantDomain::TYPE_CUSTOM])
-            ->value('host');
-
-        return 'https://'.($host ?? $tenant->slug.'.'.config('tenancy.platform_domain')).'/join/'.$token;
+        return 'https://'.DomainService::primaryHost($tenant).'/join/'.$token;
     }
 }

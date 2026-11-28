@@ -15,6 +15,7 @@ use App\Models\LicencePool;
 use App\Models\Programme;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Qcto\QctoCodes;
 use App\Tenancy\TenantContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -79,7 +80,8 @@ final class CohortController extends Controller
 
     public function update(Request $request, Cohort $cohort): JsonResponse
     {
-        $input = $request->validate($this->rules(true) + ['join_open' => ['sometimes', 'boolean'], 'qcto_submitted' => ['sometimes', 'boolean']]);
+        $input = $request->validate($this->rules(true) + ['join_open' => ['sometimes', 'boolean'], 'qcto_submitted' => ['sometimes', 'boolean'],
+            'qcto_qualification_id' => ['sometimes', 'nullable', 'string', 'max:20', 'regex:/^[A-Za-z0-9-]+$/'], 'readiness_type' => ['sometimes', Rule::in(array_map('strval', array_keys(QctoCodes::READINESS)))]]);
         $this->cohorts->update($cohort, $input, $this->actor($request));
 
         return $this->show($cohort->refresh());

@@ -30,7 +30,7 @@ final class ProviderAdmin
     public const HQ_FIELDS = ['name', 'legal_name', 'registration_number', 'vat_number', 'accreditation_number', 'accreditation_expires_at', 'payment_terms'];
 
     /** Fields the provider may change itself. */
-    public const PROVIDER_FIELDS = ['contact_email', 'contact_phone', 'billing_email', 'address'];
+    public const PROVIDER_FIELDS = ['contact_email', 'contact_phone', 'billing_email', 'address', 'qcto_sdp_code'];
 
     public function __construct(
         private readonly AuditLogger $audit,

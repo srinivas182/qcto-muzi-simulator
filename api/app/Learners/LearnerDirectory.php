@@ -191,7 +191,7 @@ final class LearnerDirectory
         if ($invitation->learner_id === null) {
             return;
         }
-        Learner::query()->whereKey($invitation->learner_id)->update(['user_id' => $user->id, 'status' => Learner::ACTIVE, 'joined_at' => now()]);
+        Learner::query()->whereKey($invitation->learner_id)->update(['user_id' => $user->id, 'status' => Learner::ACTIVE, 'joined_at' => now(), 'popi_agreed_at' => now()]);
     }
 
     /** @return array<string, mixed> */

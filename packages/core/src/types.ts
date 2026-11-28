@@ -253,6 +253,7 @@ export interface ProviderDetails extends ProviderRow {
   contact_email: string | null;
   contact_phone: string | null;
   billing_email: string | null;
+  qcto_sdp_code: string | null;
   address: ProviderAddress;
   payment_terms: { mode: 'pay_first' | 'on_account'; days: number };
   status_reason: string | null;
