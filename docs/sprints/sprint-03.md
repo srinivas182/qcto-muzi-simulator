@@ -381,3 +381,36 @@ and enrolment register, licence health, learner home on web and mobile).
   cannot.
 - **QCTO finding for 3.6b:** QCTO's first enrolment upload is due **21 working days** after training
   starts. QCTO's file is Excel with 43 fixed columns (A–AQ), most of which we do not collect yet.
+
+## Sub-sprint 3.6b notes (QCTO details, enrolment file, deadline)
+
+The remaining 3.6 work is split again: **3.6b** (this) and **3.6c** (licence health, learner home on web and
+mobile, and learners filling in their own QCTO details).
+
+- **Decision (Srini, 28 Nov 2026):** each learner gets an optional "QCTO details" section, filled in by staff
+  now and by the learner too in 3.6c. Each cohort shows how complete its data is, and the file lists what is
+  missing.
+- **QCTO's file**, checked against QCTO's *data loading specification*: Excel only, every value entered as
+  text, fixed column headings in order (A–AQ, 43 columns), named `LEISAyyyymmdd-<provider name>`. Our file
+  matches this. Dates are YYYYMMDD, and postal codes and codes keep their leading zeros. SA ID holders get
+  alternative ID type 533; passport holders get 527 by default. A test opens the file and checks every
+  column of a sample learner.
+- **What fills each column:** the provider's QCTO SDP code (new field in Academy details; the accreditation
+  number is used if there is no code); the cohort's qualification ID, taken from the occupational
+  qualification of the programme version and editable; the learner's details; the POPIA agreement date
+  (recorded when the learner accepts the invitation); the expected completion date (the cohort end date);
+  statement of results "not yet issued" until assessments exist (Sprint 5); the readiness type (per cohort,
+  default 4); FLC; and the date stamp.
+- **Not filled yet:** the Stats SA area code is typed in, because Stats SA's list is not built in yet. The
+  assessment centre code (AM) is filled by QCTO.
+- **POPIA:** equity and disability are special personal information. They are stored encrypted. Only staff
+  with `learners.manage` see them, the audit log records only which fields changed, and the file needs
+  `learners.reveal_id` (it contains full ID numbers). Each download is audited.
+- **Deadline:** the upload is due **21 working days** after training starts. Weekends and SA public
+  holidays are skipped, including Sunday holidays moved to Monday, Good Friday and Family Day; Easter is
+  calculated without PHP's calendar extension. Admins are emailed 5 working days before and again when the
+  upload is late, until it is marked as uploaded. Changing the start date resets the reminders.
+- **Speed:** the 120 QCTO code labels per language moved into their own small files (about 1.2 KB each),
+  which load only on the two screens that use them. Language files went from 14.9 KB to 13.9 KB. **Watch:**
+  every new screen's text goes into the language files too, so in Sprint 4 they should be split by area
+  (HQ, provider, learner) to stay under 15 KB.

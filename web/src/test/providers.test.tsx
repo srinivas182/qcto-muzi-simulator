@@ -9,7 +9,7 @@ const details: ProviderDetails = {
   id: 'p-1', name: 'Ubuntu Skills Academy', slug: 'ubuntu', status: 'trial', programme_additions: false,
   accreditation: { state: 'expiring', days_left: 30 }, created_at: '2026-11-01T08:00:00Z',
   legal_name: 'Ubuntu Skills (Pty) Ltd', registration_number: '2019/123456/07', vat_number: '4123456789',
-  accreditation_number: 'SDP0712/24-00321', accreditation_expires_at: '2026-12-28',
+  qcto_sdp_code: null, accreditation_number: 'SDP0712/24-00321', accreditation_expires_at: '2026-12-28',
   contact_email: 'hello@ubuntu.test', contact_phone: null, billing_email: null, address: { city: 'Durban' },
   payment_terms: { mode: 'pay_first', days: 0 }, status_reason: null, status_changed_at: null,
 };

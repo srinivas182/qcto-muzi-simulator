@@ -30,6 +30,9 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $archived_at
  * @property string|null $created_by
  * @property Carbon $created_at
+ * @property string|null $qcto_qualification_id
+ * @property string $readiness_type
+ * @property int $qcto_reminder_level
  * @property-read Centre $centre
  * @property-read Programme $programme
  * @property-read ProgrammeVersion $version
@@ -40,7 +43,7 @@ class Cohort extends Model
 
     public const QCTO_TYPES = ['qualification', 'skills_programme', 'none'];
 
-    protected $fillable = ['centre_id', 'programme_id', 'programme_version_id', 'name', 'starts_on', 'ends_on', 'qcto_type', 'qcto_submitted_at', 'join_code', 'join_open', 'archived_at', 'created_by'];
+    protected $fillable = ['centre_id', 'programme_id', 'programme_version_id', 'name', 'starts_on', 'ends_on', 'qcto_type', 'qcto_submitted_at', 'join_code', 'join_open', 'archived_at', 'created_by', 'qcto_qualification_id', 'readiness_type', 'qcto_reminder_level'];
 
     protected function casts(): array
     {

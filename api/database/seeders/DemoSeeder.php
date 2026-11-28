@@ -160,6 +160,15 @@ final class DemoSeeder extends Seeder
             ], $admin);
             $ids = Learner::query()->orderBy('surname')->limit(6)->pluck('id')->all();
             app(Enrolments::class)->enrol($tenant, $cohort, $ids, $admin);
+            // QCTO details for three learners, so the cohort shows a realistic mix of complete and missing data.
+            $tenant->update(['qcto_sdp_code' => 'SDP-DEMO-0001']);
+            foreach (array_slice($ids, 0, 3) as $i => $id) {
+                Learner::query()->findOrFail($id)->fill([
+                    'title' => ['Ms', 'Ms', 'Mr'][$i], 'equity_encrypted' => 'BA', 'disability_encrypted' => ['status' => 'N', 'rating' => null],
+                    'socioeconomic_code' => '02', 'province_code' => '5', 'stats_area_code' => '59910', 'flc_code' => '03', 'popi_agreed_at' => now()->subDays(2),
+                    'home_address' => ['line1' => (12 + $i).' Florida Road', 'line2' => 'Morningside', 'line3' => 'Durban', 'postal_code' => '4001'],
+                ])->save();
+            }
             Enrolment::query()->where('learner_id', $ids[0])->update(['started_at' => now(), 'status' => Enrolment::ACTIVE, 'progress' => 12]);
         });
     }

@@ -7,6 +7,8 @@ namespace App\Cohorts;
 use App\Models\Cohort;
 use App\Models\Enrolment;
 use App\Models\User;
+use App\Qcto\QctoRegister;
+use App\Qcto\WorkingDays;
 
 /** API shapes for cohorts and enrolments. ID numbers appear only masked. */
 final class CohortPresenter
@@ -27,6 +29,10 @@ final class CohortPresenter
             'ends_on' => $c->ends_on?->toDateString(),
             'qcto_type' => $c->qcto_type,
             'qcto_submitted_at' => $c->qcto_submitted_at?->toIso8601String(),
+            'qcto_due_on' => QctoRegister::dueOn($c)?->toDateString(),
+            'qcto_days_left' => ($due = QctoRegister::dueOn($c)) === null ? null : WorkingDays::between(today(), $due),
+            'qcto_qualification_id' => $c->qcto_qualification_id,
+            'readiness_type' => $c->readiness_type,
             'join_open' => $c->join_open,
             'archived' => $c->archived_at !== null,
             'learners' => ($counts[Enrolment::ENROLLED] ?? 0) + ($counts[Enrolment::ACTIVE] ?? 0),

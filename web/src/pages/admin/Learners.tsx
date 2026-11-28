@@ -1,10 +1,11 @@
 import { useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CheckCircle2, Copy, Eye, FileUp, MessageCircle, Plus, Search, Send, UserMinus, UserPlus, Users } from 'lucide-react';
-import { checkSaId, HOME_LANGUAGES, type ImportReport, type LearnerItem, type LearnerStatus } from '@simuwork/core';
+import { checkSaId, HOME_LANGUAGES, type ImportReport, type LearnerItem, type LearnerStatus, type QctoDetails } from '@simuwork/core';
 import type { MessageKey } from '@simuwork/core/locales/en';
 import { Badge, Button, Card, cx, Drawer, EmptyState, Field, inputClass, PageHeader, Skeleton, Switch, useToast } from '../../components/ui';
 import { readLearnerFile, TEMPLATE_CSV, type ImportRow } from '../../components/learners/importFile';
+import { QctoDetailsDrawer } from '../../components/qcto/QctoDetailsDrawer';
 import { api, ApiError } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
 import { can, useSession } from '../../lib/session';
@@ -206,6 +207,7 @@ function LearnerDrawer({ learner, manage, reveal, onClose }: { learner: LearnerI
         {row(t('lrn.f.joined'), learner.joined_at && new Date(learner.joined_at).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' }))}
       </dl>
       {number && <p className="mt-2 text-[12px] text-muted">{t('lrn.revealNote')}</p>}
+      <QctoSummary learner={learner} manage={manage} />
 
       {manage && (
         <div className="mt-6 space-y-3">
@@ -306,5 +308,23 @@ function ImportLearners({ open, onClose }: { open: boolean; onClose: () => void 
         </div>
       )}
     </Drawer>
+  );
+}
+
+function QctoSummary({ learner, manage }: { learner: LearnerItem; manage: boolean }) {
+  const { t } = useI18n();
+  const [editing, setEditing] = useState(false);
+  const details = useQuery({ queryKey: ['learner-qcto', learner.id], queryFn: () => api<{ data: QctoDetails }>(`/learners/${learner.id}/qcto`) });
+  const missing = details.data?.data.missing;
+  return (
+    <div className="mt-5 rounded-xl border border-line p-4">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-[14px] font-bold text-ink">{t('qd.section')}</h3>
+        {missing && <Badge tone={missing.length ? 'warning' : 'success'}>{missing.length ? t('qd.nMissing', { n: missing.length }) : t('qd.complete')}</Badge>}
+      </div>
+      {missing && missing.length > 0 && <p className="mt-2 text-[13px] text-muted">{missing.map((m) => t(`qd.m.${m}` as MessageKey)).join(' · ')}</p>}
+      {manage && <Button className="mt-3" size="sm" variant="secondary" onClick={() => setEditing(true)}>{t('qd.edit')}</Button>}
+      {editing && <QctoDetailsDrawer learner={learner} onClose={() => setEditing(false)} />}
+    </div>
   );
 }

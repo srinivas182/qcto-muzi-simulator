@@ -12,6 +12,10 @@ export interface CohortItem {
   ends_on: string | null;
   qcto_type: QctoType;
   qcto_submitted_at: string | null;
+  qcto_due_on: string | null;
+  qcto_days_left: number | null;
+  qcto_qualification_id: string | null;
+  readiness_type: string;
   join_open: boolean;
   archived: boolean;
   learners: number;

@@ -40,6 +40,7 @@ final class ProviderPresenter
             'contact_email' => $tenant->contact_email,
             'contact_phone' => $tenant->contact_phone,
             'billing_email' => $tenant->billing_email,
+            'qcto_sdp_code' => $tenant->qcto_sdp_code,
             'address' => (object) $tenant->address,
             'payment_terms' => $tenant->payment_terms,
             'status_reason' => $tenant->status_reason,

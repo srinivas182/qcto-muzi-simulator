@@ -44,6 +44,7 @@ final class AcademyController extends Controller
             'contact_email' => ['nullable', 'email:rfc', 'max:190'],
             'contact_phone' => ['nullable', 'string', 'max:32'],
             'billing_email' => ['nullable', 'email:rfc', 'max:190'],
+            'qcto_sdp_code' => ['sometimes', 'nullable', 'string', 'max:30', 'regex:/^[A-Za-z0-9\/-]+$/'],
             'address' => ['sometimes', 'array'],
             'address.line1' => ['nullable', 'string', 'max:120'],
             'address.line2' => ['nullable', 'string', 'max:120'],

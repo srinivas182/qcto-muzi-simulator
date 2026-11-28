@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\V1\Programmes\ProviderProgrammeController;
 use App\Http\Controllers\Api\V1\Programmes\ReferencePageController;
 use App\Http\Controllers\Api\V1\Providers\AcademyController;
 use App\Http\Controllers\Api\V1\Providers\ProviderController;
+use App\Http\Controllers\Api\V1\Qcto\QctoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -155,6 +156,11 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::post('/enrolments/{enrolment}/withdraw', [CohortController::class, 'withdraw'])->whereUuid('enrolment')->name('enrolments.withdraw');
                 Route::post('/enrolments/{enrolment}/transfer', [CohortController::class, 'transfer'])->whereUuid('enrolment')->name('enrolments.transfer');
             });
+            Route::get('/learners/{learner}/qcto', [QctoController::class, 'show'])->whereUuid('learner')->middleware('permission:learners.view')->name('learners.qcto');
+            Route::patch('/learners/{learner}/qcto', [QctoController::class, 'update'])->whereUuid('learner')->middleware('permission:learners.manage')->name('learners.qcto.update');
+            Route::get('/cohorts/{cohort}/qcto-check', [QctoController::class, 'check'])->whereUuid('cohort')->middleware('permission:classes.view')->name('cohorts.qcto-check');
+            Route::get('/cohorts/{cohort}/qcto-register', [QctoController::class, 'register'])->whereUuid('cohort')
+                ->middleware(['permission:learners.reveal_id', 'throttle:20,1'])->name('cohorts.qcto-register');
             Route::post('/cohorts/join', [CohortController::class, 'join'])->middleware(['permission:learning.use', 'throttle:10,1'])->name('cohorts.join');
             Route::post('/learners/{learner}/reveal-id', [LearnerController::class, 'revealId'])->whereUuid('learner')
                 ->middleware(['permission:learners.reveal_id', 'throttle:30,1'])->name('learners.reveal-id');

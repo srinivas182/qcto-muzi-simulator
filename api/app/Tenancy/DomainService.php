@@ -21,6 +21,16 @@ final class DomainService
 {
     public function __construct(private readonly DnsResolver $dns) {}
 
+    /** The host links in emails and SMS should use: a verified primary or custom domain, else the subdomain. */
+    public static function primaryHost(Tenant $tenant): string
+    {
+        $host = $tenant->domains()->whereNotNull('verified_at')->orderByDesc('is_primary')
+            ->orderByRaw('case when type = ? then 0 else 1 end', [TenantDomain::TYPE_CUSTOM])
+            ->value('host');
+
+        return (string) ($host ?? $tenant->slug.'.'.config('tenancy.platform_domain'));
+    }
+
     public function createSubdomain(Tenant $tenant): TenantDomain
     {
         $host = $tenant->slug.'.'.TenantResolver::platformDomain();

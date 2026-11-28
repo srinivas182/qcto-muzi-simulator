@@ -6,14 +6,14 @@ import { Button, Card, cx, Field } from './ui';
 import { useI18n } from '../lib/i18n';
 
 const HQ_FIELDS = ['name', 'legal_name', 'registration_number', 'vat_number', 'accreditation_number', 'accreditation_expires_at'] as const;
-const CONTACT_FIELDS = ['contact_email', 'contact_phone', 'billing_email'] as const;
+const CONTACT_FIELDS = ['contact_email', 'contact_phone', 'billing_email', 'qcto_sdp_code'] as const;
 const ADDRESS_FIELDS = ['line1', 'line2', 'city', 'province', 'postal_code'] as const;
 type Values = Record<(typeof HQ_FIELDS)[number] | (typeof CONTACT_FIELDS)[number], string> & { address: Required<Record<keyof ProviderAddress, string>> } & { terms_mode: string; terms_days: string };
 
 const toValues = (p: ProviderDetails): Values => ({
   name: p.name, legal_name: p.legal_name ?? '', registration_number: p.registration_number ?? '', vat_number: p.vat_number ?? '',
   accreditation_number: p.accreditation_number ?? '', accreditation_expires_at: p.accreditation_expires_at ?? '',
-  contact_email: p.contact_email ?? '', contact_phone: p.contact_phone ?? '', billing_email: p.billing_email ?? '',
+  contact_email: p.contact_email ?? '', contact_phone: p.contact_phone ?? '', billing_email: p.billing_email ?? '', qcto_sdp_code: p.qcto_sdp_code ?? '',
   address: { line1: p.address.line1 ?? '', line2: p.address.line2 ?? '', city: p.address.city ?? '', province: p.address.province ?? '', postal_code: p.address.postal_code ?? '' },
   terms_mode: p.payment_terms.mode, terms_days: String(p.payment_terms.days),
 });
@@ -77,6 +77,7 @@ export function ProviderDetailsForm({ provider, scope, editable, onSave, errors 
       <Section title={t('acad.accreditation')} aside={<AccreditationBadge state={provider.accreditation} />}>
         {input('accreditation_number')}
         {input('accreditation_expires_at', 'date')}
+        {input('qcto_sdp_code')}
       </Section>
       <Section title={t('acad.contact')}>
         {input('contact_email', 'email')}

@@ -22,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property array<string, mixed> $branding
  * @property array<string, mixed> $settings
  * @property string|null $accreditation_number
+ * @property string|null $qcto_sdp_code
  * @property string|null $vat_number
  * @property string|null $contact_email
  * @property string|null $contact_phone
@@ -49,6 +50,7 @@ class Tenant extends Model
     public const STATUS_ARCHIVED = 'archived';
 
     protected $fillable = [
+        'qcto_sdp_code',
         'name', 'slug', 'status', 'accreditation_number', 'vat_number',
         'contact_email', 'contact_phone', 'branding', 'settings',
         'legal_name', 'registration_number', 'address', 'accreditation_expires_at', 'billing_email',

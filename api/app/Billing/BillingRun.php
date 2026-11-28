@@ -10,6 +10,7 @@ use App\Models\Invoice;
 use App\Models\LicencePool;
 use App\Models\Tenant;
 use App\Notifications\BillingReminder;
+use App\Qcto\QctoReminders;
 use App\Tenancy\TenantContext;
 use Illuminate\Support\Facades\Notification;
 
@@ -19,7 +20,8 @@ use Illuminate\Support\Facades\Notification;
  *  2. invoice monthly pools for the current month (once: one invoice per pool per month);
  *  3. payment reminders at the due date, then after 7, 14 and 30 days (30 days = buying and enrolling blocked);
  *  4. renewal reminders 30 and 7 days before a fixed-term pool ends;
- *  5. seats of learners who never started go back to their pool (14-day no-show rule).
+ *  5. seats of learners who never started go back to their pool (14-day no-show rule);
+ *  6. QCTO enrolment upload reminders (5 working days before and when late).
  */
 final class BillingRun
 {
@@ -30,12 +32,13 @@ final class BillingRun
         private readonly Invoicer $invoicer,
         private readonly AuditLogger $audit,
         private readonly Enrolments $enrolments,
+        private readonly QctoReminders $qcto,
     ) {}
 
-    /** @return array{expired: int, invoiced: int, reminders: int, renewals: int, no_shows: int} */
+    /** @return array{expired: int, invoiced: int, reminders: int, renewals: int, no_shows: int, qcto_reminders: int} */
     public function run(): array
     {
-        $totals = ['expired' => 0, 'invoiced' => 0, 'reminders' => 0, 'renewals' => 0, 'no_shows' => 0];
+        $totals = ['expired' => 0, 'invoiced' => 0, 'reminders' => 0, 'renewals' => 0, 'no_shows' => 0, 'qcto_reminders' => 0];
         foreach (Tenant::query()->where('status', '!=', Tenant::STATUS_ARCHIVED)->get() as $tenant) {
             $result = $this->context->runAs($tenant, fn (): array => $this->forTenant($tenant));
             foreach ($result as $k => $v) {
@@ -116,6 +119,6 @@ final class BillingRun
             }
         }
 
-        return ['expired' => $expired, 'invoiced' => $invoiced, 'reminders' => $reminders, 'renewals' => $renewals, 'no_shows' => $this->enrolments->returnNoShows()];
+        return ['expired' => $expired, 'invoiced' => $invoiced, 'reminders' => $reminders, 'renewals' => $renewals, 'no_shows' => $this->enrolments->returnNoShows(), 'qcto_reminders' => $this->qcto->run($tenant)];
     }
 }

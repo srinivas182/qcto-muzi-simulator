@@ -16,7 +16,7 @@ final class BillingDaily extends Command
     public function handle(BillingRun $run): int
     {
         $totals = $run->run();
-        $this->info(sprintf('Expired %d, invoiced %d, payment reminders %d, renewal reminders %d, no-show seats returned %d.', $totals['expired'], $totals['invoiced'], $totals['reminders'], $totals['renewals'], $totals['no_shows']));
+        $this->info(sprintf('Expired %d, invoiced %d, payment reminders %d, renewal reminders %d, no-show seats returned %d, QCTO reminders %d.', $totals['expired'], $totals['invoiced'], $totals['reminders'], $totals['renewals'], $totals['no_shows'], $totals['qcto_reminders']));
 
         return self::SUCCESS;
     }
