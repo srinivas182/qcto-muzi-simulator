@@ -42,6 +42,7 @@ use App\Http\Controllers\Api\V1\Providers\ProviderController;
 use App\Http\Controllers\Api\V1\Qcto\QctoController;
 use App\Http\Controllers\Api\V1\Studio\AssessmentPlanController;
 use App\Http\Controllers\Api\V1\Studio\LessonStudioController;
+use App\Http\Controllers\Api\V1\Workplace\LogbookController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -140,7 +141,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
             Route::middleware('permission:learners.view')->group(function (): void {
                 Route::get('/learners', [LearnerController::class, 'index'])->name('learners.index');
                 Route::get('/learners/{learner}', [LearnerController::class, 'show'])->whereUuid('learner')->name('learners.show');
+                Route::get('/enrolments/{enrolment}/logbook', [LogbookController::class, 'show'])->whereUuid('enrolment')->name('enrolments.logbook');
             });
+            Route::get('/logbook/{entry}/photo', [LogbookController::class, 'showPhoto'])->whereUuid('entry')->name('logbook.photo'); // staff with learners.view, or the learner
             Route::middleware('permission:learners.manage')->group(function (): void {
                 Route::post('/learners', [LearnerController::class, 'store'])->name('learners.store');
                 Route::post('/learners/import', [LearnerController::class, 'import'])->middleware('throttle:20,1')->name('learners.import');
@@ -181,6 +184,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::post('/enrolments/{enrolment}/nudge', [ShareController::class, 'nudge'])->whereUuid('enrolment')->middleware('throttle:30,1')->name('enrolments.nudge');
                 Route::post('/enrolments/{enrolment}/withdraw', [CohortController::class, 'withdraw'])->whereUuid('enrolment')->name('enrolments.withdraw');
                 Route::post('/enrolments/{enrolment}/transfer', [CohortController::class, 'transfer'])->whereUuid('enrolment')->name('enrolments.transfer');
+                Route::put('/enrolments/{enrolment}/workplace', [LogbookController::class, 'place'])->whereUuid('enrolment')->name('enrolments.workplace');
             });
             Route::get('/learners/{learner}/qcto', [QctoController::class, 'show'])->whereUuid('learner')->middleware('permission:learners.view')->name('learners.qcto');
             Route::patch('/learners/{learner}/qcto', [QctoController::class, 'update'])->whereUuid('learner')->middleware('permission:learners.manage')->name('learners.qcto.update');
@@ -193,6 +197,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::get('/learn/enrolments/{enrolment}/activities', [LearnController::class, 'activities'])->whereUuid('enrolment')->name('learn.activities');
                 Route::get('/learn/enrolments/{enrolment}/lessons/{activity}', [LearnController::class, 'lesson'])->whereUuid(['enrolment', 'activity'])->name('learn.lesson');
                 Route::get('/learn/enrolments/{enrolment}/assessments', [TestController::class, 'index'])->whereUuid('enrolment')->name('learn.assessments');
+                Route::get('/learn/enrolments/{enrolment}/logbook', [LogbookController::class, 'mine'])->whereUuid('enrolment')->name('learn.logbook');
+                Route::post('/learn/enrolments/{enrolment}/logbook', [LogbookController::class, 'checkIn'])->whereUuid('enrolment')->middleware('throttle:60,1')->name('learn.logbook.check-in');
+                Route::post('/learn/logbook/{entry}/photo', [LogbookController::class, 'photo'])->whereUuid('entry')->middleware('throttle:30,1')->name('learn.logbook.photo');
                 Route::post('/learn/enrolments/{enrolment}/tests/{task}/start', [TestController::class, 'start'])->whereUuid(['enrolment', 'task'])->middleware('throttle:10,1')->name('learn.tests.start');
                 Route::get('/learn/sittings/{sitting}', [TestController::class, 'show'])->whereUuid('sitting')->name('learn.sittings.show');
                 Route::post('/learn/sittings/{sitting}/photos', [TestController::class, 'photo'])->whereUuid('sitting')->middleware('throttle:20,1')->name('learn.sittings.photos');

@@ -27,7 +27,8 @@ describe('Knowledge tests', () => {
     renderAt('/learn/enrolments/e1/assessments');
     expect(await screen.findByRole('link', { name: 'Knowledge test: start' })).toHaveAttribute('href', '/learn/enrolments/e1/tests/t1');
     expect(screen.getByText('10 questions · 20 min · pass 70% · 1 tries left')).toBeInTheDocument();
-    expect(screen.getByText('Done with your assessor')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Workplace logbook: open' })).toHaveAttribute('href', '/learn/enrolments/e1/logbook');
+    expect(screen.getByText('Daily check-ins confirmed by your mentor')).toBeInTheDocument();
   });
 
   it('answers are kept on the device, sent to the server, and handed in', async () => {

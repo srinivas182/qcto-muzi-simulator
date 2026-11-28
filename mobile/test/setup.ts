@@ -18,6 +18,7 @@ jest.mock('expo-haptics', () => ({
 }));
 jest.mock('expo-camera', () => ({ CameraView: () => null, useCameraPermissions: () => [{ granted: false }, jest.fn()] }));
 jest.mock('expo-audio', () => ({ useAudioPlayer: () => ({ play: jest.fn(), pause: jest.fn() }), useAudioPlayerStatus: () => ({ playing: false }) }));
+jest.mock('expo-image-manipulator', () => ({ SaveFormat: { JPEG: 'jpeg' }, ImageManipulator: { manipulate: () => ({ resize: () => ({ renderAsync: async () => ({ saveAsync: async () => ({ uri: 'file:///small.jpg' }) }) }) }) } }));
 jest.mock('expo-speech', () => ({ speak: jest.fn(), stop: jest.fn() }));
 // expo-file-system: an in-memory disk, so offline packs can be tested.
 jest.mock('expo-file-system', () => {

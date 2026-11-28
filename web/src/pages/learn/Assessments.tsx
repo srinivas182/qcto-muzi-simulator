@@ -42,13 +42,14 @@ function Item({ eid, x }: { eid: string; x: LearnAssessmentItem }) {
       <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand">{x.kind === 'test' ? <PenLine className="size-5" /> : x.kind === 'logbook' ? <Briefcase className="size-5" /> : <ClipboardCheck className="size-5" />}</span>
       <span className="min-w-0 flex-1">
         <span className="block font-semibold text-ink">{x.title}</span>
-        <span className="block text-[12px] text-muted">{x.kind === 'test' ? t('as.testMeta', { n: x.questions ?? 0, min: x.minutes ?? 0, pass: x.pass_mark ?? 0, left: Math.max(0, left) }) : t('as.withAssessor')}</span>
+        <span className="block text-[12px] text-muted">{x.kind === 'test' ? t('as.testMeta', { n: x.questions ?? 0, min: x.minutes ?? 0, pass: x.pass_mark ?? 0, left: Math.max(0, left) }) : t(x.kind === 'logbook' ? 'as.lb.meta' : 'as.withAssessor')}</span>
       </span>
       {status}
     </span>
   );
   const canSit = x.kind === 'test' && x.result !== 'competent' && !x.waiting_for_marking && (x.open_sitting !== null || left > 0);
   const fb = x.feedback;
+  if (x.kind === 'logbook') return <li><Link to={`/learn/enrolments/${eid}/logbook`} className="block hover:bg-surface-2" aria-label={`${x.title}: ${t('as.lb.open')}`}>{body}</Link></li>;
   return (
     <li>
       {canSit ? <Link to={`/learn/enrolments/${eid}/tests/${x.id}`} className="block hover:bg-surface-2" aria-label={`${x.title}: ${t(x.open_sitting ? 'as.resume' : 'as.start')}`}>{body}</Link> : body}
