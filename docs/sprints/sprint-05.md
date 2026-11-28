@@ -119,3 +119,47 @@ None of them produces evidence of practical competence by itself.
 - Running the EISA itself: that is the assessment centre's job. We prepare the learner and the documents.
 - QCTO certificate issuing: only the QCTO does this.
 - Funding and grants (SETA discretionary grants), and payroll for learnerships.
+
+## Sub-sprint 5.1a notes (assessment plan and question banks)
+
+**Built**
+- **`assessment_tasks`** (HQ content, versioned with the programme like activities):
+  - each task has a component (knowledge, practical or workplace) and a kind (test, simulator, observation or
+    logbook), restricted per component;
+  - linked QCTO outcomes, settings, and a question bank for tests;
+  - draft → review → publish;
+  - carried forward when a new programme version is published, with simulator tasks re-pointed to the new
+    copies.
+- **Assessment tab** on the HQ programme page:
+  - tasks per component;
+  - an outcome coverage table (K, P, W), with uncovered outcomes highlighted and counted;
+  - "New assessment task" (title, component, kind, simulator, outcomes).
+- **Task editor** (`/hq/programmes/:code/assessment/:id`):
+  - **Settings per kind:**
+    - test: questions per sitting, time, pass mark, attempts, and integrity (light or camera check, with a
+      plain explanation);
+    - simulator: a real-job run plus assessor review;
+    - observation: a checklist;
+    - logbook: minimum confirmed days.
+  - **Question bank:**
+    - question types: one right answer, several right answers, or a short written answer with a model answer
+      for the assessor;
+    - each question has marks and a QCTO outcome.
+  - **Drafting and translation:**
+    - **AI drafts 10 questions** from the task's outcomes; only programme content is sent;
+    - AI translation sits side by side with the English, with expert review per language;
+    - **model answers are never translated** and stay with the assessor.
+  - **Publishing** needs a reviewed English version, a bank big enough for the questions per sitting, and a
+    published simulator.
+
+**Checks:** API 5 new tests, web 2 new tests.
+
+### Gaps we fill and best recommendations (5.1a)
+| Gap against the leaders | What we did | When |
+|---|---|---|
+| UK e-portfolios map to UK standards; SA PoE tools store scans | The assessment plan maps every summative task to the QCTO outcomes and shows the gaps | This sprint |
+| Writing question banks takes weeks | AI draft from the outcomes; an expert reviews before publishing | This sprint |
+| Tests only in English | Learners may take tests in isiZulu, isiXhosa or Afrikaans (reviewed); model answers stay in English for assessors | This sprint |
+| Questions leak once learners share them | Each sitting draws a random set from the bank; answer keys never reach the device | 5.1b |
+| One fixed pass mark | Per-task pass mark and attempts; providers set the integrity level | This sprint |
+| Item statistics | Show which questions most learners get wrong, so HQ can fix unclear ones | Proposed for later |

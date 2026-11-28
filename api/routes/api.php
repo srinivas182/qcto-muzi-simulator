@@ -37,6 +37,7 @@ use App\Http\Controllers\Api\V1\Programmes\ReferencePageController;
 use App\Http\Controllers\Api\V1\Providers\AcademyController;
 use App\Http\Controllers\Api\V1\Providers\ProviderController;
 use App\Http\Controllers\Api\V1\Qcto\QctoController;
+use App\Http\Controllers\Api\V1\Studio\AssessmentPlanController;
 use App\Http\Controllers\Api\V1\Studio\LessonStudioController;
 use Illuminate\Support\Facades\Route;
 
@@ -252,6 +253,19 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
             });
             Route::post('/activities/{activity}/review', [LessonStudioController::class, 'review'])->whereUuid('activity')->middleware('permission:content.review')->name('activities.review');
             Route::post('/activities/{activity}/publish', [LessonStudioController::class, 'publish'])->whereUuid('activity')->middleware('permission:content.publish')->name('activities.publish');
+            // Assessment plan and question banks (Sprint 5.1a).
+            Route::middleware('permission:content.author|content.review|content.publish')->group(function (): void {
+                Route::get('/programmes/{programme}/assessment', [AssessmentPlanController::class, 'index'])->name('programmes.assessment');
+                Route::get('/assessment-tasks/{task}', [AssessmentPlanController::class, 'show'])->whereUuid('task')->name('assessment-tasks.show');
+            });
+            Route::middleware('permission:content.author')->group(function (): void {
+                Route::post('/programmes/{programme}/assessment-tasks', [AssessmentPlanController::class, 'store'])->name('programmes.assessment-tasks.store');
+                Route::patch('/assessment-tasks/{task}', [AssessmentPlanController::class, 'update'])->whereUuid('task')->name('assessment-tasks.update');
+                Route::post('/assessment-tasks/{task}/ai-draft', [AssessmentPlanController::class, 'aiDraft'])->whereUuid('task')->middleware('throttle:10,1')->name('assessment-tasks.ai-draft');
+                Route::post('/assessment-tasks/{task}/translate', [AssessmentPlanController::class, 'translate'])->whereUuid('task')->middleware('throttle:10,1')->name('assessment-tasks.translate');
+            });
+            Route::post('/assessment-tasks/{task}/review', [AssessmentPlanController::class, 'review'])->whereUuid('task')->middleware('permission:content.review')->name('assessment-tasks.review');
+            Route::post('/assessment-tasks/{task}/publish', [AssessmentPlanController::class, 'publish'])->whereUuid('task')->middleware('permission:content.publish')->name('assessment-tasks.publish');
             Route::put('/programmes/{programme}/coverage/{code}', [CoverageController::class, 'update'])
                 ->middleware('permission:programmes.manage|content.author')->name('programmes.coverage.update');
 
