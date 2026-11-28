@@ -14,15 +14,18 @@ use App\Learning\LearnContent;
 use App\Learning\Progress;
 use App\Learning\SimCoach;
 use App\Models\Activity;
+use App\Models\Attempt;
 use App\Models\ClassSession;
 use App\Models\Enrolment;
 use App\Models\Learner;
+use App\Models\LearnerRating;
 use App\Models\User;
 use App\Qcto\QctoDetails;
 use App\Tenancy\TenantContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /** Learner: their programmes, starting a programme, and their own QCTO details. */
@@ -121,6 +124,9 @@ final class LearnController extends Controller
             return response()->noContent(304)->header('ETag', $etag);
         }
 
+        // Pilot measure: data used per learner (what the device downloads; files it already has are skipped).
+        $enrolment->increment('pack_downloads', 1, ['pack_bytes' => $enrolment->pack_bytes + (int) $pack['bytes']]);
+
         return response()->json(['data' => $pack])->header('ETag', $etag)->header('Cache-Control', 'private, no-cache');
     }
 
@@ -131,6 +137,19 @@ final class LearnController extends Controller
         $data = $request->validate(['step' => ['required', 'string', 'max:12'], 'kind' => ['required', 'in:why,help'], 'locale' => ['sometimes', 'string'], 'variant' => ['nullable', 'string', 'max:12']]);
 
         return response()->json(['data' => $coach->ask($activity, $data['step'], $data['kind'], LearnContent::locale($data['locale'] ?? 'en'), $data['variant'] ?? null)]);
+    }
+
+    /** The learner's 3-question rating of a simulator they have finished (1–5 each). */
+    public function rate(Request $request, Enrolment $enrolment, Activity $activity): JsonResponse
+    {
+        $this->mineAndPublished($request, $enrolment, $activity, Activity::SCENARIO);
+        $data = $request->validate(['easy' => ['required', 'integer', 'between:1,5'], 'real' => ['required', 'integer', 'between:1,5'], 'ready' => ['required', 'integer', 'between:1,5']]);
+        if (! Attempt::query()->where('enrolment_id', $enrolment->id)->where('activity_id', $activity->id)->whereNotNull('finished_at')->exists()) {
+            throw ValidationException::withMessages(['rating' => 'Finish the simulator first.']);
+        }
+        LearnerRating::query()->updateOrCreate(['enrolment_id' => $enrolment->id, 'activity_id' => $activity->id], $data);
+
+        return response()->json(['data' => $data], 201);
     }
 
     private function mineAndPublished(Request $request, Enrolment $e, Activity $a, string $kind): void

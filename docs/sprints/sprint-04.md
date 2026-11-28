@@ -548,3 +548,23 @@ now checked in CI. The learner language part is at most 5.9 KB.
 | Live classrooms need fast Wi-Fi | Moves are tiny (a few hundred bytes); they work on mobile data and queue if the signal drops | This sprint |
 | Polling every 4 s | Push updates with Laravel Reverb (WebSockets) when classes grow large | Proposed for later |
 | Facilitator help | "Send a hint to Sipho" from the board | Proposed for later |
+
+## Sub-sprint 4.7c notes (pilot measures)
+
+**Built**
+- **Pilot measures per class** (`GET /cohorts/{c}/pilot`, shown under the progress board):
+  - completion of the first simulator, with the median time and tries to the first completion;
+  - help per run (hints and coach help), and the **three steps learners ask about most** (so HQ can improve
+    those hints);
+  - data per learner (offline pack downloads: `enrolments.pack_downloads` and `pack_bytes`);
+  - the learner rating.
+- **3-question learner rating** after a simulator (web and mobile; optional; one tap per question; 1–5):
+  - Was it easy to use?
+  - Did it feel like real work?
+  - Do you feel more ready for the job?
+  - Stored in `learner_ratings` (with RLS), one per learner per simulator, and it can be changed. Only
+    allowed after finishing the simulator.
+
+**Checks:** API 264 tests, web 106, mobile 38.
+
+The **Sprint 4 report** is in `docs/sprints/sprint-04-report.md`.

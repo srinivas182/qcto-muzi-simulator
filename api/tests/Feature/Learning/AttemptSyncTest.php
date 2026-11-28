@@ -438,4 +438,26 @@ final class AttemptSyncTest extends AccessTestCase
         $board()->assertJsonPath('data', null);
         $this->fresh()->getJson($this->url('/learn/home'), $this->bearer($this->token))->assertJsonPath('data.enrolments.0.class', null);
     }
+
+    public function test_pilot_measures_cover_completion_time_tries_help_data_and_the_learner_rating(): void
+    {
+        $rate = fn (array $body, ?string $token = null) => $this->fresh()->postJson($this->url("/learn/enrolments/{$this->enrolment->id}/scenarios/{$this->a['S1']->id}/rating"), $body, $this->bearer($token ?? $this->token));
+        $rate(['easy' => 5, 'real' => 4, 'ready' => 4])->assertUnprocessable(); // finish the simulator first
+
+        $failed = $this->item('S1', ['duration_seconds' => 300, 'result' => ['events' => [['step' => 'unplug', 'action' => 'hint'], ['step' => 'unplug', 'action' => 'coach', 'value' => 'help'], self::RIGHT[0]]]]);
+        $done = $this->item('S1', ['started_at' => '2027-02-10T08:30:00Z', 'finished_at' => '2027-02-10T08:40:00Z', 'duration_seconds' => 600]);
+        $this->sync([$failed, $done]);
+        $rate(['easy' => 5, 'real' => 4, 'ready' => 3])->assertCreated();
+        $rate(['easy' => 4, 'real' => 4, 'ready' => 3])->assertCreated(); // one rating per simulator, can be changed
+        $rate(['easy' => 9, 'real' => 4, 'ready' => 3])->assertUnprocessable();
+        $this->fresh()->getJson($this->url("/learn/enrolments/{$this->enrolment->id}/pack"), $this->bearer($this->token))->assertOk();
+
+        [, $staff] = $this->person($this->ubuntu, 'facilitator');
+        $this->fresh()->getJson($this->url("/cohorts/{$this->enrolment->cohort_id}/pilot"), $this->bearer($staff))->assertOk()
+            ->assertJsonPath('data.first_simulator.code', 'TS-S1')->assertJsonPath('data.first_simulator.completed', 1)->assertJsonPath('data.first_simulator.completion', 100)
+            ->assertJsonPath('data.first_simulator.median_minutes', 10)->assertJsonPath('data.first_simulator.median_tries', 2)
+            ->assertJsonPath('data.help.per_run', 1)->assertJsonPath('data.help.top_steps.0.prompt', 'Make it safe.')->assertJsonPath('data.help.top_steps.0.asks', 2)
+            ->assertJsonPath('data.data.learners_offline', 1)
+            ->assertJsonPath('data.rating.count', 1)->assertJsonPath('data.rating.easy', 4)->assertJsonPath('data.rating.ready', 3);
+    }
 }

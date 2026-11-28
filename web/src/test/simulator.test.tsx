@@ -28,7 +28,7 @@ const syncer = (init?: RequestInit) => {
 
 describe('Simulator', () => {
   it('runs a practice attempt in the simple view, with consequences, hints and a debrief that links to the lesson', async () => {
-    const calls = mockApi({ '/learn/enrolments/e1/scenarios/s1': { data: scenario }, '/learn/attempts/sync': syncer }, learner());
+    const calls = mockApi({ '/learn/enrolments/e1/scenarios/s1': { data: scenario }, '/learn/attempts/sync': syncer, '/learn/enrolments/e1/scenarios/s1/rating': { data: {} } }, learner());
     renderAt('/learn/enrolments/e1/simulators/s1');
     expect(await screen.findByRole('heading', { name: 'A PC won’t boot' })).toBeInTheDocument();
     fireEvent.click(screen.getAllByRole('button', { name: 'Start' })[0]!); // practice
@@ -58,6 +58,14 @@ describe('Simulator', () => {
     const body = JSON.parse(String((calls.mock.calls.findLast(([u]) => String(u).endsWith('/learn/attempts/sync'))![1] as RequestInit).body));
     expect(body.attempts[0]).toMatchObject({ mode: 'practice', completed: true, score: 87, activity_id: 's1' });
     expect(body.attempts[0].result.events.map((e: { action: string }) => e.action)).toEqual(['tap', 'hint', 'tap', 'choose', 'place']);
+
+    // Pilot: three one-tap questions after the run.
+    fireEvent.click(screen.getByRole('button', { name: 'Was it easy to use? 5/5' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Did it feel like real work? 4/5' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Do you feel more ready for the job? 4/5' }));
+    expect(await screen.findByText('Thank you! This helps us make it better.')).toBeInTheDocument();
+    const rating = calls.mock.calls.find(([u]) => String(u).endsWith('/scenarios/s1/rating'));
+    expect(JSON.parse(String((rating![1] as RequestInit).body))).toEqual({ easy: 5, real: 4, ready: 4 });
   });
 
   it('real-job mode has no hints, shows the customer and a clock, and a safety mistake fails it', async () => {

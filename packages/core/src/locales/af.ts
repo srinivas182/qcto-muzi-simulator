@@ -1271,6 +1271,26 @@ const af: Messages = {
   'cm.counts': "{mistakes} foute · {help} hulp",
   'cm.stuckBadge': "Sit vas",
   'cm.working': "Besig",
+  // Sprint 4.7c: pilot measures and learner rating
+  'sim.rateTitle': "Drie vinnige vrae (opsioneel)",
+  'sim.rate.easy': "Was dit maklik om te gebruik?",
+  'sim.rate.real': "Het dit soos regte werk gevoel?",
+  'sim.rate.ready': "Voel jy meer gereed vir die werk?",
+  'sim.rateThanks': "Dankie! Dit help ons om dit beter te maak.",
+  'pg.pilot': "Loodsmaatstawwe",
+  'pg.pilotLead': "Wat ons met hierdie klas nagaan voordat ons inhoud vir die ander programme maak.",
+  'pg.p.completion': "Eerste simulator voltooi",
+  'pg.p.completionSub': "{done} van {n} leerders · {code}",
+  'pg.p.time': "Tyd om te voltooi (mediaan)",
+  'pg.p.minutes': "{n} min",
+  'pg.p.tries': "{n} pogings",
+  'pg.p.help': "Hulp per poging",
+  'pg.p.helpSub': "wenke en afrigter, oor {n} pogings",
+  'pg.p.data': "Data per leerder",
+  'pg.p.dataSub': "{n} leerders het vir vanlyn afgelaai",
+  'pg.p.rating': "Leerdergradering ({n})",
+  'pg.p.topSteps': "Stappe waaroor leerders die meeste vra",
+  'pg.p.noAsks': "Nog geen hulp gevra nie.",
 };
 
 export default af;

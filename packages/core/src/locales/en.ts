@@ -1269,6 +1269,26 @@ const en = {
   'cm.counts': "{mistakes} mistakes · {help} help",
   'cm.stuckBadge': "Stuck",
   'cm.working': "Working",
+  // Sprint 4.7c: pilot measures and learner rating
+  'sim.rateTitle': "Three quick questions (optional)",
+  'sim.rate.easy': "Was it easy to use?",
+  'sim.rate.real': "Did it feel like real work?",
+  'sim.rate.ready': "Do you feel more ready for the job?",
+  'sim.rateThanks': "Thank you! This helps us make it better.",
+  'pg.pilot': "Pilot measures",
+  'pg.pilotLead': "What we check with this class before making content for the other programmes.",
+  'pg.p.completion': "First simulator completed",
+  'pg.p.completionSub': "{done} of {n} learners · {code}",
+  'pg.p.time': "Time to complete (median)",
+  'pg.p.minutes': "{n} min",
+  'pg.p.tries': "{n} tries",
+  'pg.p.help': "Help per run",
+  'pg.p.helpSub': "hints and coach, over {n} runs",
+  'pg.p.data': "Data per learner",
+  'pg.p.dataSub': "{n} learners downloaded for offline",
+  'pg.p.rating': "Learner rating ({n})",
+  'pg.p.topSteps': "Steps learners ask about most",
+  'pg.p.noAsks': "No help asked yet.",
 } as const;
 
 export type MessageKey = keyof typeof en;
