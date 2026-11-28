@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, BookOpen, Briefcase, Check, CircleAlert, Dumbbell, Lightbulb, Radio, RotateCcw, ShieldAlert, Wifi, WifiOff, X } from 'lucide-react';
 import { scoreRun, type LearnScenario, type SimMode, type SimScore, type SimState } from '@simuwork/core';
+import { RateCard } from '../../components/sim/RateCard';
 import { SimRunner } from '../../components/sim/SimRunner';
 import { Badge, Button, Card, cx, Skeleton } from '../../components/ui';
 import { api } from '../../lib/api';
@@ -137,6 +138,7 @@ function Debrief({ eid, sc, f, onAgain, back }: { eid: string; sc: LearnScenario
         </div>
       </Card>
 
+      <RateCard eid={eid} aid={sc.id} />
       <Card className="p-0">
         <h2 className="border-b border-line px-5 py-3 text-[15px] font-bold text-ink">{t('sim.replay')}</h2>
         <ol>

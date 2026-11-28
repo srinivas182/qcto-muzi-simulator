@@ -36,6 +36,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $last_activity_at
  * @property Carbon|null $reminded_at
  * @property int $reminders_sent
+ * @property int $pack_downloads
+ * @property int $pack_bytes
  * @property-read Programme $programme
  * @property-read Learner $learner
  * @property-read Cohort $cohort
@@ -61,7 +63,7 @@ class Enrolment extends Model
 
     public const FREE_WITHDRAWAL_BELOW = 10;
 
-    protected $fillable = ['learner_id', 'cohort_id', 'programme_id', 'programme_version_id', 'licence_pool_id', 'holds_seat', 'status', 'progress', 'seat_taken_at', 'started_at', 'ended_at', 'reason', 'created_by', 'sor_issued_on', 'last_activity_at', 'reminded_at', 'reminders_sent'];
+    protected $fillable = ['learner_id', 'cohort_id', 'programme_id', 'programme_version_id', 'licence_pool_id', 'holds_seat', 'status', 'progress', 'seat_taken_at', 'started_at', 'ended_at', 'reason', 'created_by', 'sor_issued_on', 'last_activity_at', 'reminded_at', 'reminders_sent', 'pack_downloads', 'pack_bytes'];
 
     protected function casts(): array
     {

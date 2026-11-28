@@ -1271,6 +1271,26 @@ const zu: Messages = {
   'cm.counts': "amaphutha angu-{mistakes} · usizo olungu-{help}",
   'cm.stuckBadge': "Ubambekile",
   'cm.working': "Uyasebenza",
+  // Sprint 4.7c: pilot measures and learner rating
+  'sim.rateTitle': "Imibuzo emithathu esheshayo (akuphoqelekile)",
+  'sim.rate.easy': "Bekulula ukukusebenzisa?",
+  'sim.rate.real': "Bekuzwakala njengomsebenzi wangempela?",
+  'sim.rate.ready': "Uzizwa ulungele umsebenzi kakhulu?",
+  'sim.rateThanks': "Siyabonga! Lokhu kusisiza ukuthi sikwenze kube ngcono.",
+  'pg.pilot': "Izilinganiso zokuhlola",
+  'pg.pilotLead': "Esikuhlolayo nale kilasi ngaphambi kokwenza okuqukethwe kwezinye izinhlelo.",
+  'pg.p.completion': "I-simulator yokuqala iqediwe",
+  'pg.p.completionSub': "abafundi abangu-{done} kwabangu-{n} · {code}",
+  'pg.p.time': "Isikhathi sokuqeda (maphakathi)",
+  'pg.p.minutes': "imizuzu engu-{n}",
+  'pg.p.tries': "imizamo engu-{n}",
+  'pg.p.help': "Usizo ngomzamo ngamunye",
+  'pg.p.helpSub': "amacebo nomqeqeshi, emizamweni engu-{n}",
+  'pg.p.data': "Idatha ngomfundi ngamunye",
+  'pg.p.dataSub': "abafundi abangu-{n} balande ukuze basebenze ngaphandle kwe-inthanethi",
+  'pg.p.rating': "Ukulinganisa kwabafundi ({n})",
+  'pg.p.topSteps': "Izinyathelo abafundi ababuza ngazo kakhulu",
+  'pg.p.noAsks': "Akukho usizo olucelwe okwamanje.",
 };
 
 export default zu;

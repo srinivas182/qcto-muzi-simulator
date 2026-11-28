@@ -149,6 +149,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::get('/cohorts/options', [CohortController::class, 'options'])->name('cohorts.options');
                 Route::get('/cohorts/{cohort}', [CohortController::class, 'show'])->whereUuid('cohort')->name('cohorts.show');
                 Route::get('/cohorts/{cohort}/progress', [CohortController::class, 'progress'])->whereUuid('cohort')->name('cohorts.progress');
+                Route::get('/cohorts/{cohort}/pilot', [CohortController::class, 'pilot'])->whereUuid('cohort')->name('cohorts.pilot');
                 Route::get('/cohorts/{cohort}/class', [CohortController::class, 'liveClass'])->whereUuid('cohort')->middleware('throttle:120,1')->name('cohorts.class');
                 Route::get('/enrolments/{enrolment}/checklist', [CohortController::class, 'checklist'])->whereUuid('enrolment')->name('enrolments.checklist');
             });
@@ -184,6 +185,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
                 Route::post('/learn/enrolments/{enrolment}/shares', [ShareController::class, 'store'])->whereUuid('enrolment')->middleware('throttle:10,1')->name('learn.shares.store');
                 Route::delete('/learn/shares/{share}', [ShareController::class, 'destroy'])->whereUuid('share')->name('learn.shares.destroy');
                 Route::patch('/learn/me/reminders', [ShareController::class, 'reminders'])->name('learn.reminders');
+                Route::post('/learn/enrolments/{enrolment}/scenarios/{activity}/rating', [LearnController::class, 'rate'])->whereUuid(['enrolment', 'activity'])->middleware('throttle:20,1')->name('learn.rating');
                 Route::post('/learn/enrolments/{enrolment}/scenarios/{activity}/coach', [LearnController::class, 'coach'])->whereUuid(['enrolment', 'activity'])->middleware('throttle:20,1')->name('learn.coach');
                 Route::get('/learn/enrolments/{enrolment}/scenarios/{activity}', [LearnController::class, 'scenario'])->whereUuid(['enrolment', 'activity'])->name('learn.scenario');
                 Route::post('/learn/attempts/sync', [LearnController::class, 'sync'])->middleware('throttle:60,1')->name('learn.sync');

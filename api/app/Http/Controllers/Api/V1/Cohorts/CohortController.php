@@ -10,6 +10,7 @@ use App\Cohorts\Enrolments;
 use App\Http\Controllers\Controller;
 use App\Learning\ClassMode;
 use App\Learning\CohortProgress;
+use App\Learning\PilotMeasures;
 use App\Models\Centre;
 use App\Models\ClassSession;
 use App\Models\Cohort;
@@ -105,6 +106,12 @@ final class CohortController extends Controller
         $classes->end($session, $actor);
 
         return response()->json(['data' => ClassMode::present($session->load('activity'))]);
+    }
+
+    /** Pilot measures for this class (Sprint 4.7c). */
+    public function pilot(Cohort $cohort, PilotMeasures $measures): JsonResponse
+    {
+        return response()->json(['data' => $measures->forCohort($cohort)])->header('Cache-Control', 'private, no-cache');
     }
 
     /** A learner's job-ready checklist, as their facilitator sees it. */

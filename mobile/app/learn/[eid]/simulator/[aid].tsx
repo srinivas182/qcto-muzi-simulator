@@ -3,7 +3,7 @@ import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { scoreRun, simReducer, startRun, touchable, type LearnScenario, type SimAction, type SimMode, type SimScore, type SimState } from '@simuwork/core';
 import { api } from '../../../../src/lib/api';
 import { attempts, syncAttempts } from '../../../../src/lib/attempts';
@@ -243,6 +243,7 @@ function Debrief({ eid, sc, f, onAgain }: { eid: string; sc: LearnScenario; f: F
         {score.passed && f.mode === 'practice' ? <Button title={t('sim.asJob')} onPress={() => onAgain('job')} /> : null}
         <Button variant={score.passed && f.mode === 'practice' ? 'secondary' : 'primary'} title={t('sim.again')} onPress={() => onAgain(f.mode)} />
       </View>
+      <Rate eid={eid} aid={sc.id} />
       <T style={{ fontWeight: '700', marginBottom: space.sm }}>{t('sim.replay')}</T>
       <Card style={{ padding: 0 }}>
         {f.steps.map((st, i) => {
@@ -268,6 +269,41 @@ function Debrief({ eid, sc, f, onAgain }: { eid: string; sc: LearnScenario; f: F
   );
 }
 
+const QUESTIONS = ['easy', 'real', 'ready'] as const;
+const FACES = ['😞', '🙁', '😐', '🙂', '😄'];
+
+/** Pilot measure: three one-tap questions after a simulator (optional). */
+function Rate({ eid, aid }: { eid: string; aid: string }) {
+  const { t } = useI18n();
+  const { c } = useTheme();
+  const [answers, setAnswers] = useState<Partial<Record<(typeof QUESTIONS)[number], number>>>({});
+  const send = useMutation({ mutationFn: (body: Record<string, number>) => api(`/learn/enrolments/${eid}/scenarios/${aid}/rating`, { method: 'POST', body }) });
+  const pick = (q: (typeof QUESTIONS)[number], v: number) => {
+    const next = { ...answers, [q]: v };
+    setAnswers(next);
+    if (QUESTIONS.every((k) => next[k])) send.mutate(next as Record<string, number>);
+  };
+  if (send.isSuccess) return <Card style={{ marginBottom: space.lg }}><T style={{ textAlign: 'center' }}>{t('sim.rateThanks')}</T></Card>;
+  return (
+    <Card style={{ marginBottom: space.lg, gap: space.md }}>
+      <T style={{ fontWeight: '700' }}>{t('sim.rateTitle')}</T>
+      {QUESTIONS.map((q) => (
+        <View key={q} style={{ gap: space.xs }}>
+          <T>{t(`sim.rate.${q}`)}</T>
+          <View style={styles.row}>
+            {FACES.map((f, i) => (
+              <Pressable key={i} accessibilityRole="button" accessibilityLabel={`${t(`sim.rate.${q}`)} ${i + 1}/5`} accessibilityState={{ selected: answers[q] === i + 1 }} onPress={() => pick(q, i + 1)}
+                style={[styles.face, { borderColor: answers[q] === i + 1 ? c.brand : c.line, backgroundColor: answers[q] === i + 1 ? c.brandSoft : 'transparent' }]}>
+                <T style={{ fontSize: 22 }}>{f}</T>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+      ))}
+    </Card>
+  );
+}
+
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   note: { flexDirection: 'row', alignItems: 'center', gap: space.sm, padding: space.md, borderRadius: radius.md, marginBottom: space.md },
@@ -282,5 +318,6 @@ const styles = StyleSheet.create({
   toggle: { minHeight: 44, paddingHorizontal: space.md, borderRadius: radius.md, borderWidth: 1.5, justifyContent: 'center' },
   tile: { width: '48%', minHeight: 64, padding: space.md, borderRadius: radius.md, borderWidth: 1.5, justifyContent: 'center' },
   stepRow: { flexDirection: 'row', gap: space.md, padding: space.lg },
+  face: { width: 48, height: 48, borderRadius: radius.md, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   mark: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
 });

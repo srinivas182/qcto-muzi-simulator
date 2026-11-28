@@ -87,6 +87,7 @@ export default function CohortProgress() {
           <p className="mt-3 text-[12px] text-muted">{t('pg.legend')}</p>
         </>
       )}
+      <Pilot id={id} />
       {open && <ChecklistDrawer id={open.id} name={open.name} onClose={() => setOpen(null)} />}
     </div>
   );
@@ -96,4 +97,45 @@ function ChecklistDrawer({ id, name, onClose }: { id: string; name: string; onCl
   const { t } = useI18n();
   const q = useQuery({ queryKey: ['checklist', id], queryFn: () => api<{ data: { areas: ChecklistArea[] } }>(`/enrolments/${id}/checklist`) });
   return <Drawer open onClose={onClose} title={t('jr.title')} subtitle={name}>{q.data ? <Checklist areas={q.data.data.areas} /> : <Skeleton className="h-64" />}</Drawer>;
+}
+
+type PilotData = {
+  first_simulator: { code: string; title: string; learners: number; started: number; completed: number; completion: number; median_minutes: number | null; median_tries: number | null } | null;
+  help: { per_run: number; runs: number; top_steps: { activity: string; step: string; prompt: string; asks: number }[] };
+  data: { learners_offline: number; avg_mb: number };
+  rating: { count: number; easy: number | null; real: number | null; ready: number | null };
+};
+
+/** Pilot measures for this class: what we check before producing content for the other programmes. */
+function Pilot({ id }: { id: string }) {
+  const { t } = useI18n();
+  const q = useQuery({ queryKey: ['pilot', id], queryFn: () => api<{ data: PilotData }>(`/cohorts/${id}/pilot`) });
+  const p = q.data?.data;
+  if (!p) return null;
+  const f = p.first_simulator;
+  const tile = (label: string, value: string, sub?: string) => (
+    <Card key={label} className="p-4"><p className="text-[12px] font-semibold text-muted">{label}</p><p className="mt-1 text-[22px] font-bold tabular-nums text-ink">{value}</p>{sub && <p className="text-[12px] text-muted">{sub}</p>}</Card>
+  );
+  return (
+    <section className="mt-8">
+      <h2 className="text-[18px] font-bold text-ink">{t('pg.pilot')}</h2>
+      <p className="mt-1 text-[13px] text-muted">{t('pg.pilotLead')}</p>
+      <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {tile(t('pg.p.completion'), f ? `${f.completion}%` : '—', f ? t('pg.p.completionSub', { done: f.completed, n: f.learners, code: f.code }) : undefined)}
+        {tile(t('pg.p.time'), f?.median_minutes != null ? t('pg.p.minutes', { n: f.median_minutes }) : '—', f?.median_tries != null ? t('pg.p.tries', { n: f.median_tries }) : undefined)}
+        {tile(t('pg.p.help'), String(p.help.per_run), t('pg.p.helpSub', { n: p.help.runs }))}
+        {tile(t('pg.p.data'), p.data.learners_offline ? `${p.data.avg_mb} MB` : '—', t('pg.p.dataSub', { n: p.data.learners_offline }))}
+      </div>
+      <div className="mt-3 grid gap-3 lg:grid-cols-2">
+        <Card className="p-4">
+          <p className="text-[13px] font-bold text-ink">{t('pg.p.rating', { n: p.rating.count })}</p>
+          {(['easy', 'real', 'ready'] as const).map((k) => <p key={k} className="mt-1.5 flex justify-between text-[13px]"><span className="text-muted">{t(`sim.rate.${k}`)}</span><span className="font-semibold tabular-nums text-ink">{p.rating[k] ?? '—'} / 5</span></p>)}
+        </Card>
+        <Card className="p-4">
+          <p className="text-[13px] font-bold text-ink">{t('pg.p.topSteps')}</p>
+          {p.help.top_steps.length === 0 ? <p className="mt-1.5 text-[13px] text-muted">{t('pg.p.noAsks')}</p> : p.help.top_steps.map((s) => <p key={`${s.activity}${s.step}`} className="mt-1.5 flex justify-between gap-3 text-[13px]"><span className="text-ink">{`${s.activity} · ${s.prompt}`}</span><span className="shrink-0 font-semibold tabular-nums text-muted">{s.asks}×</span></p>)}
+        </Card>
+      </div>
+    </section>
+  );
 }
