@@ -1373,6 +1373,22 @@ const zu: Messages = {
   'as.notYetLong': "Awukabi nekhono. Funda futhi uzame futhi.",
   'as.revise': "Funda lokhu ngaphambi komzamo olandelayo:",
   'as.lateNote': "Ezinye izimpendulo zifike ngemuva kokuphela kwesikhathi, ngoba ifoni ibingaxhunyiwe. Umhloli wakho uyakubona lokhu.",
+  // Sprint 5.1c: optional camera check
+  'acad.cam.title': "Ukuhlola ngekhamera ekuhlolweni",
+  'acad.cam.lead': "Ivumela ukuhlolwa okumakwe \"ukuhlola ngekhamera\" ukuthi kuthathe izithombe ezincane ezine zomfundi ngesikhathi ebhala. Kuvaliwe ngokwemvelo.",
+  'acad.cam.onBy': "Kuvulwe ngu-{name} ngo-{date}.",
+  'acad.cam.saved': "Kugciniwe",
+  'acad.cam.p1': "Abafundi kufanele bavume ngaphambi kokuhlolwa ngakunye. Noma ubani othi cha unikezwa ukuhlolwa okuqashwe ngumuntu.",
+  'acad.cam.p2': "Izithombe ezincane ezine ekuhlolweni ngakunye (cishe ama-60 KB sezizonke), akukho vidiyo futhi akukho msindo.",
+  'acad.cam.p3': "Abahloli nabamodereyitha bakho kuphela abangazibona.",
+  'acad.cam.p4': "Izithombe zisuswa ngokuzenzakalelayo ezinsukwini ezingu-90 ngemuva kokuba umphumela usuwugcine.",
+  'acad.cam.accept': "Ngifundile futhi ngiyamukela ithempulethi yokuhlola umthelela we-POPIA (DPIA) yokuhlola ngekhamera egameni lenhlangano yethu.",
+  'acad.cam.switchOn': "Vula",
+  'as.cam.title': "Lokhu kuhlolwa kusebenzisa ikhamera",
+  'as.cam.body': "Ikhamera yakho ithatha izithombe ezincane ezine ngesikhathi ubhala, ukukhombisa ukuthi nguwe. Umhloli nomodereyitha wakho kuphela abazibonayo, futhi zisuswa ezinsukwini ezingu-90 ngemuva komphumela wakho.",
+  'as.cam.agree': "Ngiyavuma ukuhlolwa ngekhamera kulokhu kuhlolwa.",
+  'as.cam.decline': "Awufuni ikhamera? Cela umhlinzeki wakho ukuhlolwa okuqashwe ngumuntu esikhundleni salokho. Kubalwa ngokufanayo.",
+  'as.cam.on': "Ukuhlola ngekhamera kuvuliwe",
 };
 
 export default zu;

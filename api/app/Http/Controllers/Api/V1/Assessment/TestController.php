@@ -4,21 +4,31 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1\Assessment;
 
+use App\Assessment\CameraChecks;
 use App\Assessment\TestSittings;
 use App\Http\Controllers\Controller;
 use App\Models\AssessmentTask;
 use App\Models\Enrolment;
 use App\Models\Learner;
+use App\Models\SittingPhoto;
+use App\Models\Tenant;
 use App\Models\TestSitting;
 use App\Models\User;
+use App\Tenancy\TenantContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /** Learners take knowledge tests; assessors mark short answers (Sprint 5.1b). */
 final class TestController extends Controller
 {
-    public function __construct(private readonly TestSittings $sittings) {}
+    public function __construct(
+        private readonly TestSittings $sittings,
+        private readonly CameraChecks $camera,
+        private readonly TenantContext $context,
+    ) {}
 
     /** My summative tasks for a programme, with where I stand on each. */
     public function index(Request $request, Enrolment $enrolment): JsonResponse
@@ -34,6 +44,7 @@ final class TestController extends Controller
             return [
                 'id' => $t->id, 'code' => $t->code, 'title' => $t->title, 'component' => $t->component, 'kind' => $t->kind, 'outcomes' => $t->outcomeCodes(),
                 'minutes' => $t->settings['minutes'] ?? null, 'questions' => $t->settings['pick'] ?? null, 'pass_mark' => $t->settings['pass_mark'] ?? null,
+                'camera' => CameraChecks::required($this->tenant(), $t),
                 'attempts_allowed' => $t->settings['attempts'] ?? null, 'attempts_used' => $mine->count(), 'open_sitting' => $open?->id,
                 'waiting_for_marking' => $mine->contains('status', 'submitted'),
                 'result' => $mine->contains('result', 'competent') ? 'competent' : ($mine->contains('result', 'not_yet') ? 'not_yet' : null),
@@ -45,8 +56,8 @@ final class TestController extends Controller
     public function start(Request $request, Enrolment $enrolment, AssessmentTask $task): JsonResponse
     {
         $this->mine($request, $enrolment);
-        $data = $request->validate(['locale' => ['sometimes', 'string', 'max:5'], 'device' => ['sometimes', 'nullable', 'string', 'max:40']]);
-        $sitting = $this->sittings->start($enrolment, $task, (string) ($data['locale'] ?? 'en'), $data['device'] ?? null, $this->user($request));
+        $data = $request->validate(['locale' => ['sometimes', 'string', 'max:5'], 'device' => ['sometimes', 'nullable', 'string', 'max:40'], 'camera_consent' => ['sometimes', 'boolean']]);
+        $sitting = $this->sittings->start($this->tenant(), $enrolment, $task, (string) ($data['locale'] ?? 'en'), $data['device'] ?? null, (bool) ($data['camera_consent'] ?? false), $this->user($request));
 
         return response()->json(['data' => TestSittings::paperFor($sitting)], 201)->header('Cache-Control', 'no-store');
     }
@@ -69,6 +80,26 @@ final class TestController extends Controller
         return response()->json(['data' => $sitting->status === 'open' ? TestSittings::paperFor($sitting) : TestSittings::resultFor($sitting)])->header('Cache-Control', 'no-store');
     }
 
+    /** A small photo from a camera-checked sitting. */
+    public function photo(Request $request, TestSitting $sitting): JsonResponse
+    {
+        $this->mine($request, $sitting->enrolment);
+        $file = $request->validate(['photo' => ['required', 'file', 'max:60']])['photo'];
+        $photo = $this->camera->photo($sitting, $file, $this->user($request));
+
+        return response()->json(['data' => ['id' => $photo->id]], 201);
+    }
+
+    /** Assessors and moderators only: one photo of a camera-checked sitting. */
+    public function showPhoto(TestSitting $sitting, SittingPhoto $photo): StreamedResponse
+    {
+        if ($photo->test_sitting_id !== $sitting->id) {
+            throw new NotFoundHttpException;
+        }
+
+        return Storage::disk('local')->response($photo->path, null, ['Cache-Control' => 'private, no-store']);
+    }
+
     /** Assessor view: the paper with the learner's answers, the answer key and model answers. */
     public function review(TestSitting $sitting): JsonResponse
     {
@@ -76,6 +107,7 @@ final class TestController extends Controller
 
         return response()->json(['data' => TestSittings::resultFor($sitting) + [
             'learner' => $sitting->enrolment->learner->fullName(), 'task' => ['code' => $sitting->task->code, 'title' => $sitting->task->title],
+            'camera' => $sitting->camera, 'photos' => SittingPhoto::query()->where('test_sitting_id', $sitting->id)->orderBy('taken_at')->get()->map(fn (SittingPhoto $p) => ['id' => $p->id, 'taken_at' => $p->taken_at->toIso8601String()])->all(),
             'questions' => array_map(function (array $p) use ($bank, $sitting): array {
                 $q = (array) $bank->get($p['id']);
                 $a = $sitting->answers[$p['id']] ?? null;
@@ -103,6 +135,11 @@ final class TestController extends Controller
         if ($learner === null || $e->learner_id !== $learner->id) {
             throw new NotFoundHttpException;
         }
+    }
+
+    private function tenant(): Tenant
+    {
+        return $this->context->tenant() ?? throw new NotFoundHttpException;
     }
 
     private function user(Request $request): User

@@ -1373,6 +1373,22 @@ const xh: Messages = {
   'as.notYetLong': "Akukabi nabuchule. Phinda ufunde uzame kwakhona.",
   'as.revise': "Phinda ufunde oku phambi kwenzame elandelayo:",
   'as.lateNote': "Ezinye iimpendulo zifike emva kokuphela kwexesha, kuba ifowuni ibingaqhagamshelwanga. Umvavanyi wakho uyakubona oku.",
+  // Sprint 5.1c: optional camera check
+  'acad.cam.title': "Ukujonga ngekhamera kwiimvavanyo",
+  'acad.cam.lead': "Ivumela iimvavanyo eziphawulwe \"ukujonga ngekhamera\" ukuba zithathe iifoto ezincinci ezine zomfundi ngelixa ebhala. Icinyiwe ngokwesiqhelo.",
+  'acad.cam.onBy': "Ivulwe ngu-{name} ngo-{date}.",
+  'acad.cam.saved': "Igciniwe",
+  'acad.cam.p1': "Abafundi kufuneka bavume phambi kovavanyo ngalunye. Nabani na othi hayi unikwa uvavanyo olubekwe esweni.",
+  'acad.cam.p2': "Iifoto ezincinci ezine kuvavanyo ngalunye (malunga nee-60 KB zizonke), akukho vidiyo kwaye akukho sandi.",
+  'acad.cam.p3': "Ngabavavanyi nabamodareyitha bakho kuphela abanokuzibona.",
+  'acad.cam.p4': "Iifoto zicinywa ngokuzenzekelayo kwiintsuku ezingama-90 emva kokuba isiphumo sigqityiwe.",
+  'acad.cam.accept': "Ndiyifundile kwaye ndiyamkela itemplate yovavanyo lwefuthe le-POPIA (DPIA) yokujonga ngekhamera egameni lombutho wethu.",
+  'acad.cam.switchOn': "Vula",
+  'as.cam.title': "Olu vavanyo lusebenzisa ikhamera",
+  'as.cam.body': "Ikhamera yakho ithatha iifoto ezincinci ezine ngelixa ubhala, ukubonisa ukuba nguwe. Ngumvavanyi nomodareyitha wakho kuphela abazibonayo, kwaye zicinywa kwiintsuku ezingama-90 emva kwesiphumo sakho.",
+  'as.cam.agree': "Ndiyavuma ukujongwa ngekhamera kolu vavanyo.",
+  'as.cam.decline': "Awuyifuni ikhamera? Cela umboneleli wakho uvavanyo olubekwe esweni endaweni yoko. Lubalwa ngokufanayo.",
+  'as.cam.on': "Ukujonga ngekhamera kuvuliwe",
 };
 
 export default xh;

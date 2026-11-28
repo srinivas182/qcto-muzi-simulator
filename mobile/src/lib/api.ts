@@ -48,7 +48,8 @@ export async function api<T>(path: string, options: { method?: string; body?: un
   const headers: Record<string, string> = { Accept: 'application/json', 'X-Client': 'mobile' };
   if (tenant) headers['X-Tenant'] = tenant;
   if (context.token) headers.Authorization = `Bearer ${context.token}`;
-  if (options.body !== undefined) headers['Content-Type'] = 'application/json';
+  const form = typeof FormData !== 'undefined' && options.body instanceof FormData; // uploads: fetch sets the boundary
+  if (options.body !== undefined && !form) headers['Content-Type'] = 'application/json';
   Object.assign(headers, options.headers);
 
   let res: Response;
@@ -56,7 +57,7 @@ export async function api<T>(path: string, options: { method?: string; body?: un
     res = await fetch(API_URL + path, {
       method: options.method ?? 'GET',
       headers,
-      body: options.body === undefined ? undefined : JSON.stringify(options.body),
+      body: options.body === undefined ? undefined : form ? (options.body as FormData) : JSON.stringify(options.body),
       signal: options.signal,
     });
   } catch {
