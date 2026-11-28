@@ -185,4 +185,31 @@ final class AttemptSyncTest extends AccessTestCase
         [$otherToken] = $this->enrolled($this->ubuntu, Package::query()->firstOrFail());
         $this->fresh()->getJson($this->url("/learn/enrolments/{$this->enrolment->id}/activities"), $this->bearer($otherToken))->assertNotFound();
     }
+
+    public function test_the_lesson_comes_in_the_learners_language_only_when_reviewed(): void
+    {
+        $blocks = [['id' => 'b1abcdef', 'type' => 'narration', 'script' => 'Hello', 'audio_asset_id' => null]];
+        $this->a['L1']->update(['content' => ['blocks' => $blocks, 'i18n' => ['zu' => ['b1abcdef' => ['script' => 'Sawubona']], 'xh' => ['b1abcdef' => ['script' => 'Molo']]],
+            'review' => ['en' => ['by' => 'HQ'], 'zu' => ['by' => 'HQ'], 'xh' => ['ai' => true]]]]);
+        $url = fn (string $loc) => $this->url("/learn/enrolments/{$this->enrolment->id}/lessons/{$this->a['L1']->id}?locale={$loc}");
+        $this->fresh()->getJson($url('zu'), $this->bearer($this->token))->assertOk()->assertJsonPath('data.blocks.0.script', 'Sawubona')->assertJsonPath('data.locale', 'zu');
+        $this->fresh()->getJson($url('xh'), $this->bearer($this->token))->assertOk()->assertJsonPath('data.blocks.0.script', 'Hello')->assertJsonPath('data.locale', 'en');
+
+        $this->fresh()->getJson($this->url("/learn/enrolments/{$this->enrolment->id}/lessons/{$this->a['D1']->id}"), $this->bearer($this->token))->assertNotFound(); // draft
+        $this->fresh()->getJson($this->url("/learn/enrolments/{$this->enrolment->id}/lessons/{$this->a['S1']->id}"), $this->bearer($this->token))->assertNotFound(); // a scenario
+        [$otherToken] = $this->enrolled($this->ubuntu, Package::query()->firstOrFail());
+        $this->fresh()->getJson($url('en'), $this->bearer($otherToken))->assertNotFound();
+    }
+
+    public function test_the_continue_card_points_to_the_first_required_activity_not_done(): void
+    {
+        $home = fn () => $this->fresh()->getJson($this->url('/learn/home'), $this->bearer($this->token))->assertOk();
+        $home()->assertJsonPath('data.enrolments.0.next.title', 'Activity L1')->assertJsonPath('data.enrolments.0.next.started', false);
+        $this->sync([$this->item('L1'), $this->item('L2', ['completed' => false, 'finished_at' => null])]);
+        $home()->assertJsonPath('data.enrolments.0.next.title', 'Activity L2')->assertJsonPath('data.enrolments.0.next.started', true);
+        $this->sync([$this->item('L2'), $this->item('S1')]);
+        $home()->assertJsonPath('data.enrolments.0.next.title', 'Activity X1'); // then optional ones
+        $this->sync([$this->item('X1')]);
+        $home()->assertJsonPath('data.enrolments.0.next', null);
+    }
 }

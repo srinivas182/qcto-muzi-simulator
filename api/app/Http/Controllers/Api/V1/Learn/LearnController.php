@@ -8,7 +8,10 @@ use App\Cohorts\Enrolments;
 use App\Http\Controllers\Api\V1\Qcto\QctoController;
 use App\Http\Controllers\Controller;
 use App\Learning\AttemptSync;
+use App\Learning\LessonContent;
 use App\Learning\Progress;
+use App\Models\Activity;
+use App\Models\ContentAsset;
 use App\Models\Enrolment;
 use App\Models\Learner;
 use App\Models\User;
@@ -47,6 +50,7 @@ final class LearnController extends Controller
                     'ends_on' => $end?->toDateString(),
                     'days_left' => $end === null ? null : max(0, (int) today()->diffInDays($end, false)),
                     'seat_returns_on' => $e->started_at === null && $e->status === Enrolment::ENROLLED ? $e->noShowDate($c)->toDateString() : null,
+                    'next' => Progress::next($e), // the "Continue" card: the first required activity not done yet
                 ];
             })->all(),
         ]]);
@@ -72,6 +76,29 @@ final class LearnController extends Controller
         }
 
         return response()->json(['data' => ['progress' => $enrolment->progress, 'activities' => Progress::board($enrolment)]]);
+    }
+
+    /**
+     * A published lesson for the learner, in their language (reviewed translations only; otherwise English),
+     * with the pictures, audio and simulator titles it uses.
+     */
+    public function lesson(Request $request, Enrolment $enrolment, Activity $activity): JsonResponse
+    {
+        if ($enrolment->learner_id !== $this->learner($request)->id || $activity->programme_version_id !== $enrolment->programme_version_id
+            || $activity->status !== Activity::PUBLISHED || $activity->kind !== Activity::LESSON) {
+            throw new NotFoundHttpException;
+        }
+        $locale = in_array($request->query('locale'), LessonContent::LOCALES, true) ? (string) $request->query('locale') : 'en';
+        $blocks = LessonContent::localise($activity->content, $locale);
+        $assetIds = collect($blocks)->flatMap(fn ($b) => [$b['asset_id'] ?? null, $b['low_asset_id'] ?? null, $b['audio_asset_id'] ?? null])->filter()->unique();
+        $reviewed = $locale === 'en' || isset($activity->content['review'][$locale]['by']);
+
+        return response()->json(['data' => [
+            'id' => $activity->id, 'code' => $activity->code, 'title' => $activity->title, 'minutes' => $activity->minutes,
+            'content_version' => $activity->content_version, 'locale' => $reviewed ? $locale : 'en', 'blocks' => $blocks,
+            'assets' => ContentAsset::query()->whereIn('id', $assetIds->filter(fn ($id) => preg_match('/^[0-9a-f-]{36}$/', (string) $id) === 1))->get()->mapWithKeys(fn (ContentAsset $a) => [$a->id => $a->present()]),
+            'scenarios' => Activity::query()->where('programme_version_id', $activity->programme_version_id)->where('kind', Activity::SCENARIO)->where('status', Activity::PUBLISHED)->get(['id', 'code', 'title'])->keyBy('code'),
+        ]])->header('Cache-Control', 'private, max-age=300');
     }
 
     /** Attempts from the device, online or queued offline. Safe to send again; see AttemptSync. */

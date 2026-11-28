@@ -71,7 +71,18 @@ function ProgrammeCard({ e }: { e: LearnEnrolment }) {
           <div className="flex justify-between text-[13px]"><span className="font-semibold text-ink">{t('lh.progress')}</span><span className="text-muted">{e.progress}%</span></div>
           <div className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-surface-2"><div className="h-full rounded-full bg-brand transition-all" style={{ width: `${e.progress}%` }} /></div>
         </div>
-        {e.started ? (
+        {e.next ? (
+          <Link to={`/learn/enrolments/${e.id}/${e.next.kind === 'lesson' ? 'lessons' : 'simulators'}/${e.next.id}`}
+            className="mt-5 flex items-center gap-4 rounded-2xl bg-brand px-5 py-4 text-white shadow-md transition hover:brightness-110">
+            <PlayCircle className="size-7 shrink-0" />
+            <span className="min-w-0 flex-1">
+              <span className="block text-[12px] font-semibold uppercase tracking-wide text-white/80">{t(e.next.started || e.progress > 0 ? 'lh.continue' : 'lh.startHere')}</span>
+              <span className="block truncate text-[17px] font-bold">{e.next.title}</span>
+              <span className="block text-[13px] text-white/80">{t(e.next.kind === 'lesson' ? 'lp.lesson' : 'lp.simulator')} · {t('lp.minutes', { n: e.next.minutes })}</span>
+            </span>
+            <ArrowRight className="size-5 shrink-0" />
+          </Link>
+        ) : e.started ? (
           <p className="mt-5 flex items-center gap-2 rounded-xl bg-surface-2 px-4 py-3 text-[14px] text-muted"><Sparkles className="size-4 shrink-0 text-brand" />{t('lh.comingSoon')}</p>
         ) : (
           <>
@@ -79,6 +90,7 @@ function ProgrammeCard({ e }: { e: LearnEnrolment }) {
             {e.seat_returns_on && <p className="mt-2 text-[13px] text-muted">{t('lh.startBy', { date: date(e.seat_returns_on) })}</p>}
           </>
         )}
+        <Link to={`/learn/enrolments/${e.id}`} className="mt-4 inline-block text-[14px] font-semibold text-brand hover:underline">{t('lh.seeAll')}</Link>
       </div>
     </Card>
   );

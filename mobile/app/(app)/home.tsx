@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Constants from 'expo-constants';
+import { router } from 'expo-router';
 import { Box, CalendarClock, ClipboardList, Download, MapPin, Monitor, PlayCircle, QrCode, Sparkles, Users, Wifi } from '../../src/ui/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { LearnEnrolment, LearnHomeData } from '@simuwork/core';
@@ -88,7 +89,16 @@ function ProgrammeCard({ e }: { e: LearnEnrolment }) {
             <View style={{ width: `${e.progress}%`, height: '100%', backgroundColor: c.brand, borderRadius: 4 }} />
           </View>
         </View>
-        {e.started ? (
+        {e.next ? (
+          <Pressable accessibilityRole="button" onPress={() => router.push(`/learn/${e.id}/${e.next!.kind === 'lesson' ? 'lesson' : 'simulator'}/${e.next!.id}`)} style={[styles.continue, { backgroundColor: c.brand }]}>
+            <PlayCircle size={26} color="#FFFFFF" />
+            <View style={{ flex: 1 }}>
+              <T variant="caption" tone="inverse" style={{ opacity: 0.8 }}>{t(e.next.started || e.progress > 0 ? 'lh.continue' : 'lh.startHere')}</T>
+              <T tone="inverse" style={{ fontWeight: '700', fontSize: 17 }} numberOfLines={1}>{e.next.title}</T>
+              <T variant="caption" tone="inverse" style={{ opacity: 0.8 }}>{`${t(e.next.kind === 'lesson' ? 'lp.lesson' : 'lp.simulator')} · ${t('lp.minutes', { n: e.next.minutes })}`}</T>
+            </View>
+          </Pressable>
+        ) : e.started ? (
           <View style={[styles.soon, { backgroundColor: c.brandSoft }]}><Sparkles size={16} color={c.brand} /><T variant="caption" style={{ flex: 1 }}>{t('lh.comingSoon')}</T></View>
         ) : (
           <View style={{ marginTop: space.sm }}>
@@ -96,6 +106,7 @@ function ProgrammeCard({ e }: { e: LearnEnrolment }) {
             {e.seat_returns_on && <T variant="caption" tone="muted" style={{ marginTop: 6 }}>{t('lh.startBy', { date: date(e.seat_returns_on) })}</T>}
           </View>
         )}
+        <Pressable accessibilityRole="link" onPress={() => router.push(`/learn/${e.id}`)} style={{ minHeight: 44, justifyContent: 'center' }}><T tone="brand" style={{ fontWeight: '700' }}>{t('lh.seeAll')}</T></Pressable>
       </View>
     </Card>
   );
@@ -194,6 +205,7 @@ const styles = StyleSheet.create({
   art: { height: 140, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16 },
   tile: { width: 60, height: 60, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   tip: { flexDirection: 'row', alignItems: 'center', gap: space.sm, marginTop: space.lg, padding: space.md, borderRadius: radius.md, borderWidth: 1, borderStyle: 'dashed' },
+  continue: { flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.lg, borderRadius: radius.lg, marginTop: space.sm, minHeight: 72 },
   bar: { height: 8, borderRadius: 4, overflow: 'hidden', marginTop: 6 },
   soon: { flexDirection: 'row', alignItems: 'center', gap: space.sm, marginTop: space.sm, padding: space.md, borderRadius: radius.md },
   banner: { flexDirection: 'row', alignItems: 'center', gap: space.sm, padding: space.md, borderRadius: radius.md, borderWidth: 1, marginBottom: space.lg },
