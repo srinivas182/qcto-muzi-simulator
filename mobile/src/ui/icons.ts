@@ -23,3 +23,8 @@ export { default as Sparkles } from 'lucide-react-native/icons/sparkles';
 export { default as Wifi } from 'lucide-react-native/icons/wifi';
 export { default as WifiOff } from 'lucide-react-native/icons/wifi-off';
 export { default as X } from 'lucide-react-native/icons/x';
+export { default as CalendarClock } from 'lucide-react-native/icons/calendar-clock';
+export { default as ClipboardList } from 'lucide-react-native/icons/clipboard-list';
+export { default as MapPin } from 'lucide-react-native/icons/map-pin';
+export { default as QrCode } from 'lucide-react-native/icons/qr-code';
+export { default as Users } from 'lucide-react-native/icons/users';

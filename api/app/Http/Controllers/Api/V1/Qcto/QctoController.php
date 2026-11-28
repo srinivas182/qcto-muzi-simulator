@@ -38,7 +38,17 @@ final class QctoController extends Controller
 
     public function update(Request $request, Learner $learner): JsonResponse
     {
-        $input = $request->validate([
+        $input = $request->validate(self::rules());
+        /** @var User $user */
+        $user = $request->user();
+
+        return response()->json(['data' => QctoDetails::present($this->details->update($learner, $input, $user), true)])->header('Cache-Control', 'no-store');
+    }
+
+    /** @return array<string, list<string>> */
+    public static function rules(): array
+    {
+        return [
             'title' => ['sometimes', 'nullable', 'string'], 'middle_name' => ['sometimes', 'nullable', 'string', 'max:120'],
             'alt_id_type' => ['sometimes', 'nullable', 'string'], 'equity' => ['sometimes', 'nullable', 'string'],
             'nationality_code' => ['sometimes', 'nullable', 'string'], 'citizen_status' => ['sometimes', 'nullable', 'string'],
@@ -47,11 +57,7 @@ final class QctoController extends Controller
             'home_address' => ['sometimes', 'nullable', 'array'], 'postal_address' => ['sometimes', 'nullable', 'array'],
             'province_code' => ['sometimes', 'nullable', 'string'], 'stats_area_code' => ['sometimes', 'nullable', 'string', 'max:20'],
             'flc_code' => ['sometimes', 'nullable', 'string'], 'flc_sor_number' => ['sometimes', 'nullable', 'string', 'max:40'],
-        ]);
-        /** @var User $user */
-        $user = $request->user();
-
-        return response()->json(['data' => QctoDetails::present($this->details->update($learner, $input, $user), true)])->header('Cache-Control', 'no-store');
+        ];
     }
 
     public function check(Cohort $cohort): JsonResponse
