@@ -20,12 +20,13 @@ use Illuminate\Support\Carbon;
  * @property Carbon $expires_at
  * @property Carbon|null $accepted_at
  * @property Carbon|null $revoked_at
+ * @property string|null $learner_id
  */
 class Invitation extends Model
 {
     use BelongsToTenant, HasUuids;
 
-    protected $fillable = ['name', 'email', 'phone', 'role', 'token_hash', 'invited_by', 'expires_at'];
+    protected $fillable = ['name', 'email', 'phone', 'role', 'token_hash', 'invited_by', 'expires_at', 'learner_id'];
 
     protected function casts(): array
     {

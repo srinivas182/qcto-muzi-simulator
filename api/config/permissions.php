@@ -49,6 +49,7 @@ return [
         'People' => [
             'learners.view' => ['scope' => 'tenant', 'label' => 'See learners'],
             'learners.manage' => ['scope' => 'tenant', 'label' => 'Add, invite and change learners'],
+            'learners.reveal_id' => ['scope' => 'tenant', 'label' => "See learners' full ID numbers (each look is recorded)"],
             'staff.manage' => ['scope' => 'tenant', 'label' => 'Invite and manage staff'],
             'roles.manage_tenant' => ['scope' => 'tenant', 'label' => 'Create roles and assign them to people'],
             'centres.manage' => ['scope' => 'tenant', 'label' => 'Manage centres and campuses'],

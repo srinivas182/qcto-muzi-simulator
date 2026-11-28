@@ -7,7 +7,9 @@ namespace Database\Seeders;
 use App\Billing\LicenceOrders;
 use App\Billing\Payments;
 use App\Identity\ConsentService;
+use App\Learners\LearnerDirectory;
 use App\Models\BillingSetting;
+use App\Models\Learner;
 use App\Models\LicencePool;
 use App\Models\OutcomeCoverage;
 use App\Models\Package;
@@ -86,6 +88,7 @@ final class DemoSeeder extends Seeder
         $this->demoCoverage();
         $this->demoPackages();
         $this->demoBilling($context);
+        $this->demoLearners($context);
 
         $this->command?->info('Demo ready. Password for every account: '.self::PASSWORD);
     }
@@ -110,6 +113,42 @@ final class DemoSeeder extends Seeder
             app(Payments::class)->recordEft($paid['invoice'], $paid['invoice']->total_cents, 'DEMO EFT 0001', today(), $hq);
             $orders->buy($tenant, Package::query()->where('code', 'data-analytics-courses-monthly')->firstOrFail(), 10, $admin);
         });
+    }
+
+    /** A small class at Ubuntu: some invited, one joined, one passport holder. Test ID numbers only. */
+    private function demoLearners(TenantContext $context): void
+    {
+        $tenant = Tenant::query()->where('slug', 'ubuntu')->firstOrFail();
+        $context->runAs($tenant, function () use ($tenant): void {
+            if (Learner::query()->exists()) {
+                return;
+            }
+            $admin = User::query()->where('email', 'admin@ubuntu.demo')->firstOrFail();
+            $rows = [
+                ['Sipho', 'Ndlovu', '0003075001081', '082 555 0101', 'zu'], ['Thandi', 'Mokoena', '0105120123087', '082 555 0102', 'st'],
+                ['Lerato', 'Dlamini', '9911250456088', '082 555 0103', 'zu'], ['Ayanda', 'Khumalo', '0207155789080', '082 555 0104', 'xh'],
+                ['Pieter', 'van Wyk', '9808085123083', '082 555 0105', 'af'], ['Naledi', 'Mahlangu', '0112290034089', '082 555 0106', 'nr'],
+                ['Kagiso', 'Molefe', '0009015432084', '082 555 0107', 'tn'], ['Zanele', 'Sithole', '0204040876086', '082 555 0108', 'zu'],
+            ];
+            $import = array_map(fn (array $r) => ['first_names' => $r[0], 'surname' => $r[1], 'id_number' => self::luhn($r[2]), 'phone' => $r[3], 'home_language' => $r[4]], $rows);
+            $import[] = ['first_names' => 'Grace', 'surname' => 'Banda', 'id_type' => 'passport', 'id_number' => 'MW1234567', 'phone' => '082 555 0109', 'home_language' => 'en', 'date_of_birth' => '2001-06-14'];
+            $directory = app(LearnerDirectory::class);
+            $directory->import($tenant, $import, false, false, $admin);
+            Learner::query()->where('surname', 'Ndlovu')->update(['status' => Learner::ACTIVE, 'joined_at' => now()->subDays(3)]);
+        });
+    }
+
+    /** Replace the last digit of a 13-digit test ID with its correct Luhn check digit. */
+    private static function luhn(string $id): string
+    {
+        $base = substr($id, 0, 12);
+        $sum = 0;
+        foreach (str_split(strrev($base)) as $i => $c) {
+            $d = (int) $c * ($i % 2 === 0 ? 2 : 1);
+            $sum += $d > 9 ? $d - 9 : $d;
+        }
+
+        return $base.((10 - $sum % 10) % 10);
     }
 
     /** Three packages on sale: a fixed-term bundle, a monthly courses-only plan, and a simulator pack. */

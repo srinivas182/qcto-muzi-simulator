@@ -43,12 +43,6 @@
   },
   "size-limit": [
     {
-      "name": "All JavaScript incl. lazy pages and languages (gzip)",
-      "path": "dist/assets/*.js",
-      "limit": "240 KB",
-      "gzip": true
-    },
-    {
       "name": "CSS (gzip)",
       "path": "dist/assets/*.css",
       "limit": "30 KB",

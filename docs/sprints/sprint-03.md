@@ -323,3 +323,30 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
 - **Before going live:** each gateway's signature and status checks are covered by tests built from the
   gateways' published formats; each must still be run once end to end in the gateway's own sandbox with
   Muzi's test keys (test mode) before switching to live.
+
+## Sub-sprint 3.5 notes (learners)
+
+- **Learner register** per provider (tenant table with RLS). The same person can learn at two providers;
+  each provider sees only its own record.
+- **ID numbers (POPIA):** SA ID or passport. SA IDs are checked as they are typed (13 digits, valid date,
+  Luhn check digit). The date of birth, gender and citizenship are read from the ID, using the same rules
+  in the API and the web app. The number is stored **encrypted**, plus a keyed hash so duplicates are found
+  without decrypting, plus the last 4 digits for display. It never appears in lists, logs or the audit
+  trail. Seeing the full number needs its own permission (`learners.reveal_id`, tp_admin by default), and
+  every look is recorded (`learners.id_revealed`).
+- **Add one:** a drawer with a live ID check; a mobile number or an email is required so the learner can be
+  invited. Duplicate ID or mobile numbers are refused with the name of the existing learner.
+- **Import many:** CSV or Excel (.xlsx), up to 1000 rows. Headers are matched loosely ("Cell", "Mobile",
+  "Last name", …), and leading zeros that Excel drops are put back. Step 1 checks every row (including
+  repeats within the file) and saves nothing. Step 2 adds only the good rows, so fixing a file and
+  importing it again does not add anyone twice. 500 rows are previewed and imported in under 10 seconds
+  (tested).
+- **Invitations:** sent by SMS when an SMS provider is set up, otherwise by email, otherwise as a link to
+  share. Staff can copy the link or send it by WhatsApp. Accepting it creates the learner's account and
+  marks them active. Deactivating a learner signs them out and cancels open invitations.
+- Excel files are read by a 2 KB built-in reader (the browser's own unzip and XML parser) that loads only
+  when someone imports a spreadsheet, instead of an 18 KB library.
+- **Speed budgets changed (Srini, 28 Nov 2026):** the check that added up *all* JavaScript files (every page
+  and every language, 240 KB) was replaced with checks that match what a user actually downloads: first load
+  ≤ 170 KB (unchanged, non-negotiable; now 138.7 KB), each language file ≤ 15 KB (now ≤ 11.7 KB), and each
+  page or on-demand helper ≤ 25 KB (largest now 7.0 KB). CSS stays ≤ 30 KB. See `web/scripts/shell-size.mjs`.

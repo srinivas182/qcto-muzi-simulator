@@ -6,6 +6,7 @@ namespace App\Identity;
 
 use App\Audit\AuditLogger;
 use App\Authorization\RoleService;
+use App\Learners\LearnerDirectory;
 use App\Models\Invitation;
 use App\Models\Role;
 use App\Models\Tenant;
@@ -115,6 +116,7 @@ final class InvitationService
 
             $invitation->forceFill(['accepted_at' => now(), 'accepted_user_id' => $user->id])->save();
             $this->roles->assignKey($user, $invitation->role);
+            LearnerDirectory::linkAccount($invitation, $user);
             $this->audit->record('invitations.accepted', $user, null, ['role' => $invitation->role], $user);
 
             return $user;
