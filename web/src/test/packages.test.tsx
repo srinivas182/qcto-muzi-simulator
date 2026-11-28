@@ -22,9 +22,13 @@ describe('pricing (same rules as the API)', () => {
 
 describe('Packages', () => {
   it('lets a provider price seats and shows how to reach the next band', async () => {
-    mockApi({ '/shop': { data: [pkg], vat_rate: 15 } }, session({ permissions: ['licences.manage'], navigation: nav('admin', 'admin.licences') }));
+    mockApi({
+      '/shop': { data: [pkg], vat_rate: 15 },
+      '/licences': { data: [], past: [], account: { blocked: false, open_invoices: 0, owed_cents: 0, overdue_cents: 0, payment_terms: { mode: 'pay_first', days: 0 } } },
+    }, session({ permissions: ['licences.manage'], navigation: nav('admin', 'admin.licences') }));
     renderAt('/admin/licences');
 
+    fireEvent.click(await screen.findByRole('tab', { name: 'Shop' }));
     fireEvent.click(await screen.findByRole('button', { name: 'Get a price' }));
     fireEvent.change(screen.getByLabelText('How many learners?'), { target: { value: '45' } });
     expect(screen.getByText('Add 5 more to reach the 50-seat price.')).toBeInTheDocument();

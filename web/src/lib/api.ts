@@ -63,3 +63,18 @@ export async function api<T>(path: string, { method = 'GET', body, signal }: Opt
 
   return data as T;
 }
+
+/** Download a file (e.g. an invoice PDF) from the API with the signed-in cookie, and save it in the browser. */
+export async function downloadFile(path: string, filename: string): Promise<void> {
+  const headers: Record<string, string> = { 'X-Requested-With': 'XMLHttpRequest', 'X-Client': 'web' };
+  const devTenant = import.meta.env.VITE_DEV_TENANT as string | undefined;
+  if (devTenant) headers['X-Tenant'] = devTenant;
+  const res = await fetch(API_BASE + path, { headers, credentials: 'same-origin' });
+  if (!res.ok) throw new ApiError(res.status, `Download failed (${res.status})`);
+  const url = URL.createObjectURL(await res.blob());
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}

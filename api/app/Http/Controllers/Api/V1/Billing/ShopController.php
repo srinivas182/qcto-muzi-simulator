@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1\Billing;
 use App\Billing\PackageCatalogue;
 use App\Billing\PriceCalculator;
 use App\Http\Controllers\Controller;
+use App\Models\BillingSetting;
 use App\Models\Package;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ final class ShopController extends Controller
     {
         return response()->json([
             'data' => $this->catalogue->onSale()->map(fn (Package $p) => $this->catalogue->present($p))->values()->all(),
-            'vat_rate' => (float) config('billing.vat_rate'),
+            'vat_rate' => BillingSetting::current()->vatRate(),
         ]);
     }
 

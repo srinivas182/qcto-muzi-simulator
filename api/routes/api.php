@@ -13,7 +13,11 @@ use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\SessionController;
 use App\Http\Controllers\Api\V1\Auth\TwoFactorController;
+use App\Http\Controllers\Api\V1\Billing\BillingSettingsController;
+use App\Http\Controllers\Api\V1\Billing\InvoiceController;
+use App\Http\Controllers\Api\V1\Billing\LicenceController;
 use App\Http\Controllers\Api\V1\Billing\PackageController;
+use App\Http\Controllers\Api\V1\Billing\PlatformBillingController;
 use App\Http\Controllers\Api\V1\Billing\ShopController;
 use App\Http\Controllers\Api\V1\CurrentTenantController;
 use App\Http\Controllers\Api\V1\DomainAllowedController;
@@ -103,6 +107,16 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
             Route::middleware('permission:licences.manage')->group(function (): void {
                 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
                 Route::get('/shop/{package}/quote', [ShopController::class, 'quote'])->name('shop.quote');
+                Route::get('/licences', [LicenceController::class, 'index'])->name('licences.index');
+                Route::post('/orders', [LicenceController::class, 'order'])->name('orders.store');
+                Route::patch('/licences/{pool}', [LicenceController::class, 'update'])->whereUuid('pool')->name('licences.update');
+                Route::post('/licences/{pool}/cancel', [LicenceController::class, 'cancel'])->whereUuid('pool')->name('licences.cancel');
+            });
+            Route::middleware('permission:billing.tenant|licences.manage')->group(function (): void {
+                Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+                Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->whereUuid('invoice')->name('invoices.show');
+                Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->whereUuid('invoice')->name('invoices.pdf');
+                Route::get('/invoices/{invoice}/credit-note.pdf', [InvoiceController::class, 'creditNotePdf'])->whereUuid('invoice')->name('invoices.credit-note');
             });
             Route::get('/academy', [AcademyController::class, 'show'])->middleware('permission:academy.manage')->name('academy.show');
             Route::patch('/academy', [AcademyController::class, 'update'])->middleware('permission:academy.manage')->name('academy.update');
@@ -148,6 +162,22 @@ Route::prefix('v1')->name('api.v1.')->group(function () use ($authRoutes, $acces
             });
             Route::put('/programmes/{programme}/coverage/{code}', [CoverageController::class, 'update'])
                 ->middleware('permission:programmes.manage|content.author')->name('programmes.coverage.update');
+
+            Route::middleware('permission:billing.view')->prefix('/billing')->name('billing.')->group(function (): void {
+                Route::get('/summary', [PlatformBillingController::class, 'summary'])->name('summary');
+                Route::get('/invoices', [PlatformBillingController::class, 'invoices'])->name('invoices.index');
+                Route::get('/invoices/{invoice}', [PlatformBillingController::class, 'show'])->whereUuid('invoice')->name('invoices.show');
+                Route::get('/invoices/{invoice}/pdf', [PlatformBillingController::class, 'pdf'])->whereUuid('invoice')->name('invoices.pdf');
+                Route::get('/invoices/{invoice}/credit-note.pdf', [PlatformBillingController::class, 'creditNotePdf'])->whereUuid('invoice')->name('invoices.credit-note');
+            });
+            Route::middleware('permission:billing.manage')->prefix('/billing')->name('billing.')->group(function (): void {
+                Route::post('/invoices/{invoice}/payments', [PlatformBillingController::class, 'recordPayment'])->whereUuid('invoice')->name('invoices.payments');
+                Route::post('/invoices/{invoice}/credit', [PlatformBillingController::class, 'credit'])->whereUuid('invoice')->name('invoices.credit');
+            });
+            Route::middleware('permission:billing.settings')->group(function (): void {
+                Route::get('/billing/settings', [BillingSettingsController::class, 'show'])->name('billing.settings');
+                Route::patch('/billing/settings', [BillingSettingsController::class, 'update'])->name('billing.settings.update');
+            });
 
             Route::middleware('permission:packages.manage|billing.view')->group(function (): void {
                 Route::get('/packages', [PackageController::class, 'index'])->name('packages.index');

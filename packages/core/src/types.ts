@@ -277,3 +277,86 @@ export interface ReferencePageContent {
   markdown: string;
   source: { document?: string; page?: number } | null;
 }
+
+export type InvoiceStatus = 'issued' | 'paid' | 'credited';
+
+export interface InvoiceRow {
+  id: string;
+  number: string;
+  kind: 'order' | 'monthly';
+  issue_date: string;
+  due_date: string;
+  period_start: string | null;
+  period_end: string | null;
+  subtotal_cents: number;
+  vat_rate: number;
+  vat_cents: number;
+  total_cents: number;
+  paid_cents: number;
+  balance_cents: number;
+  status: InvoiceStatus;
+  overdue_days: number;
+  buyer_name: string | null;
+  tenant_id: string;
+  description: string;
+}
+
+export interface InvoiceDetail extends InvoiceRow {
+  lines: { description: string; quantity: number; unit_cents: number; amount_cents: number }[];
+  seller: { name: string; vat_number: string | null; registration_number: string | null; email: string | null; phone: string | null; bank: { bank?: string; account_name?: string; account_number?: string; branch_code?: string; account_type?: string } };
+  buyer: { name: string; trading_name?: string; vat_number: string | null; email: string | null };
+  payments: { id: string; method: 'eft' | 'gateway'; gateway: string | null; amount_cents: number; reference: string | null; paid_on: string }[];
+  credit_note: { number: string; reason: string; issue_date: string } | null;
+}
+
+export interface LicencePoolItem {
+  id: string;
+  package: { code: string; name: string; min_seats: number; includes_simulators: boolean; includes_courses: boolean };
+  programme: { code: string; title: string; prefix: string };
+  billing: 'term' | 'monthly';
+  term_months: number | null;
+  unit_price_cents: number;
+  seats: number;
+  seats_used: number;
+  seats_free: number;
+  seats_next_month: number | null;
+  starts_on: string | null;
+  ends_on: string | null;
+  days_left: number | null;
+  cancel_at_period_end: boolean;
+  status: 'pending' | 'active' | 'expired' | 'cancelled';
+}
+
+export interface LicenceAccount {
+  blocked: boolean;
+  open_invoices: number;
+  owed_cents: number;
+  overdue_cents: number;
+  payment_terms: { mode: 'pay_first' | 'on_account'; days: number };
+}
+
+export interface BillingSettingsData {
+  seller_name: string | null;
+  registration_number: string | null;
+  vat_number: string | null;
+  address: ProviderAddress;
+  email: string | null;
+  phone: string | null;
+  bank: { bank?: string | null; account_name?: string | null; account_number?: string | null; branch_code?: string | null; account_type?: string | null };
+  vat_rate: number;
+  invoice_prefix: string;
+  credit_note_prefix: string;
+  due_days: number;
+  complete: boolean;
+}
+
+export interface BillingSummary {
+  paid_this_month_cents: number;
+  invoiced_this_month_cents: number;
+  outstanding_cents: number;
+  overdue_cents: number;
+  monthly_recurring_cents: number;
+  active_seats: number;
+  seats_by_programme: { title: string; prefix: string; seats: number }[];
+  blocked_providers: { id: string; name: string }[];
+}

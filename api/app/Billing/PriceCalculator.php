@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Billing;
 
+use App\Models\BillingSetting;
 use App\Models\Package;
 use App\Models\PackagePrice;
 use Illuminate\Validation\ValidationException;
@@ -33,7 +34,7 @@ final class PriceCalculator
             throw ValidationException::withMessages(['seats' => 'There is no price for this number of seats.']);
         }
 
-        $vatRate ??= (float) config('billing.vat_rate');
+        $vatRate ??= BillingSetting::current()->vatRate();
         $subtotal = $band->unit_price_cents * $seats;
         $vat = self::vat($subtotal, $vatRate);
 

@@ -25,8 +25,8 @@ describe('app shell', () => {
   });
 
   it('shows menu items that are not built yet as "on the way"', async () => {
-    mockApi({}, session());
-    renderAt('/admin/billing');
+    mockApi({}, session({ navigation: nav('admin', 'admin.reports') }));
+    renderAt('/admin/reports');
     expect(await screen.findByText('On the way')).toBeInTheDocument();
   });
 

@@ -265,3 +265,35 @@ Each sub-sprint is its own PR, merged only when CI is fully green.
   with a live calculator and a hint for the next price band. Ordering arrives in 3.3 (`licences.manage`).
 - Demo: three packages on sale (Technical Support 12-month bundle, Data Analytics monthly courses,
   Cybersecurity Defender 6-month simulators).
+
+## Sub-sprint 3.3 notes (billing)
+- **HQ → Billing settings** (Super Admin only, new permission `billing.settings`): seller company, registration
+  and VAT numbers, address, contact, EFT bank account, VAT rate, days to pay, and invoice / credit note
+  prefixes. Nothing is hard-coded; changes apply to new documents only, because every invoice keeps a copy of
+  the seller and buyer as they were on the day.
+- **Buying seats** (provider, `licences.manage`): from the shop (new licence) or a licence card (top-up).
+  - Each purchase creates an order and a tax invoice at once.
+  - **Pay first:** seats go live when the invoice is paid. **On account:** seats go live at once and the
+    invoice is due in the provider's agreed number of days.
+  - The price per seat is locked in the licence when first bought; top-ups use it.
+  - Fixed-term top-ups are charged for the days left in the term. Monthly licences charge the rest of the
+    current month, then one invoice on the 1st for "seats next month" (which the provider can lower, never
+    below the package minimum or the seats in use). Monthly licences can be cancelled at month end (and
+    resumed before then).
+- **Invoices:** gap-free numbers from a locked counter (a rolled-back order gives its number back); VAT per
+  line, rounded once; PDF (dompdf) emailed to the billing email and downloadable by both sides. Invoices and
+  credit notes cannot be edited or deleted (database trigger). Mistakes are fixed with a **credit note**,
+  which cancels an unpaid invoice in full and takes back any seats it gave.
+- **Payments:** HQ records EFT payments (part payments allowed) against an invoice; when it is paid in full,
+  its seats go live. Online gateways follow in 3.4.
+- **Daily run** (`billing:daily`, 02:15, safe to repeat): expires finished licences, issues monthly invoices
+  (one per licence per month, enforced by a unique index), sends payment reminders on the due date and after
+  7, 14 and 30 days, and renewal reminders 30 and 7 days before a fixed term ends.
+- **Decision 4 in practice:** an invoice more than 30 days overdue blocks buying (API 423) and, from 3.6,
+  enrolling new learners. Learners already enrolled are never affected.
+- **Screens:** provider *Licences & packages* (my licences with seat use, dates, top-up, monthly seats, cancel;
+  shop with Buy) and *Billing* (invoices, EFT details, PDFs); HQ *Billing* (month overview, outstanding and
+  overdue, monthly recurring, seats by programme, blocked providers; all invoices with record-payment and
+  credit; settings).
+- Demo: placeholder seller details, a paid 60-seat Technical Support licence and an unpaid Data Analytics
+  monthly order for Ubuntu.
